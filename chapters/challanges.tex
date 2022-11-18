@@ -1,0 +1,34 @@
+\chapter{Implementation Challanges}
+There are several challenges for implementing this protocol.
+As we are going to use UDP as a transport wrapper, it
+is hard to maintain a steady connection. A major problem
+arises when a client stays behind the NAT. In the case of
+TCP connection, NAT keeps port binding until connection
+terminates. However UDP provides a connectionless wrapper,
+and there is no concept of connection termination. So, there is
+no defined rule about how long the NAT will keep UDP port
+binding. In general, they hold binding at least for 5 seconds.
+So server needs to send data within 5 seconds. We can resolve
+this issue by sending polling packet to the server in regular
+interval.
+
+\paragraph{} The next challenge is the network stack related issues. By default, existing implementation doesn’t provide any method
+to directly send a packet to a network interface (We have
+observed this in Linux kernel). We can solve this issue by
+change kernel a bit or change the routing table a bit (like
+what is done in MPTCP). Presently, the protocol is under
+development and we are testing several systems related issues
+for running it over low-cost IoT devices.
+%In our proposed scheme, we have devised mechanism to improve the good-put of E-TCP. In our effort to achieve this goal we have to lose out on the bandwidth utilization of the E-TCP. Based on our experiments we observe that, TCP-Vegas gives better good put than TCP-Reno. From this observation, we decide to add RTT based congestion control algorithm to E-TCP. We have two options to carry out this job, 1) Use an existing RTT based congestion control algorithm like TCP-Vegas, 2) Devise our own congestion detection algorithm. We propose two different schemes namely \textit{EV-TCP} and \textit{EV2-TCP}. We combine E-TCP and TCP Vegas to devise EV-TCP. EV2-TCP is based on queuing delay detection scheme. We will discuss EV-TCP and EV2-TCP in this chapter.
+
+%\section{EV-TCP}
+%We combine TCP Vegas and E-TCP for better good put. There are number of approaches for RTT based congestion control like Wang and Crowcroft's DUAL algorithm , Jain's CARD (Congestion Avoidance using Round-trip Delay)  or Wang and Crowcroft's Tri-S scheme . But among them, we choose TCP Vegas because it has been implemented successfully in several network stacks. TCP Vegas is a modification of TCP Reno, to detect congestion before any packet loss occurs.
+
+% \paragraph{} We didn't change the actual E-TCP's congestion control algorithm. We just patched a modified RTT based congestion control mechanism from TCP Vegas.% This mechanism has been modified to implement in E-TCP. 
+
+%\paragraph{} We do not change the actual E-TCP's congestion control algorithm. We have modified the congestion signalling mechanism by adding RTT based congestion detection technique. 
+
+
+
+%\paragraph{Congestion Signalling: } Like E-TCP, basic congestion control mechanism of EV-TCP is based on selective acknowledgement. EV-TCP includes three extra parameters namely \textit{cc\_seq}, \textit{h\_seq}, \textit{bitmap}. The functionality of these parameters are similar to E-TCP, so we are not elaborating them here. In next part we will discuss signalling procedure at each end.
+

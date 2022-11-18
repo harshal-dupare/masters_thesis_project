@@ -1,0 +1,9 @@
+% \vspace{2in}
+
+\begin{abstract}
+
+\paragraph{} In computer network. TCP is the mostly used transport layer protocol, which carries data. TCP have congestion control algorithm which make it reliable. In inter-network, router is required to routes packets from one network to another. Router have buffer for each outgoing links to keep outgoing packets. Whenever buffers overflows, it drops packets which caused congestion. Size of the buffer is very important. It is thumb rule to set it to BDP. How, when BDP goes very high, buffer can not be stored to on-chip SRAM. Off-chip storage required greater accessing time. So, buffer needs to be small enough so that it can be stored to on-chip SRAM. This small buffer may lead to performance degradation of TCP. There is research going on to devise new TCP congestion control algorithm for better performance.
+
+\paragraph{} There is new new TCP congestion control algorithm E-TCP proposed for this type of network. E-TCP can achieve more than 90\% link of link utilization. But, due to high packet-loss rate in E-TCP, good-put became remarkable low. We have proposed two different improvement namely EV-TCP and EV2-TCP to decrease loss-rate and increase good-put. In this report we have describe this new algorithms.
+
+\end{abstract}

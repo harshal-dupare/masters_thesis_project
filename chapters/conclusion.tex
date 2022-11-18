@@ -1,0 +1,39 @@
+\chapter{Conclusion and Future Work}
+Write about the conclusion of your work and what you plan for the next semester.
+% \section{Conclusions and Key Observations}
+% So far, we have evaluated different techniques of natural language generation for counterspeech generation and did a coherent comparisons smong all. We have concluded the following points from the same:
+% \begin{enumerate}
+%     \item In our research, we demonstrate the efficiency of our approach on Controllable counter speech generation through CounterGEDI attribute control. 
+%     \item Our Counter\textsc{GeDi} models for six different attribute shows significant improvement in the attribute scores over the baselines. 
+%     \item Further, our ablation study on Multi-attribute model suggests that the attribute scores can improve further if suitable attributes are combined together and reduce in the otherwise scenario.
+% \end{enumerate}
+
+% \section{Future Work}
+% As the next step, we plan to do the following steps:
+% \begin{enumerate}
+% \item We plan to perform more extensive experiments on weightage of different attributes in Multi-Attribute Control Models.
+% \item Sometimes the length of the responses are quite large. We intend to restrict the generation length of sentences in future so as to make generated sentences more coherent for human assessment.
+
+% \item In the future, we also plan to add other attributes like `hope'~\cite{palakodety2020hope}, `humor'~\cite{fw8e-z983-21} and `empathy'~\cite{rashkin2019towards} to the controllable generation pipeline. %Further, we would also explore other methods for controlling outputs like ~\cite{liu2021dexperts,yang2021fudge} and improve the control for multi-attribute setups. 
+% \item Finally, we would aim to build a counterspeech suggestion tool around this setup and allow counter speakers (NGO operators/moderators) to control the generation output as per their query attribute(s). A further improvement in this pipeline will be to use the hate speakers' historical data, profile information, demography and social relation to select the appropriate type of attribute to maximise the effect of the counterspeech.
+
+% \item \textbf{Counter-Argument Generation Model}: We plan to work on a dataset to finetune language model for Counter-Argument Generation. This will allow Language Model to have more robust grounding in generation of Counter-arguments against Hatespeech. We intend to assess the model in both Zero Shot and Few Shot Settings.
+
+% \begin{figure}
+%     \centering
+%     \includegraphics[scale=0.7,width=0.8\linewidth]{Graphics/System(a).jpg}
+%     \caption{System-Architecture for Counter Argument Generation Model}
+%     \label{fig:sysa}
+% \end{figure}
+
+
+
+
+% \item Augmenting the dataset with different types of counter-speech is on our priority list. We have demonstrated counter-speech generation through different models but there is still room for improvement in the quality of counter-speech and that requires a diverse dataset comprising of all types of counter-speech.
+%     \item The generation capability of our proposed model incorporated with the Human-in-the-loop technique could be used for data-augmentation. Human-in-the-Loop would enable the segregation of generated-responses into different types of counter-speech.
+%     \item The length of the initiator arguments and responses were quite large in case of the Create-Debate Dataset. For now we have truncated the large sentences but in future we propose to use summarization module to effectively utilize the arguing capabilities of the dataset.
+%     \item Fine-tuned models could also be used for data augmentation. The generated responses could be filtered into categories of counter-speech. We also aim to build a model to automatically differentiate between the types of counter-speech.
+%     \item Users also use their native or regional language for targeting specific communities. We also aim to analyze the other datasets such as multi-lingual datasets or Non-English datasets for future work.
+%     \item We aim to build a one-step solution for combating online hate-speech. Therefore we aim to build an API that could detect hate-speech and could provide automated and diverse counter-narratives in response to them.
+%     \item For this one-step solution we also have been crawling data from twitter which is possibly labeled as hate/non-hate with low confidence and annotating them manually. This data annotation in the high-entropy region would help model detect hate-speech with high confidence and will improve the performance of the overall pipeline.
+\end{enumerate}

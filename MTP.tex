@@ -1,0 +1,186 @@
+%% Based on a TeXnicCenter-Template by Gyorgy SZEIDL.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------
+%
+\documentclass[12pt,a4paper,twoside]{iitgthesis}%
+%
+% \usepackage{amsmath}%
+% \usepackage{amsfonts}%
+% \usepackage{amssymb}%
+% \usepackage{graphicx}
+% \usepackage[tight,normalsize,sf,SF]{subfigure}
+\usepackage{epsfig}
+\usepackage[square,numbers]{natbib}
+\bibliographystyle{ksfh_nat}
+\bibliographystyle{abbrvnat}
+\usepackage{graphicx}
+%\usepackage{subcaption}
+\usepackage{color}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{relsize}
+\usepackage{multirow}
+\usepackage{algorithm}
+\usepackage{subfig}
+\usepackage{float}
+\usepackage{tikz-cd}
+\usepackage{gensymb}
+\usepackage{comment}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage[bottom]{footmisc}
+% \usepackage{algorithmic}
+
+\usepackage[noend]{algpseudocode}
+\captionsetup[algorithm]{labelformat=empty}
+\algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}%
+
+\usepackage{url}
+\usepackage{tabularx}
+\usepackage[citecolor = blue]{hyperref}
+% \usepackage[font=small,labelfont=bf]{caption}
+% \usepackage{fullpage}
+% \usepackage[left=1.5cm,right=2cm,top=2cm]{geometry}
+% \usepackage[T1]{fontenc}
+%\usepackage[boxruled,vlined]{algorithm2e}
+\graphicspath{{./Graphics/}}
+%----------------------------------------------------------
+\newtheorem{theorem}{Theorem}
+\newtheorem{acknowledgement}[theorem]{Acknowledgement}
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{case}[theorem]{Case}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{conclusion}[theorem]{Conclusion}
+\newtheorem{condition}[theorem]{Condition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{criterion}[theorem]{Criterion}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{exercise}[theorem]{Exercise}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{notation}[theorem]{Notation}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{solution}[theorem]{Solution}
+\newtheorem{summary}[theorem]{Summary}
+\newenvironment{proof}[1][Proof]{\textbf{#1.} }{\ \rule{0.5em}{0.5em}}
+
+\newcommand{\contsubfig}{
+% \addtocounter{figure}{-1}
+\addtocounter{subfigure}{1}
+}
+\newcommand{\norm}[1]{\| #1 \|}
+\newcommand{\bignorm}[1]{\Bigl \| #1 \Bigr \| }
+
+
+
+\captionsetup[figure]{font=small,labelfont={bf,it},textfont=it}
+\captionsetup[subfigure]{font=small,labelfont={bf,it},textfont=it}
+ 
+
+% \oddsidemargin=2cms
+%----------------------------------------------------------
+\begin{document}
+
+\title{Multi-Objective Optimization Problems with Well-Conditioned Solutions}
+\reporttype{thesis}
+\author{Harshal Bharat Dupare}
+\iitgdegree{Integrated Bachelors and Masters of Science}
+\department{Department of Mathematics}
+\rollnum{18MA20015}
+\setguide{Dr. Swanand Ravindra Khare\\and\\Dr. Geetanjali Panda}
+\date{November, 2022}
+\maketitle
+%\newpage
+%\thispagestyle{empty}
+%\mbox{}
+
+%\begin{dedication}
+%\large{\textbf{\textit{``May we be fearless... from friends and enemies... from known and unknown... from night and day... May all the directions be our allies...'' \hfill -Atharva Veda}}}
+%\vfill
+%\huge{\textbf{\textit{ Dedicated to}}}
+
+%\LARGE{\textbf{\textit{My Parents, My Sister and My Teachers}}}
+%\vfill
+
+%\end{dedication}
+
+
+\begin{romanpages}
+
+%\newpage
+%\thispagestyle{empty}
+%\mbox{}
+
+\input{chapters/certificate.tex}
+%\newpage
+%\thispagestyle{empty}
+%\mbox{}
+% \begin{acknowledgements}
+%\input{chapters/acknowledgements.tex}
+% \end{acknowledgements}
+%\newpage
+%\thispagestyle{empty}
+%\mbox{}
+\input{chapters/acknowledgements.tex}
+%\newpage
+%\thispagestyle{empty}
+%\mbox{}
+\input{chapters/abstract.tex}
+%\newpage
+%\thispagestyle{empty}
+%\mbox{}
+
+\tableofcontents
+%\newpage
+%\thispagestyle{empty}
+%\mbox{}
+%\listoffigures
+%\newpage
+%\thispagestyle{empty}
+%\mbox{}
+% \listoftables
+% \newpage
+% \thispagestyle{empty}
+% \mbox{}
+\end{romanpages}
+
+\input{chapters/introduction.tex}
+
+\input{chapters/relatedworks.tex}
+% \input{chapters/experiment_results.tex}
+% \input{chapters/background.tex}
+% \input{chapters/Approach.tex}
+% \input{chapters/final_experiments.tex}
+%\newpage
+%\thispagestyle{empty}
+%\mbox{}
+
+%\input{chapters/system.tex}
+%\newpage
+%\thispagestyle{empty}
+%\mbox{}
+
+
+%\newpage
+%\thispagestyle{empty}
+%\mbox{}
+
+\input{chapters/conclusion.tex}
+%\newpage
+%\thispagestyle{empty}
+%\mbox{}
+% \input{chapters/challanges.tex}
+%\newpage
+%\thispagestyle{empty}
+%\mbox{}
+
+
+
+
+\renewcommand{\bibname}{References}
+\bibliography{ref_new}
+\end{document}

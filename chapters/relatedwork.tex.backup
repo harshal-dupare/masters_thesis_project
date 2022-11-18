@@ -1,0 +1,99 @@
+\chapter{Related Works}
+Router is a queuing model with fixed service rate and random arrival rate. Like every queuing model, setting queue length or buffer size is a critical problem. When buffer is small, large number of packet will be dropped. Large buffer will increase queuing delay. In 1994, Curtis Villamizar \textit{et. al.} \cite{bdprule} suggested to keep router size to BDP. It is said that, this size guarantees 100\% link utilization. Even if the buffer overflows, and TCP shrinks its window-size, the buffer contains enough packets to forward to the output links. They validate their claims by testing with 8TCP flows on 40mbps core links.%This is a Experimental result tested with 8 TCP flows on 40mbps core links.
+
+\paragraph{} Now a days, typical core network links have capacity 40Gbps with delay of 250ms. So, according to thumb rule the buffer size will be 1.25GB, which requires off-chip DRAM. It is very complex to design such buffer and it will cause huge power consumption. To reduce power consumption and achieve greater speed core networks are deploying optical router. But the optical router has the problem of buffer size. Very huge buffer can not be designed for optical router. P. Bernasconi \textit{et. al.} \cite{optprob} have shown that any optical buffer can delays a packet about 100ns. Now BDP become near about 4000 bits for 40Gbps links.
+
+\paragraph{} In 2004, Appenzeller \textit{et al.} \cite{apenbuf} have shown that buffer size can be fixed to BDP/$\sqrt{N}$ without loosing bandwidth utilization, where N is the number of persistent TCP connection. They claimed that if number of flows is significantly high then small buffer does not affect the TCP throughput. They also shown from experimental results that the buffer size BDP/$\sqrt{N}$ is enough to utilized the link bandwidth. This model is named as \textit{small buffer} model.
+%Before \cite{apenbuf}, \cite{modtcp} theoretically modeled TCP throughput for TCP Reno and \cite{modtcpval} validate this result with \cite{ns} simulation.\\\paragraph{}
+
+\paragraph{} Dhamdhere and Dovorils \cite{dham} challenged that small buffer model can cause extensive packet drop. They have shown that \textit{small buffer} model can cause upto 15\% of packet loss. They performed experiment with NS2 simulator with a very complex network topology consisting of 18 nodes.
+
+\paragraph{} L.L.H. Andrew \textit{et. al.}\cite{halfbdp} have shown that smaller buffer size can not affect TCP throughput when time-outs are not there and large number of long-live TCP connections exist. Even 99\% of link utilization can be achieved with only 5 users when buffer size is slightly larger than half of the BDP.
+
+\paragraph{} In \cite{tinybuf}, Enachescu \textit{et al.} theoretically shows that if we can sacrifice some fraction of bandwidth, we can reduce buffer size up to $\log(W_{max})$ i.e. \textit{tiny buffer}. They told that buffer size can be as small as 10-12 packets. They concluded that when buffer size is 10 to 12, it may lead to degradation of link bandwidth utilization. In this paper, A new TCP algorithm called spaced TCP was introduced, which is performs better than TCP Reno.
+%  They discovered a truth that saw tooth length depends on buffer size. Spaced TCP exploited this dependency.
+
+\paragraph{} In \cite{survey}, Arun Vishwanath \textit{et. al.} discussed about the buffer size problem, and pros and cons of the solution given in few past years. They pointed out the requirement of the small buffer. They also pointed out that all solutions given for small buffer are assumed that all packets are TCP packet. It can be a further research topic to solve the buffering problem with TCP and UDP flows.
+
+\paragraph{} There are several algorithms to solve different issues of small buffered high speed network. Yu Gu \textit{et. al.} designed a TCP congestion control algorithm called E-TCP to achieve 90\% utilization of the high speed link with very small buffer (20 units of packets)\cite{Gu06congestioncontrol}. Next, we discuss the algorithm described by Yu Gu.
+
+\section{E-TCP}
+E-TCP is designed to achieve high utilization of high-speed link. TCP's basic congestion control algorithm increases the congestion window by one segment in each RTT period upon receiving successful acknowledgement, and decreases by half of current window size on packet loss. This is called Additive Increment and Multiplicative Decrement (AIMD). Unlike other existing TCP variants for high-speed network, E-TCP not only modifies the AIMD formula, but also changes the congestion signalling mechanism by adding several extra parameters in TCP header. It separates the congestion control and reliability from TCP in two different parts and solves them separately. The reliability issue can be easily solved by detection and re-transmission of lost segment. Congestion control is the big issue. E-TCP first solves this problem, and then attaches a reliability module to this. Congestion controller in E-TCP has two parts, i) Congestion control algorithm i.e. modified AIMD, and ii) Congestion signalling mechanism. Next, we describe these two parts separately.
+
+\paragraph{Congestion Control:} 
+E-TCP's target is to maintain 90\% utilization of high-speed link and packet loss rate 0.01, when queue length is 20 units of packets. To achieve this target, E-TCP modifies TCP's original window adjustment formula (i.e. AIMD) as following.
+\begin{enumerate}
+  \item For every successfully received ACK packet, window will be adjusted as 
+\begin{center}
+ $ W \leftarrow W+{\frac{1}{25}}$
+\end{center}
+  \item And for each packet loss, window size will be 
+\begin{center}
+ $ W \leftarrow W-\frac{W}{25 \times (2 + 0.01W)}$
+\end{center}
+\end{enumerate}
+
+\paragraph{}This algorithm converges to equilibrium with steady-state congestion window
+\begin{center}
+ $W^* = \frac{2}{p-0.01}$
+\end{center}
+
+\paragraph{Congestion Signaling:} \label{para:etcpalgo}
+
+Congestion signalling mechanism of E-TCP is based on selective acknowledgement technique. It involves both sender and receiver for this signalling purpose. E-TCP includes three extra parameters \textit{$cc\_seq$, $h\_seq$ and $bitmap$}.
+\begin{itemize}
+  \item \textbf{$cc\_seq$:} This is congestion controller sequence number. E-TCP sender sets this parameter to keep track of out going segments. E-TCP receiver reads this parameter to keep track of received packets and signal the sender about its status. $cc\_seq$ in header does not repeat ever i.e. no matter of sending time, two packets cannot have same $cc\_seq$. 
+  \item \textbf{$h\_seq$:} Highest sequence number (i.e. $cc\_seq$) receiver ever received. Receiver sets this parameter.
+  \item \textbf{$bitmap$:} This is a 32bit $bitmap$ field. Receiver sets this parameter to tell sender about the receiving status of last 32 packets ($h\_seq - 1$ to $h\_seq - 32$). If a bit in bitmap is 1 that means the corresponding packet has been received successfully, other wise it is not received till now.
+\end{itemize}
+
+\begin{algorithm}[ht]
+\caption{E-TCP Congestion signalling}
+\label{algo:etcpcong}
+\begin{algorithmic}
+\If { $cc\_ack > h\_seq$} 
+  \State $mask = 0$x$01 //$ bitmap mask
+  \While{$cc\_ack + 1 < h\_seq - 32$}
+    \State // seq. in the gap are treated as lost
+    \State $slowdown()$
+    \State $cc\_ack ++$
+  \EndWhile
+  \If{$h\_seq - cc\_ack > 2$}
+    \State $mask = mask << (h\_seq - cc\_ack-2)$
+  \EndIf
+  \While{$cc\_ack < h\_seq$}
+    \If{$mask \& bitmap || cc\_ack == h\_seq - 1$}
+      \State $opencwnd()$
+    \Else
+      \If{$h\_seq > cc\_ack + 3$}
+	\State $slowdown()$
+      \Else
+	\State $break$
+      \EndIf
+    \EndIf
+    \State $mask = mask >> 1$
+    \State $cc\_ack++$
+  \EndWhile
+\EndIf
+\end{algorithmic}
+\end{algorithm}
+
+
+Now we will look at the signalling procedure at each ends.
+
+\textbullet \textbf{E-TCP Receiver:} Receiver maintains two parameters namely $h\_seq$ and 32 $bitmap$. As we know as sender sends the current congestion sequence number, receiver reads it and compares with its current $h\_seq$. If $cc\_seq$ is greater than current $h\_seq$, it updates $h\_seq$ with current $cc\_seq$ and shifts $bitmap$ accordingly. Otherwise receiver just sets the particular bit in $bitmap$. Then it sends an acknowledgement to sender which contains current $h\_seq$ and $bitmap$.
+
+
+\textbullet \textbf{E-TCP Sender:} Senders keep two parameters: $cc\_seq$ (congestion controller sequence number) and $cc\_ack$ (congestion controller acknowledgement number). $cc\_seq$ stores the sequence number of latest sent packet. $cc\_ack$ contains the highest sequence number that is successfully acknowledged. Whenever sender sends a packet, it does the following
+  \begin{enumerate}
+   \item Increases the current $cc\_seq$
+   \item Adds the field $cc\_seq$, which contains the current $cc\_seq$.
+  \end{enumerate}
+
+
+\paragraph{} When an ACK packet arrives at sender side, sender first extracts the $h\_seq$ and $bitmap$ from its header. Then it checks whether $cc\_ack$ is greater than $h\_seq$ or not. If $cc\_ack$ is greater than or equal to $h\_seq$, sender discards the packet. Other wise, it checks $bitmap$ for status of packets with $cc\_seq$, $cc\_ack+1$ to $h\_seq - 1$. For each successful acknowledgement, it calls window increasing function and set $cc\_ack$ to that packet sequence number and for each unacknowledged packet sender calls window decreasing function. For an unacknowledged packet with $c\_seq$ $s$, E-TCP set $cc\_ack$ to $s-1$ and does not take any action until it receives a packet with $h\_seq > s$. When receiver receives a packet with $h\_seq > s$, it sets $cc\_ack$ to $h\_seq$.
+
+
+\paragraph{} Although E-TCP achieves very high utilization, it gives very poor good-put. Reason behind this behaviour is that it has same congestion detection mechanism like other TCP variants (TCP Tahoe, TCP Reno, TCP NewReno) i.e. congestion is detected by packet loss. But time required to detect a packet loss can be up to 1 RTT. As, E-TCP increases window-size very aggressively, in this duration (i.e. 1 RTT), window size can grow very high and sender injects packets into the network in higher rate than when first loss occurs, which results more packet loss. So, a huge number of packets received at receiver side are out-of-order. %This procedure runs until first packet loss get detected. %We tried to change this detection system by adding RTT based congestion detection system.
+
+% \paragraph{} Instead of deriving new RTT based congestion control algorithm, we try use existing RTT based congestion control algorithm. There are number of approach for RTT based congestion control like Wang and Crowcroft's DUAL algorithm \cite{Wang92eliminatingperiodic}, Jain's CARD (Congestion Avoidance using Round-trip Delay) \cite{Jain89adelay-based} or Wang and Crowcroft's Tri-S scheme \cite{Jon91anew}. But among them, TCP Vegas has been implemented successfully in several network stacks. TCP Vegas is a modification to TCP Reno to detect congestion before any packets loss occurs. In next subsection we will discuss the algorithm used by TCP Vegas.

@@ -1,0 +1,81 @@
+\chapter{System Architecture}
+\section{Controlled Text Generation}
+\noindent\textbf{\textsc{GeDi}}: For controlling generated counterspeech,  we use a recent method Generative Discriminators (\textsc{GeDi})~\cite{krause2020gedi}, where the authors present a decoding time algorithm to control the output from the generation model. \textsc{GeDi} assumes we have class conditioned language model (CC-LM) with a desired control code $c$ and an undesired control code $\bar{c}$. For our case, we fix the control code $c$ as `true' and $\bar{c}$ as `false'. The authors use the contrast between $P_{\theta}(x_{1:t}|c)$ and $P_{\theta}(x_{1:t}|\bar{c})$ to guide sampling from an LM that gives $P_{LM}(x_{1:T})$. The probability that the next token $x_t$ belongs to desired class is calculated using this contrast. This is calculated using equation~\ref{eq:1} where $\alpha$ is a learnable scale parameter.
+% \newpage
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1.0\textwidth]{Graphics/gedi_paper.png}
+    \caption{\scriptsize{A toy example of how GeDi-guided generation uses Bayes rule to efficiently compute classification
+probabilities for possible next tokens at each generation timestep using only element-wise operations. These
+classification probabilities can then be used to guide generation from a language model (e.g., GPT-2) to achieve
+attribute control across domains. If the GeDi was trained on movie reviews for sentiment control, its direct
+class-conditional predictions will be biased towards predicting movie review words (illustrated by next word
+prediction of “cinematic”). However, by contrasting the predictions of opposing control codes via Bayes rule,
+the bias towards movie reviews can be canceled out.}}
+    \label{fig:gedi-figure}
+\end{figure}
+
+\begin{equation}
+\scriptsize
+    \label{eq:1}
+    P_{\theta}\left(c \mid x_{1: t}\right)=\frac{P(c) P_{\theta}\left(x_{1: t} \mid c\right)^{\alpha / t}}{\sum_{c^{\prime} \in\{c, \bar{c}\}} P\left(c^{\prime}\right) P_{\theta}\left(x_{1: t} \mid c^{\prime}\right)^{\alpha / t}}
+\end{equation}
+
+
+In order to train the \textsc{GeDi} model, the authors combine the generative language modeling loss $\mathcal{L}_g$(ref equation \ref{eq:lg}) as shown in equation~\ref{eq:2} with a discriminative loss $\mathcal{L}_d$. The equations \ref{eq:3}  shows the final loss $\mathcal{L}_{gd}$ where $\lambda$ is a learnable parameter.
+
+\begin{equation}
+\scriptsize
+    \label{eq:lg}
+    \mathcal{L}_{g}=-\frac{1}{N} \sum_{i=1}^{N} \frac{1}{T_{i}} \sum_{t=1}^{T_{i}} \log P_{\theta}\left(x_{t}^{(i)} \mid x_{<t}^{(i)}, c^{(i)}\right)
+\end{equation}
+
+\begin{equation}
+\scriptsize
+    \label{eq:2}
+    \mathcal{L}_{d}=-\frac{1}{N} \sum_{i=1}^{N} \log P_{\theta}\left(c^{(i)} \mid x_{1: T_{i}}^{(i)}\right)
+\end{equation}
+
+\begin{equation}
+\scriptsize
+    \label{eq:3}
+    \mathcal{L}_{g d}=\lambda \mathcal{L}_{g}+(1-\lambda) \mathcal{L}_{d}
+\end{equation}
+
+While generation, the authors propose a simple method to guide the model toward the target class which is represented using the heuristic equation \ref{eq:4} where $\omega$ is controllable parameter. In order to control multiple attributes, we extend the heuristic as represented in equation \ref{eq:5} where $\omega_{i}$ is a controllable parameter to bias the generation toward class $c_{i}$ for \textsc{GeDi} trained on the $i^\textrm{th}$ attribute. 
+
+\begin{equation}
+    \scriptsize
+    \label{eq:4}
+    P_{w}\left(x_{t} \mid x_{<t}, c\right) \propto P_{L M}\left(x_{t} \mid x_{<t}\right) P_{\theta}\left(c \mid x_{t}, x_{<t}\right)^{\omega}
+\end{equation}
+
+\begin{equation}
+    \label{eq:5}
+    \scriptsize
+    P_{w}\left(x_{t} \mid x_{<t}, c_{1}, .. c_{n}\right) \propto P_{L M}\left(x_{t} \mid x_{<t}\right)\prod_{i=1,..,n} P_{\theta}\left(c_{i} \mid x_{t}, x_{<t}\right)^{\omega_{i}}
+\end{equation}
+
+\section{Experimental setup}
+\noindent\textbf{Counterspeech generation models}: The DialoGPTm model for each counterspeech model has six initial layers fixed due to resource constraints. The model were trained till 10 epochs with batch size as 8. We saved the final model at the epoch having the best language modelling loss for the validation dataset. We used a maximum length of 256 tokens for the DialoGPTm model\footnote{1\% datapoints have more than 256 tokens.}. The learning rate is fixed at $5e^{-6}$ for training the model.
+
+\noindent\textbf{\textsc{GeDi} models}: We train the GPT-2 model as the \textsc{GeDi} models based on the training setting specified in the original paper~\cite{krause2020gedi}. For each model we fix the batch size at 8  and train the models for 5 epochs. The $\lambda$ weight in equation \ref{eq:3} is fixed at 0.8 to maximise generation quality for the \textsc{GeDi} model. We used a maximum length of 128 tokens for the GPT-2 model.  The learning rate is fixed at $2e^{-5}$ for training the model following the recommendations by \citet{krause2020gedi}. 
+
+\section{Final pipeline}
+Our final pipeline comprises three parts as shown in Figure \ref{fig:pipeline}. The \textbf{part A} represents the vanilla counterspeech generation model trained on one of the three counterspeech datasets. Similar to an auto-regressive setup, it takes in the hate speech with the currently generated counterspeech (empty at the initial step) and produces next token probablities for the production of the next token. The \textbf{part B} consists of the single or multiple \textsc{GeDi} models. Each \textsc{GeDi} model controls an attribute out of the total six. It takes as input the currently generated counterspeech and produces token probabilities based on the desired attribute. We initially allow the counterspeech generation models to generate 10 tokens without any control to provide the initial prompt to the \textsc{GeDi} model. Finally, \textbf{part C} selects the next token based on the token probabilities from different models, i.e., the counterspeech generation model and the \textsc{GeDi} models following equation \ref{eq:5}. For each \textsc{GeDi} model, we primarily control the weight ($\omega$) as mentioned in equation \ref{eq:4}, while other parameters are kept same as the paper~\cite{krause2020gedi}. For single attribute, we fix the weight at 1 to give equal importance to the counterspeech generation as well as the control attributes. For two attribute control, we set weights at 0.5 for both the attributes. For three attributes control, which comprises detoxification, politeness and an emotion, we set 0.3 for politeness \& detoxification each and 0.4 for the emotion. We also use nucleus sampling as a decoding strategy~\cite{holtzman2019curious} with $k=0.92$ and $p=100$ to increase the diversity of the outputs.
+ 
+
+
+
+% The second part is the \textsc{GeDi} model where it takes as input a text prompt and tries to generate a token based on the desired class. The entire pipeline is illustrated in Figure \ref{fig:pipeline}. We initially allow the counterspeech generation model to generate 10 tokens without any control, which forms the initial prompt and context for the \textsc{GeDi} model. For all the \textsc{GeDi} models, we primarily control the weight ($\omega$) as mentioned in equation \ref{eq:4} while other parameters are kept same as the paper~\cite{krause2020gedi}.  %\am{This part is unclear. What do you mean multiple attribute and then three attribute. I see you have singe, two and three attributes? If so, then tell the values of $\omega$ for each separately. That's all.}\punyajoy{done} 
+% To increase diversity of the generated posts, we use nucleus sampling as a decoding strategy~\cite{holtzman2019curious} with $k=0.92$ and $p=100$. 
+
+% \bm{The final pipeline paragraph is a bit hard to understand. It's not exactly clear how the generation process is taking place. One suggestion would be to label different parts of the figure (A,B,C..) and then explain the pipeline. This might be a bit tedious process, so discuss before doing this. @AM sir, would this help?}\punyajoy{is this fine?}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{Graphics/Final.pdf}
+    \caption{\scriptsize{The figure shows how the overall setup of the pipeline. The counterspeech generation model is produces a probability distribution for the next possible token using hate speech+ counterspeech generated till now. The \textsc{GeDi} models individually take in the currently generated counter speech and produces a probability distribution for the next possible token based on the desired attributes. The output token selector selects the next output token. The unperturbed part in the counterspeech is created without any control, to provide the initial prompt to the \textsc{GeDi} model.}}
+    \label{fig:pipeline}
+\end{figure}
+

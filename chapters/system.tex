@@ -1,0 +1,186 @@
+\chapter{System Description}
+Streaming $360\degree$ videos involves a collection of tasks that needs to be performed in order to provide the best user experience. Our methodology involves the use of video contents in order to accurately predict the following viewport. Video contents is specified primarily by the objects present in the video and their trajectory. Thus, the task of finding the contents involve a detailed analysis of the trajectories of each objects present in the video. Current viewport of the user is detected by capturing the movement of the device playing the video. The main modules of our system has been illustrated in Figure \ref{fig:block_dia}. Now, we will discuss the implementation of each module in detail.
+% \begin{figure}[t]
+%     \centering
+%     \includegraphics[width=\linewidth]{Graphics/Block_Diagram.jpeg}
+%     \caption{Block Diagram illustrating the main modules of the system. Viewport prediction, Object detection, Object tracking and prediction model serves as the main components.}
+%     \label{fig:block_dia}
+% \end{figure}
+
+\section{Viewport Detection}
+This module is responsible for playing the video and capturing the viewport throughout the length of the video. We have built an android application in Java to play the video. The android application uses 'Google VR SDK' API through which the video can be played in VR mode. The application is built in order to detect the viewport of the users. It does so using the gyroscopic fluctuations while playing the video. The gyroscopic sensor of the phone triggers the EventListener object of the Java application, which periodically saves the gyroscopic data into a file.
+\par
+Gyroscopic data provides angular velocity in each Cartesian direction when the device is moved. Thus, from the data, we can get the orientation of the view as well as the position of the view in a spherical space. One can easily use the trapezoidal rule of integration to calculate the angular displacement when the device is moved.
+\par
+Let the initial center of the viewport be \((x_{init}, y_{init}, z_{init})\). After time \(t\), we record the gyroscopic data for three axes as \((\alpha, \beta, \gamma)\). Therefore the new center of the viewport at time \(t\) can be calculated as:
+\[(x_{new}, y_{new}, z_{new}) = (x_{init}+\alpha t, y_{init}+\beta t, z_{init}+\gamma t)\]
+
+Thus, the new viewport in the spherical space now becomes \((x_{new}, y_{new}, z_{new})\). 
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Graphics/Block_Diagram.jpeg}
+    \caption{Block Diagram illustrating the main modules of the system. Viewport prediction, Object detection, Object tracking and prediction model serves as the main components.}
+    \label{fig:block_dia}
+\end{figure}
+
+\section{Image Projection}
+From the previous section, we got the viewport as Cartesian coordinates in spherical space. However, for image processing, we need to represent the $360\degree$ video in a 2-D plane. The most popular way of representing a $360\degree$ image in a 2-D plane is by using its 'Equirectangular Projection'.  The projection maps meridians to vertical straight lines of constant spacing, and circles of latitude to horizontal straight lines of constant spacing. Cartesian coordinates in a sphere can be easily converted to equirectangular coordinates. Coordinates in equirectangular projection is simply the longitudes and latitudes of the sphere which is a trivial modification of the polar and azimuthal angles of a point in a sphere.
+\par
+The convention for the polar and the azimuthal angles that we follow throughout the report is shown in Figure \ref{fig:spherical_conv}
+\begin{figure}[h]
+  \centering
+    \includegraphics[width=.6\textwidth]{sphere.png}
+  \caption{Spherical Coordinates \((\rho, \theta, \phi)\), where $\rho$ is the radial distance, $\theta$ is the polar distance, $\phi$ is the azimuthal angle. $\theta$ and $\phi$ shown here in this figure is considered in positive direction}
+  \label{fig:spherical_conv}
+\end{figure}
+
+Let \((x,y,z)\) be the Cartesian coordinates of a point in sphere. We can get its representation in spherical coordinates system \((\rho, \theta, \phi)\) using the following transformation:
+\begin{equation*}
+\begin{split}
+\rho  &= \sqrt{x^2+y^2+z^2} \\ 
+\theta &= \arctan{\frac{y}{x}} \\
+\phi &= \arcsin{\frac{z}{\rho}}
+\end{split}
+\end{equation*}
+
+ Thus, the longitude\((L_n)\) and latitude\((L_t)\) can easily be computed as:
+\begin{equation*}
+\begin{split}
+L_n  &= \frac{180\degree \theta}{\pi} \\ 
+L_t &= \frac{180\degree \phi}{\pi}
+\end{split}
+\end{equation*}
+
+The above transformation from \((x,y,z)\) to \((L_n, L_t)\) gives us a representation of a 3-D image in 2-D plane. However, it is evident that objects in the equirectangular projection will be distorted, especially near the poles. Hence, any object detection algorithm will not be able to detect all the objects accurately. Thus, we further introduce a transformation that maps an image in 'Equirectangular Projection' to 'Cube map Projection'.
+
+\par
+In computer graphics, Cube map projection is a method of environment mapping that uses the six faces of a cube as the map shape. The environment is projected onto the sides of a cube and stored as six square textures, or unfolded into six regions of a single texture. Transformation from spherical space to cube map projection can be easily understood using the spherical coordinates \((\rho, \theta, \phi)\) instead of Cartesian coordinates \((x,y,z)\).
+\par
+We have \(\theta \in [-\pi, \pi]\) and \(\phi \in [-\pi/2, \pi/2]\). Thus the front face of the cube can only capture the pixels of the image having \(\theta \in [-\pi/4, \pi/4]\). The central projection of a point \((\rho\cos\phi\cos\theta, \rho\cos\phi\sin\theta, \rho\sin\phi)\) on the sphere will be \((t\cos\phi\cos\theta, t\cos\phi\sin\theta, t\sin\phi)\) which hits the plane \(x=\rho\) when \(t=\frac{\rho}{\cos\phi\cos\theta}\).
+\par
+Hence the projected point is \((\rho, \rho\tan\theta, \rho\tan\phi\sec\theta)\).
+\par
+If \(|\tan\phi\sec\theta| < 1\), then the point will be projected on the front face of the cube. Otherwise, it will be projected either on the top or the bottom face of the cube, which would then require further computations of a different projection which would hit the plane with \(z=\rho\) or \(z=-\rho\).
+\par
+However, it is easy to notice that whenever \(\phi>\pi/4\) or \(\phi<-\pi/4\), the point will always be projected to the top or bottom face of the cube. Similar will be the arguments for projecting a point on the other faces of the cube.
+
+\par
+Thus, for any point \((\rho\cos\phi\cos\theta, \rho\cos\phi\sin\theta, \rho\sin\phi)\), its projected point on any of the face of the cube will be:
+\begin{equation}
+\begin{split}
+Front &:  (\rho, \rho\tan\theta, \rho\tan\phi\sec\theta) \hspace{5mm} \forall \theta \in [-\pi/4, \pi/4], \phi \in [-\pi/4, \pi/4]\\ 
+Right &: (\rho\cot\theta, \rho, \rho\tan\phi\cosec\theta) \hspace{5mm} \forall \theta \in [\pi/4, 3\pi/4], \phi \in [-\pi/4, \pi/4] \\
+Back &: (-\rho, -\rho\tan\theta, -\rho\tan\phi\sec\theta) \hspace{5mm} \forall \theta \in [3\pi/4, \pi] \cup [-\pi, -3\pi/4], \phi \in [-\pi/4, \pi/4] \\
+Left &: (-\rho\cot\theta, -\rho, -\rho\tan\phi\cosec\theta) \hspace{5mm} \forall \theta \in [-3\pi/4, -\pi/4], \phi \in [-\pi/4, \pi/4] \\
+Top &: (\rho\cot\phi\cos\theta, \rho\cot\phi\sin\theta, \rho) \hspace{5mm} \forall \phi>\pi/4 \\
+Bottom &: (-\rho\cot\phi\cos\theta, -\rho\cot\phi\sin\theta, -\rho) \hspace{5mm} \forall \phi<-\pi/4 
+\end{split}
+\label{eq:cubemap}
+\end{equation}
+
+\par
+Each frame of the $360\degree$ video (in equirectangular projection) was hence converted to their corresponding cube map projections, which ensures that the objects are undistorted. At the end of this section, we thus have the viewports for each of the frame of the video, and the corresponding cube map projection of each frame.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.35\linewidth]{Graphics/solid_angle.jpg}
+    \caption{Illustration of Solid Angle in a sphere}
+    \label{fig:solid_angle}
+\end{figure}
+\par
+We state a minor result in this paragraph which will be used later. In geometry, a solid angle (Figure \ref{fig:solid_angle}) is a measure of the amount of the field of view from some particular point that a given object covers. That is, it is a measure of how large the object appears to an observer looking from that point. The point from which the object is viewed is called the apex of the solid angle, and the object is said to subtend its solid angle from that point. The solid angle subtended by an object that covers a spherical area of \(A\) on a sphere of radius \(r\) is given by the following formula
+\begin{equation}
+    \Omega = \frac{A}{r^2}
+\end{equation}
+In our framework, if an object moves from point \((x_1, y_1, z_1)\) to \((x_2, y_2, z_2)\) on the surface of a sphere, then assuming that the distance between the two points \(D\) is small, we calculate the solid angle using the formula
+\begin{equation}
+    \Omega = \frac{\pi D^2}{4\rho^2}
+\label{eq: solid_angle}    
+\end{equation}
+
+
+\section{Object Detection}
+A noticeable disadvantage of object detection on each of the cube faces for a frame is evident from the definition of the projection. Since each pixel of the equirectangular image is allocated a unique face of the cube, a single object might get mapped to different faces depending on its location on the sphere. Hence, any object detection algorithm will either not be able to detect the object or will detect as two objects for the adjacent faces. Cube map projection does not handle this event of an object being mapped to two adjacent faces of the cube.
+
+\par
+Hence to overcome this issue, we stitch the different faces of the cube to form a single image. Stitching will ensure that any object mapped to adjacent faces of the cube gets treated as an entire entity.
+\begin{figure}[t]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \begin{subfigure}[b]{0.3\linewidth}
+        \centering
+            \includegraphics[width=0.9\linewidth]{327_left.png}
+            \caption{Left}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.3\linewidth}
+        \centering
+            \includegraphics[width=0.9\linewidth]{327_front.png}
+            \caption{Front}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.3\linewidth}
+        \centering
+            \includegraphics[width=0.9\linewidth]{327_right.png}
+            \caption{Right}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.3\linewidth}
+        \centering
+            \includegraphics[width=0.9\linewidth]{327_back.png}
+            \caption{Back}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.3\linewidth}
+        \centering
+            \includegraphics[width=0.9\linewidth]{327_top.png}
+            \caption{Top}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.3\linewidth}
+        \centering
+            \includegraphics[width=0.9\linewidth]{327_bottom.png}
+            \caption{Bottom}
+        \end{subfigure}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+            \includegraphics[width=0.9\linewidth]{Graphics/327.png}
+            \caption{Stitched image}
+    \end{subfigure}
+    \caption{Figure shows the different faces of a cube map projection and their stitched image. In the stitched image, each adjacent face of the cube is placed in such a way that they share a common boundary. Top and Bottom face of the cube is rotated the appropriate amount so that they form a continuous image}
+\end{figure}
+
+\par
+We have used YOLOv3 algorithm on the stitched image of each frame to detect the objects and get their bounding box coordinates. YOLOv3 is a pre-trained neural network based object detection model that predicts an objectness score for each bounding box using logistic regression. The objectness score is 1 if the bounding box prior overlaps a ground truth object by more than any other bounding box prior.
+
+\par
+After the bounding box coordinates for each object is obtained for a frame (stitched image), it is then back-translated to its equirectangular projection. Inverse mapping of Equation \ref{eq:cubemap} projects an image in cubemap to its spherical coordinates which can easily be translated to its equirectangular coordinates.
+
+\section{Object Tracking}
+Since we claim that the viewport of the user watching the video depends upon the trajectory of the prime objects in the video, it is essential as a part of the next step to track the different objects in the video. We claim the following points in regard to object tracking:
+\begin{itemize}
+    \item There exists no deterministic algorithm that exactly predicts the trajectory of an object in a video. This is because there are potentially infinite possibilities of different objects in different frames that can occur in a {360\degree} video. Hence, detecting trajectory of each object exactly is not possible.
+    \item Due to the fact that no projection in {360\degree} frames produces a completely undistorted image, object detection algorithms may not be able to exactly identify the objects. It might also happen that the objects have distorted bounding boxes.
+\end{itemize}
+
+Thus, there is a need of an approximate algorithm to predict the object trajectories that might allow some inconsistencies. Currently, we have used the following algorithm for the same (we have just provided a higher level description of the algorithm; it has been implemented taking care of corner cases as well):
+\begin{enumerate}
+    \item Get the list of objects for each frame.
+    \item For each pair of consecutive frames, compare the positions of the bounding boxes of all the pair of objects in the two frames.
+    \begin{enumerate}[label=(\alph*)]
+        \item Project each of the bounding box corners to spherical projection.
+        \item Find the solid angle between the pairs of corresponding corners of the two objects using Equation \ref{eq: solid_angle}
+        \item If the solid angle is less than \(\epsilon = 0.001\), then the two objects are candidates for being the same objects. Store the solid angle data in a separate 2-D array.
+    \end{enumerate}
+    \item For each object in the first frame, find the object in the second frame with the minimum solid angle, if any. Assign the object in the second frame the same index as the object in the first frame.
+    \item Assign all the unassigned objects in the second frame with new indices.
+\end{enumerate}
+
+
+\section{Viewport Prediction}
+\par
+Predicting the upcoming viewport from the video meta-data and the previous viewports is a challenging task, especially when we want to model a dynamic system based on the content of the videos. Next viewport not only depends on the trajectories of the prime objects, but also remains in the vicinity of the previous viewport. As a consequence, the learning task must be online and the weights must be updated in an incremental manner in order to be fast and accurate.
+\par
+Incremental learning model with the information of object trajectories and previous viewports stitches together the effect of video content as well as personalization. As it has been already mentioned, the viewport of the viewer depends on the trajectory of the prime objects. However, slight deviations of the viewport from the object trajectories must also be handled. This instils the idea of user preference in the model which is captured by the information about the previous viewport.
+\par
+Before building our model, we pre-process the object trajectories of all the objects present in the video. In our exploratory model, we have designed an incremental Linear Regressor that, at any time instant $t$, takes as input the location of all the objects and the viewport information, and predicts the next viewport. We have used various optimizers for the gradient descent task which will be explained later.
+\par
+We have also trained the data on various other online regression models, the details of which will be described in the next section. 

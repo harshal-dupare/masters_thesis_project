@@ -1,0 +1,97 @@
+
+\chapter{Detailed Design of MPIoT}
+
+\section{Segment Structure}
+According to our current implementation need we have designed the MPIoT packet accordingly. We have maintained some reserved bits as well for our future use, where we will challenges in implementation with those existing bits. It evolve as we go more into implementation. MPIoT segment structure is shown in Figure \ref{fig:packet1}.
+
+\begin{figure}[h]
+  \centering
+    \includegraphics[width=.7\textwidth]{packet1.JPG}
+  \caption{MPIoT Segment Structure}
+  \label{fig:packet1}
+\end{figure}
+
+Table \ref{table:segment} describes the funtionalities of all the important fields available in MPIoT segement.
+
+\newpage
+
+\begin{longtable}{ |p{4cm}||p{3cm}|p{8cm}|  }
+ \hline
+ \multicolumn{3}{|c|}{\textbf{Segment Format Description}} \\
+ \hline
+ \textbf{Field Name}& \textbf{Size (Bytes)}& \textbf{Description}\\
+ \hline
+ Source Port& 2 & This is the 16-bit port number of the process that originated the MPIoT segment on the source device. This will normally be an ephemeral (client) port number for a request sent by a client to a server, or a well-known/registered (server) port number for a reply from a server to a client.\\ \hline
+ Destination Port& 2 &   This is the 16-bit port number of the process that is the ultimate intended recipient of the
+message on the destination device. This will usually be a well-known/registered (server)
+port number for a client request, or an ephemeral (client) port number for a server reply.\\ \hline
+Sequence Number & 4 & For normal transmissions, this is the sequence number of the first byte of data in this
+segment. In a connection request (SYN) message, this carries the ISN of the source MPIoT.
+The first byte of data will be given the next sequence number after the contents of this
+field.\\ \hline
+Acknowledgement Number & 4 &When the ACK bit is set, this segment is serving as an acknowledgment (in addition to
+other possible duties), and this field contains the sequence number the source is next
+expecting the destination to send.\\ \hline
+Interface Sequence Number & 4 & It is per interface sequence number.\\ \hline
+Interface Acknowledgement Number & 4 &It is per interface acknowledgement number.\\ \hline
+Flow Sequence Number & 4 & It is per stream sequence number.\\ \hline
+Flow Acknowledgement Number & 4 &It is per stream aknowledgement number.\\ \hline
+Connection ID& 4 & Server provides a connection ID for each customer on request, it is used for all the available interfaces of that client to connect to the server.\\ \hline
+Window Size & 2 & This indicates the number of octets of data the sender of this segment is willing to accept from the receiver at one time.\\ \hline
+Flow ID& 2 & It is used to differentiate between different flows. \\  \hline
+Flags& 3/4 & It is same as TCP's Control Bits field.\\  \hline
+MPIoT Options& 9/4 & This field consists different option parameters for MPIoT.\\  \hline
+Reserved&2& This field is reserved for future use.\\  \hline
+\caption{MPIoT Segment Format Description }
+  \label{table:segment}
+\end{longtable}
+
+
+\section{Modules}
+In context of MPIoT implementation we divided it into some modules to make to modular. Table \ref{table:module} defines different module available in MPIoT:
+
+\begin{longtable}{ |p{5cm}||p{11cm}|  }
+ \hline
+ \multicolumn{2}{|c|}{\textbf{Module List}} \\
+ \hline
+ \textbf{Module Name}& \textbf{Module Description}\\
+ \hline
+ \verb|read_client_params|   & Read the input parameters for the client.\\ \hline
+ \verb|mpiot_cli_init|&   Initializes the MPIoT layer for the client.\\ \hline
+ \verb|get_interface_list| &This function first scans the list of all the interfaces on the client and stores it's associated IP and Mask.\\ \hline
+ \verb|check_server_status|    &This function checks if the server resides on the same network.\\
+ \verb|client_conn_init|&   Create a socket to communicate with the server.\\ \hline
+ \verb|mpiot_cli_conn_send| & This is used during the initial connection setup phase. The client calls this to send the initial connection request.\\ \hline
+ \verb|mpiot_multiplexe|r& Multiplex outward packets. \\  \hline
+ \verb|process_mpiot_thread|& Start routine for the MPIoT thread. This thread reads data and send it to the scheduler.\\  \hline
+ \verb|mpiot_scheduler|& Upon receiving the data it will send it to next module after deciding the appropriate interface.\\  \hline
+ \verb|mpiot_rcv|& Receive a message on the given socket. This is invoked by the MPIoT thread.\\  \hline
+ \verb|mpiot_send|& This functions sends a chunk of data to the remote end reliably by implementing TCP like flow-control and congestion-control techniques.\\  \hline
+ \verb|read_server_params|& Read the input parameters for the server.\\  \hline
+ \verb|mpiot_server_init|& Initializes the MPIoT layer for the server\\  \hline
+ \verb|conn_listen|& This is the main loop for the server wherein it listens for incoming connections.\\  \hline
+ \verb|Init_listening_sockets|& Initialize and bind sockets.\\ \hline
+ \verb|mpiot_srv_conn_recv|& This is called during the initial connection setup phase.\\  \hline
+ \verb|Is_new_client_req|& This checks whether the given client is connecting for the first time.\\  \hline
+ \verb|handle_client|& Main routine for the server-child. This is invoked whenever a new client request is received.\\  \hline
+ \verb|demultiplexer|& It will demultiplex all incoming data.\\
+ \hline
+ \caption{MPIoT Module Description }
+  \label{table:module}
+\end{longtable}
+
+\paragraph{} Figure \ref{fig:1_data_rcv} and Figure \ref{fig:1_data_send} shows how different module communicate between each other to send and receive data respectively.
+
+\begin{figure}[h]
+  \centering
+    \includegraphics[width=.9\textwidth]{1_data_rcv.JPG}
+  \caption{Communication for Sending Data}
+  \label{fig:1_data_rcv}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+    \includegraphics[width=.9\textwidth]{1_data_send.JPG}
+  \caption{Communication for Receiving Data}
+  \label{fig:1_data_send}
+\end{figure}

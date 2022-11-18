@@ -1,0 +1,93 @@
+% http://www.youtube.com/watch?v=axbUCR1nKRA
+
+\chapter{Introduction}
+Transport layer of TCP/IP networking model provides interface to communicate between two remote application. This layer have the responsibility to receives data from underlying network layer and deliver them to appropriate application. To do this job, transport layer protocol needs to implement \textit{Multiplexing} and \textit{Demultiplexing}. There have two transport layer protocol (User Datagram Protocol(UDP) and Transmission Control Protocol(TCP)) for commutation between applications. Among them UDP is just a transport layer extension of underlying network layer protocol IP. UDP does the multiplexing-demultiplexing with the application port number (i.e. local port). Application that using the UDP as transport layer protocol, can start sending data to a remote application without setup any connection. It does not provides any guarantee that the remote receives all the data sent by the local application. Application also needs to break the data in small segments before it can send them.
+
+\paragraph{} On other hand, TCP does multiplexing-demultiplexing with all four attribute (i.e. local ip, local port, destination ip and destination port). Unlike UDP, it does not a simple transport layer extension of network layer protocol IP. Application that using TCP as underlying protocol, cannot start sending data without establish a connection. It provides interface to transfer a stream of bytes, so application does not have to break the data into segments. TCP have internal mechanism to ensure reliable data transfer with flow control and congestion control. Because this features, most of the network applications uses TCP as transport layer protocol.
+
+\paragraph{} In computer network, there always have some packet loss due to congestion and network error. TCP have mechanism to detect this losses and retransmit them. It provide flow control by advertising window size so that receiver can process received data before it receive more data. TCP also provide provide congestion control algorithms to provide maximum utilization of network utilization with out burst. 
+
+% \paragraph{} On other hand TCP is end-to-end connection oriented reliable protocol. It provides mechanism to ensure reliability by receiving Acknowledgment(ACK) from the receiver. It allows applications to send a stream of byte to another process instead of packets or segments.
+% 
+% \paragraph{} In current days most of the network traffic carried out by TCP. TCP is reliable end-to-end transport layer protocol. Due to congestion or other network error, small number of packets may be dropped or lost. TCP detects the packets lost by time out or by receiving triple duplicate acknowledgment (ACK). It provide flow control by advertising window size so that receiver can process received data before it receive more data. TCP also provide provide congestion control algorithms to provide maximum utilization of network utilization with out burst it. 
+
+\section{TCP Congestion Control}
+TCP can not talk with router, so it uses end-to-end Congestion control instead of network-assisted congestion control. TCP have three basic problems related to congestion. They are 1) At which rate TCP could start sending, 2) How will it detects congestion in intermediate links, and 3) How will it reacts when congestion detected. Different TCP variant are developed to give better solution of 2 and 3. TCP uses sliding window with \textit{go-back-n} method (\cite{trscmp,kurose-ross}) with dynamic window size. This window size controls the rate of sending data. Most of the TCP variants uses initial window size equal to the Maximum Segment Size(MSS). This is a solution to 1. Congestion control algorithm used by different TCP variants are discussed below.
+
+
+\subsection{TCP Tahoe}
+TCP Tahoe is the first variant of TCP congestion control mechanism. This variant have 3 different congestion control algorithms. These are i) \textit{Slow Start}, ii) \textit{Congestion Avoidance} and iii) \textit{Fast Retransmit}. When TCP starts for first time, it sets congestion window size to 1MSS and starts \textit{Slow-Start phase}.
+
+% \paragraph{} When TCP start for first time it sets congestion window size to 1 MSS. In this state TCP doubles its congestion window size when its receives an ACK. This process continues until window size is less than Slow-Start Threshold(ssthresh). After that it follows \textit{Congestion Avoidance} algorithm.
+\paragraph{ Slow-Start phase:} In this phase, TCP increases congestion window size by 1MSS, when ever it receives a new acknowledgment. Its means, in every RTT, TCP doubles its current congestion window size. It is called exponential growth. This phase continues until congestion window size reaches \textit{Slow-Start Threshold (ssthresh)}. After this, TCP starts \textit{Congestion Avoidance phase}. \textit{ssthresh} initially set to 20MSS. Whenever a timeout occurs ssthresh updated to half of current congestion window size, start slow start phase with congestion window size 1MSS (\cite{jacobsonslowstart}). When new ACK is received at sender side, sender does:
+% \begin{algorithm}
+\begin{algorithmic}
+  \If{$cwnd < ssthresh$} \Comment{if we’re still doing slow-start open window exponentially}
+%     \State /  
+    \State $cwnd += 1$
+  \Else \Comment{otherwise do Congestion Avoidance increment-by-1 }
+    \State $cwnd += 1/cwnd$ 
+  \EndIf
+\end{algorithmic}
+% \begin{algorithm}
+
+
+\paragraph{ Congestion Avoidance:} In this phase, congestion window increase by 1MSS in every RTT. Upon receiving new acknowledgment in this phase TCP increases congestion window by $1/cwnd$. This state continues until a packet-loss detected.
+
+\paragraph{ Fast Retransmit:} Timeouts required interrupts, since repeated interrupts are costly, most of TCP implemented with coarse timeout. This is a problem. To solve this problem, upon receiving 3 duplicate ACKs, TCP does not wait for timeouts. It restransmit the segments which appears to be lost and reset to \textit{Slow-Start} state and set congestion window size to 1MSS.
+% When packet loss is detected TCP tahoe decrease the window size to 1 MSS and reset to slow start state.\\
+
+\paragraph{Disadvantage:} TCP tahoe resets it state to slow-start whenever it detects congestion (i.e. Packet loss). It may cause to low throughput. TCP Reno have solve this problem.
+
+\subsection{TCP Reno}
+TCP Reno is modification to TCP Tahoe. It modified the algorithm when triple duplicate ACK received. Tahoe performs equally for time-outs and arrival of triple duplicates ACK. Upon receiving of triple duplicate TCP Reno performs \textit{fast retransmit}. After that unlike Tahoe, instead of reset to \textit{Slow-Start}, it halves the congestion window size and follows a new algorithm called \textit{Fast Recovery}. Reason behind this modification is this case that even though some packet has been lost, the arrival of triple duplicates indicates that some segment have been received at receiver side. So, unlike time timeout even, network shows that it capable of delivering at least some segments, even if other get lost to congestion \cite{kurose-ross}.
+% In TCP Reno, the fast recovery and fast recovery does together as follows:
+% \begin{enumerate}
+%   \item 
+% \end{enumerate}
+
+
+\paragraph{} In \textit{Fast Recovery}, Reno uses additional incoming duplicate ACK to clocks out going packets. It increase window size by 1MSS till it receives duplicates ACKs. Upon receiving new ACK Reno exit \textit{Fast Recovery}.
+
+\paragraph{Disadvantage:} Reno can not distinguish between multiple packet loss in same window and different window.
+  
+\subsection{TCP New-Reno}
+According to RFC3782 (\cite{rfc3782}), TCP NewReno is modification to TCP's \textit{fast recovery} algorithm. TCP New-Reno incorporate concept of partial ACKs and full ACKs. In \textit{Fast Recovery} phase if an non-duplicate ACKs acknowledges all the segment which was outstanding at the start of \textit{Fast Recovery}, then this ACKs called as full ACKs. Other wise it is partial ACKs. In TCP Reno a partial ACKs exits the phase \textit{Fast Recovery}, and if multiple packets loss occur in a single window then timeout is required to detects them. But in TCP New-Reno partial ACKs does not cause to exit \textit{Fast Recovery}. If multiple packets lost in a single window TCP New-Reno can detects them one-by-one in each RTT. TCP New-Reno remains in \textit{Fast Recovery} until it receives ACKs for all segments which were outstanding at beginning of \textit{Fast Recovery} or a time-out event occurs.
+
+\paragraph{ Disadvantage:} Its only disadvantage is it can not distinguish between congestion loss and packet error.
+
+\subsection{TCP SACK}
+TCP SACK is TCP with selective ACK option. TCP SACK also modification to TCP Reno. It have option to selectively acknowledges up to 3 non-sequential block. Basic idea behind TCP SACK is if multiple packets drop occur from a single window sender can detect it and retransmit multiple lost packets. The TCP SACK option field contains number of SACK block, where each block report a non-contiguous block of data received in the receiver queue. Rest other algorithms in TCP SACK are just like TCP Reno.\\\par
+\textbf{Disadvantage:} TCP SACK need individual ACK instead of cumulative ACK.
+
+% \subsection{TCP Vegas}
+\subsection{TCP Vegas}
+TCP Reno is a popular TCP congestion control algorithm. Due to coarse grain timeout scheme in TCP Reno, the time required to detect a packet loss event by timeout event can be as large as 1100ms \cite{tcpvegaspaper}. TCP Vegas first give a solution to timeout event before coarse grain timeout event occurs. Then it gives an improved approach to detect congestion using changes in RTT. It gives three new techniques for congestion control. They are:
+\begin{itemize}
+  \item New Retransmission Mechanism
+  \item Congestion Avoidance Mechanism
+  \item Modified Slow-Start Mechanism
+\end{itemize}
+From these three modifications, we intentionally skip the New Restransmission Mechanism and Modified Slow-Start Mechanism. In next part we will discuss the RTT based congestion avoidance algorithm used by TCP Vegas.
+
+
+\paragraph{ Congestion Avoidance:} \label{para:vegasalgo} TCP's congestion controller tries to guess available bandwidth. For this purpose congestion controller always increases the sending-rate, and after a certain period sending-rate becomes greater than the available bandwidth. So, the extra packets transmitted in the network needs to be stored in link buffer. TCP Vegas try to measure and control them. Goal of Vegas is to maintain right amount of extra packets, so that these packets will not be dropped due to buffer overflow. Whenever a packet is stored in a buffer, it introduces some queuing delay which varies as current queue-size. TCP Vegas measures this change and adjust window size according to the changes. In order to measure and control the extra packets, vegas do the following.
+
+\paragraph{} Vegas defines $BaseRTT$ as the RTT of a packet when path between source and destination is not congested (i.e. none of the link buffer contains any packet). In practical $BaseRTT$ is the minimum RTT Vegas ever measured. TCP Vegas measures expected throughput (rather say sending rate) with current congestion window and $BaseRTT$ by:
+\begin{center}
+ $Expected\_SendingRate = \frac{Window Size}{BaseRTT}$
+\end{center}
+TCP Vegas also measures the actual sending rate. It keeps the time-stamp whenever it sends a packet. When an acknowledgment arrives at the Vegas sender it measures the RTT by:
+\begin{center}
+ $RTT = Current\_TimeStamp - Stored\_TimeStamp$
+\end{center}
+Vegas calculate the number of bytes sent in time between packets sent and acknowledgment of that particular packet received. Then it divides the number of bytes sent by RTT to measure current $Actual$ sending-rate.
+
+
+\paragraph{} Vegas compares $Actual$ to $Expected$, and adjusts the congestion window accordingly. Vegas takes decision by difference $Diff$ of $Expected$ and $Actual$ ($Diff = Expected - Actual$). This $Diff$ is the extra data. If $Diff$ is less than zero, then its time to change the $BaseRTT$ to current sampled RTT. Vegas also defines two threshold $\alpha < \beta$ roughly too little and two high. These are by default (as in NS2.34) 1 and 3 respectively when $Diff$ measured in $kbps$. Now, if $Diff$ is lesser than $\alpha$ then window size will be increased linearly for next RTT. When $Diff > \beta$ window size will be decreases linearly for next RTT. If $\alpha < Diff < \beta$, Vegas keep window size unchanged. This whole procedure is called only once per RTT.
+
+
+\section{Router Buffer/Queue}
+Buffer or Queue at router is very important for a packet switch network. Router routes packets from one network to another network, but Router can forward a packet to a different network only if it receives a complete packet. Some time lots of packets arrived in very small time interval, and it is not possible to forward those packets in that time interval. So, the router requires to store incoming packets temporarily. Whenever these buffers overflow, packet drop occurs. To store large number of packet, large buffer is needed. But large buffer introduces large queuing delay, so buffer size is very crucial. In computer network, it is thumb-rule to set buffer size to \textit{Band-width Delay Product (BDP)}. This rule works fine with low-speed network i.e. when BDP is very small. But in current age, most of the back-bone links are high-speed. This links have high band width with high delay time (i.e Long-Fat-Network (LFN)). BDP of this type of links is very large (up to 4GB). If we have to keep buffer size equal to BDP, buffer cannot be stored at the on-chip SRAM. It require off-chip DRAM which has lesser accessing speed. It may lead to bad network performance as it will increase queuing delays. To solve this problem small buffered network has been introduced. But existing TCP variants (TCP Reno, TCP NewReno, TCP Vegas, TCP SACK etc.) cannot give high performance as their congestion control algorithm is not designed for small buffered network. As per as most of the traffic in network are carried by TCP, it is primary to devise a better algorithm congestion control algorithm for small buffered high-speed network.
+
+\paragraph{} It is aim to tune the network with small buffers so that it can not affect the link utilization or individual TCP throughput. Research can be done in buffering algorithm and TCP Congestion Control algorithm both. Yu Gu \textit{et. al.}.

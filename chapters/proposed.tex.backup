@@ -1,0 +1,170 @@
+\chapter{Proposed Scheme}
+In our proposed scheme, we have devised mechanism to improve the good-put of E-TCP. In our effort to achieve this goal we have to loose out on the band width utilization of the E-TCP. Based on our experiments we observe that, TCP-Vegas gives better good put than TCP-Reno. From this observation, we decide to add RTT based congestion control algorithm to E-TCP. We have two options to carry out this job, 1) Use some existing RTT based congestion control algorithm like TCP-Vegas, 2) Devise our own congestion detection algorithm. We propose two different schemes namely \textit{EV-TCP} and \textit{EV2-TCP}. We combine E-TCP and TCP Vegas to devise EV-TCP. EV2-TCP is based on queuing delay detection scheme. We will discuss EV-TCP and EV2-TCP in this chapter.
+
+\section{EV-TCP}
+We combine TCP Vegas and E-TCP for better good put. There are number of approaches for RTT based congestion control like Wang and Crowcroft's DUAL algorithm \cite{Wang92eliminatingperiodic}, Jain's CARD (Congestion Avoidance using Round-trip Delay) \cite{Jain89adelay-based} or Wang and Crowcroft's Tri-S scheme \cite{Jon91anew}. But among them, we choose TCP Vegas because it has been implemented successfully in several network stacks. TCP Vegas is a modification of TCP Reno, to detect congestion before any packet loss occurs.
+
+% \paragraph{} We didn't change the actual E-TCP's congestion control algorithm. We just patched a modified RTT based congestion control mechanism from TCP Vegas.% This mechanism has been modified to implement in E-TCP. 
+
+\paragraph{} We do not change the actual E-TCP's congestion control algorithm. We have modified the congestion signalling mechanism by adding RTT based congestion detection technique. 
+
+\begin{algorithm}[h!]
+\caption{EV-TCP Congestion signalling}
+\label{algo:evtcpcong}
+\begin{algorithmic}[1]
+\State CALL $RTT\_Based\_Congestion\_Avoidance(oldSeq)$
+\If { $cc\_ack > h\_seq$} 
+  \While{$cc\_ack + 1 < h\_seq - 32$} \Comment seq. in the gap are treated as lost
+    \State $slowdown()$
+    \State $cc\_ack \gets cc\_ack + 1$
+  \EndWhile
+  \State $mask \gets 0$x$01$ \Comment bitmap mask
+  \If{$h\_seq - cc\_ack > 2$}
+    \State $mask \gets mask << (h\_seq - cc\_ack-2)$
+  \EndIf
+  \While{$cc\_ack < h\_seq$}
+    \If{$(mask$ \textbf{AND} $bitmap)$ \textbf{OR} $cc\_ack = h\_seq - 1$}
+      \State $opencwnd()$
+    \Else
+      \If{$h\_seq > cc\_ack + 3$}
+	\State $slowdown()$
+      \Else
+	\State $break$
+      \EndIf
+    \EndIf
+    \State $mask \gets mask >> 1$
+    \State $cc\_ack \gets cc\_ack + 1$
+  \EndWhile
+\EndIf
+\end{algorithmic}
+\end{algorithm}
+
+\paragraph{Congestion Signalling: } Like E-TCP, basic congestion control mechanism of EV-TCP is based on selective acknowledgement. EV-TCP includes three extra parameters namely \textit{cc\_seq}, \textit{h\_seq}, \textit{bitmap}. The functionality of these parameters are similar to E-TCP, so we are not discussing them here. In next part we will discuss signalling procedure at each end.
+
+\begin{algorithm}[h!]
+\caption{RTT bases congestion Avoidance}
+\label{algo:evtcprtt}
+\begin{algorithmic}[1]
+  \Function{RTT\_Based\_Congestion\_Avoidance}{}
+    \If{$current\_time - lastsampled < (ev\_basertt/4)$}
+	\If{$cwnd < ssthresh$ }
+	  \State $Returns$
+	\ElsIf{$action=1$}
+	  \State $cwnd += 1/cwnd$
+	\ElsIf{$action=2$}
+	  \State $cwnd -= 1/cwnd$
+	\EndIf
+	\State $Returns$
+    \EndIf
+    \State $lastsampled = current\_time$
+    \State $Expected= cwnd/BaseRTT$;
+    \State $Actual  = (current\_seq-oldseq)/RTT$
+    \State $Diff = Expected -Actual$
+    \If{$Diff < 0$}
+      \State $BaseRTT = RTT$
+    \Else
+      \If{$Diff < \alpha$}
+	\State $cwnd = cwnd + 1/cwnd$
+	\State $action = 1$
+      \ElsIf{$Diff > \beta$}
+	\State $cwnd = cwnd - 1/cwnd$
+	\State $action = 2$
+      \Else
+	\State $action = 0$
+      \EndIf
+    \EndIf
+  \EndFunction
+\end{algorithmic}
+\end{algorithm}
+\begin{itemize}
+	\item \textbf{EV-TCP Receiver:} Similar to E-TCP , EV-TCP receiver maintains two parameters namely \textit{h\_seq} and \textit{bitmap}. \textit{h\_seq} contains the highest \textit{cc\_seq} ever received and \textit{bitmap} is 32 bit field, which contains the status of last 32 packets($h\_seq - 32$ to $h\_seq - 1$). Whenever EV-TCP receiver receives a data packet, it does the following:
+	\begin{enumerate}
+		\item Extract \textit{cc\_seq} parameter (which contains unique congestion controller sequence number.
+		\item Compare \textit{cc\_seq} with \textit{h\_seq}. If \textit{h\_seq} is lesser than \textit{cc\_seq}, then \textit{h\_seq} will be updated to \textit{cc\_seq} and shift the \textit{bitmap} accordingly. Other wise it sets the specific bit in \textit{bitmap}.
+		\item Sends an acknowledgement packet with \textit{cc\_seq}, \textit{h\_seq} and \textit{bitmap} to sender. 
+	\end{enumerate}
+	\item \textbf{EV-TCP Sender:} Sender maintains two parameters, namely \textit{cc\_seq} and \textit{cc\_ack}. \textit{cc\_seq} is unique congestion controller sequence number and \textit{cc\_ack} is controller acknowledgement number. When sender sends a packet, it increase \textit{cc\_seq} and add the updated value to the packet. Then add current time-stamp to the table.\\
+	When an acknowledgement packet arrives at sender side it executes algorithm \ref{algo:evtcpcong}. Steps in this algorithm are:
+	\begin{enumerate}
+		\item It runs the RTT based congestion detection technique (i.e. algorithm \ref{algo:evtcprtt}). This technique will discuss in next part of this section(line no. 1).
+		\item It checks whether \textit{cc\_ack} is greater than \textit{h\_seq} or not. If \textit{cc\_ack} is greater than \textit{h\_seq} then this packet will be discarded. Other wise proceeds to next step (line no 2).
+		\item It checks whether \textit{cc\_ack} is less than $h\_seq - 1$. If it is, then it will treat every packets in the gap $cc\_ack + 1$ to $h\_seq - 33$ as lost and decrease the window size(i.e. slowdown) for each packet(line no 3-6).
+		\item Then it initializes a 32 bit mask to test the status of packet with \textit{cc\_seq} number $cc\_ack + 1$ (line 7-10 of algorithm \ref{algo:evtcpcong}). In line 7, sender initializes \textit{mask} with 1 (i.e. set all 0 but Least Significant Bit). In next 2 lines, the \textit{mask} is shifted towards left (if required) so that the particular bit which refers the packet with \textit{cc\_seq} $cc\_ack + 1$, is setted to 1.
+		\item Then it checks for each packet referred by \textit{bitmap}(line no 10-23).
+		\item If any packet is successfully acknowledged (i.e. 1 in \textit{bitmap}) then it increases the congestion window size (line no 13) and proceeds to step \ref{cont}. Other wise proceeds to step \ref{lost}.
+		\item \label{lost} If any packet is not acknowledged (i.e. 1 in \textit{bitmap}), then it decreases congestion window size. After this, sender goes to next step (step \ref{cont}) only if \textit{h\_seq} is greater than $cc\_ack + 2$. Otherwise procedure terminates here (line no 14-19).
+		\item \label{cont} In this step, sender increases \textit{cc\_ack} by 1 and shifts the \textit{mask} towards right (line 21-22).
+	\end{enumerate}
+	\paragraph{} EV-TCP also maintains three parameters namely $ev\_basertt$, $lastsampled$ and $action$ used in RTT based congestion detection system of EV-TCP.
+	\begin{itemize}
+		\item \textit{ev\_basertt}: It is the minimum RTT sender ever measured.
+		\item \textit{lastsampled}: The RTT based congestion detection system consists of two parts. 1) Detect congestion based on RTT (line no 13-28 in algorithm \ref{algo:evtcprtt}), 2)Repeat the action taken by detection part for each acknowledgement received in rest of one-forth of \textit{ev\_basertt} (line no 2-10 in algorithm \ref{algo:evtcprtt}). \textit{lastsampled} contains the time stamp of last execution on RTT based detection system.
+		\item \textit{action}: It contain 0, 1 or 2 according to the last action (i.e. 0=do nothing, 1=increase, 2=decrease) taken by the detection part.  RTT based detection part sets it and action repeater reads it.
+	\end{itemize}
+	\paragraph{} The detection part of sender do the follows:
+	\begin{enumerate}
+		\item Calculate $Excepted$ and $Actual$ sending rate, and measure $Diff$ from them (line no 13-15).
+		\item If $Diff$ is less than 0(zero), then set \textit{BaseRTT} to current RTT. \textit{BaseRTT} is minimum RTT measured by sender (according to Brakmo \textit{et. al.}\cite{tcpvegaspaper}).
+		\item Otherwise if $Diff$ is lesser than $\alpha$ it increases window size and set $action = 1$, If $Diff$ greater than $\beta$, it decreases window size and set $action = 2$. Otherwise it resets $action$ with 0(zero). Here $\alpha$ and $\beta$ defines as maximum and minimum threshold \cite{tcpvegaspaper}.
+	\end{enumerate}
+
+\end{itemize}
+
+
+\section{EV2-TCP}
+
+\paragraph{} EV-TCP gives better good-put than E-TCP. But for a particular EV-TCP flow, if throughput decreases once, it never have been recovered. This is a problem for long connections. To solve this problem we designed EV2-TCP by modifying the RTT based congestion detection technique of EV-TCP.
+
+\paragraph{} Whenever an acknowledgement received at EV2-TCP sender, the RTT based congestion detection technique (algorithm \ref{algo:ev2tcprtt}) does the follows:
+\begin{enumerate}
+	\item It checks whether congestion window size ($swnd$) is less than slow start threshold($ssthresh$) or not. If $cwnd$ is lesser then it terminates the procedure (line no 1-3 in algorithm \ref{algo:ev2tcprtt}). Otherwise it proceeds to next step. It defines that RTT based algorithm does not run during slow-start phase.
+	\item EV2-TCP maintain two parameter $current\_rtt$ and $previous\_rtt$. $current\_rtt$ contain the RTT measured from this current received packet. $previous\_rtt$ contains the RTT of last received packets. EV2-TCP calculate $diff\_rtt$ by subtracting $previous\_rtt$ from $current\_rtt$ (line no 5).
+	\item Now if $diff\_rtt$ is greater than queuing delay for single packet, the it increases congestion window size by maximum 1MSS (Maximum Segment Size). Otherwise it decreases congestion window size by E-TCP decrement function (line no 7-15). Procedure to measure queuing delay of a single packet is described in the next part of this section.
+\end{enumerate}
+
+
+\begin{algorithm}[h!]
+\caption{RTT bases congestion Detection for EV2-TCP}
+\label{algo:ev2tcprtt}
+\begin{algorithmic}[1]
+  \Function{RTT\_Based\_Congestion\_control}{}
+%     \If{$current\_time - lastsampled\_time >= 0$}
+      \If{$cwnd < ssthresh$}
+% 	\State $cwnd +=1mss$
+	\State Terminate this procedure
+      \EndIf
+      \State $diff\_rtt \gets current\_rtt - previous\_rtt$
+      \State $previous\_rtt \gets current\_rtt$
+      \If{ $diff\_rtt < delay\_for\_single\_packet$ }
+	\State $incr \gets cwnd * 0.01 $
+	\If{$incr > 1mss$}
+	  \State $incr \gets 1mss $
+	\EndIf
+	\State $cwnd \gets cwnd + incr$
+      \Else
+	\State Slowdown
+      \EndIf
+  \EndFunction
+\end{algorithmic}
+\end{algorithm}
+\vspace{-5mm}
+\paragraph{} The challenge in the algorithm is determination of queuing delay of a single packet. To determine this, we have modified the packet sending algorithm of E-TCP at sender side. In EV2-TCP, sender sends 2 packets simultaneously. When these two packets will reach at bottle-neck queue, both packets will be enqueued. First packet will be dequeued first and second packet has to wait until first packet is removed from the queue. So, RTT of second packet will contain this extra waiting time, which is queuing delay of a single packet. When sender receives ACK of these packets, sender measures the queuing delay of a single packet by measuring the difference of the RTTs $diff$.
+
+\paragraph{} This $diff$ is not always accurate. So, sender has to keep measuring it. whenever a acknowledgement is received. In practice, we have observed that this $diff$ fluctuates. So, we take the weighted average of $diff$ as queuing delay of a single packet at bottle queue ($delay\_for\_single\_packet$). We follow the following formula to calculate weighted average.
+\begin{center}
+$delay_i=delay_{i-1}*0.99~+~0.01*diff$
+\end{center}
+% \begin{figure}[h!]
+%     \centering
+%         \includegraphics[width=5in]{diffrtt.eps}
+% %         \vspace{-10mm}
+%     \caption{Difference between RTT of two consecutive packets}
+%     \label{fig:diffrtt}
+%     \vspace{-5mm}
+% \end{figure}
+% % Figure \ref{fig:diffrtt} is plotting of actual difference and the weighted average of it. Weighted average is nearly 0.05 ms.
+
+% 
+% \paragraph{} Now we have the queuing delay of a single packet. Now we have modified the Algorithm \ref{algo:evtcprtt} as follows. We have increases the congestion window if the difference is less than weighted average, other wise congestion window decreases by calling slowdown procedure.
+
+

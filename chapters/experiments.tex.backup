@@ -1,0 +1,440 @@
+\newcounter{simcnt}
+\setcounter{simcnt}{0}
+\newcommand{\simulation}[1]
+{
+\addtocounter{simcnt}{1}
+\section{Simulation \arabic{simcnt}: #1}
+}
+\newcommand{\simnum}{\arabic{simcnt}~}
+
+\chapter{Simulation Results}
+We have performed some simulations to compare the overall performances of different TCP variants with EV-TCP and EV2-TCP. The other TCP variants we have used are as follows:
+\begin{itemize}
+	\item \textbf{TCP NewReno:} We used standard implementation of TCP NewReno in NS2.34 network simulator \cite{ns}.
+
+	\item \textbf{HSTCP:} The HSTCP version we have used is implemented in NS2.34\cite{ns}. We keep configuration of HSTCP similar to the configuration stated by Yu. Gu. \textit{et. al.} \cite{Gu06congestioncontrol}. Here we use $TCP/SACK1$ (a ns2.34 implementation of TCP SACK) with $windowOption\_=8$ and $max\_ssthresh\_=100$.
+
+	\item \textbf{FAST:} We have used FAST TCP implemented by CUBIN lab (\url{www.cubinlab.ee.unimelb.edu.au/ns2fasttcp/}) \cite{fast}. Here also we adopt the settings from \cite{Gu06congestioncontrol}. We set $\alpha$ to 1000 and $mi\_threshold\_$ to 0.00075.
+
+	\item \textbf{E-TCP:} E-TCP has been described by Yu. Gu. \textit{et. al.} \cite{Gu06congestioncontrol}.
+\end{itemize}
+
+\paragraph{} All the simulations performed using NS2.34 network simulator\cite{ns}. We almost use similar system configurations for each simulation. The configurations are as follows.
+
+\begin{figure}[h!]
+    \centering
+        \includegraphics[width=0.9\textwidth]{Topology.eps}
+        \vspace{-10mm}
+    \caption{Topology}
+    \label{fig:Topology}
+    \vspace{0mm}
+\end{figure}
+
+\begin{itemize}
+  \item Simulations has been performed on the dumbbell topology shown in figure \ref{fig:Topology}.
+%   \item Bottleneck link bandwidth set to 100Mbps with propagation delay 100ms.
+%   \item Bottleneck link propagation delay is set to 100ms.
+  \item Buffer size at bottle-neck link is set to 20 packets with $drop-tail$ buffer management scheme.
+  \item Each source or sink node is connected to bottle-neck with unique edge link.
+  \item The bandwidth of edge link is set to 100Gbps and delay set to 5ms.
+  \item Connection taken with inter start time interval of 2ms.% \ref{fig:exp-1:bw-c.eps}
+  \item In each simulation, we use a loss model with loss rate 0.1\%.
+  \item We use two different types of queue management scheme, namely DropTail and RED.
+  \item Every simulation in runs for 300 second of simulation time.
+\end{itemize}
+
+
+% \section{Experiment 1}
+\simulation{sim1}
+This simulation is performed to compare performance (in terms of good put) of different TCP variants. In this simulation we set bottleneck bandwidth to 100Mbps and bottleneck delay set to 50ms, 100ms and 200ms. We have performed this simulation when bottleneck queue-size varied from 20 units of packets to 200 units of packets.
+
+\paragraph{Result:} Result of this simulation are shown in figure \ref{fig:exp-1:gdput-50} to figure \ref{fig:exp-1:fd}. Among this graphs figure \ref{fig:exp-1:gdput-50} to figure \ref{fig:exp-1:gdput-200} are plotting good put vs queue-size.
+\paragraph{}
+\begin{figure}[h!]
+\centering
+\subfloat[DropTail queue]{
+	\includegraphics[width=0.9\textwidth]{exp-1/gdput-d-050.eps}
+	\label{fig:exp-1:gdput-50-d}
+}
+\end{figure}
+\begin{figure}[h!]
+\contsubfig
+\centering
+\subfloat[RED queue]{
+	\includegraphics[width=0.9\textwidth]{exp-1/gdput-r-050.eps}
+	\label{fig:exp-1:gdput-50-r}
+}
+\caption{Good put with bottle neck delay 50ms  }
+\label{fig:exp-1:gdput-50}
+\end{figure}
+% \pagebreak
+When bottleneck delay is set to 50ms, TCP NewReno achieves lowest good-put and EV2-TCP achieves highest good-put in both the queuing schemes\ref{fig:exp-1:gdput-50}. TCP FAST achieves very low good-put when queue size is 20. But it grows when queue-size increases. For DropTail EV-TCP achieves constant good-put for all queueing scheme. But for RED queue it achieves lesser good-put for larger queue (fig \ref{fig:exp-1:gdput-50-r}).
+
+\paragraph{}
+\begin{figure}[h!]
+\centering
+\subfloat[DropTail queue]{
+	\includegraphics[width=0.9\textwidth]{exp-1/gdput-d-100.eps}
+	\label{fig:exp-1:gdput-100-d}
+}
+\end{figure}
+\begin{figure}[h!]
+\contsubfig
+\centering
+\subfloat[RED queue]{
+	\includegraphics[width=0.9\textwidth]{exp-1/gdput-r-100.eps}
+	\label{fig:exp-1:gdput-100-r}
+}
+\caption{Good put with bottle neck delay 100ms  }
+\label{fig:exp-1:gdput-100}
+\end{figure}
+For bottleneck delay 100ms, results are similar to last one(figure \ref{fig:exp-1:gdput-100}). But every variants of TCP have little lower good-put than previous ones (i.e. good-put when bottleneck delay 50ms).
+
+\paragraph{}
+\begin{figure}[h!]
+\centering
+\subfloat[DropTail queue]{
+	\includegraphics[width=0.9\textwidth]{exp-1/gdput-d-200.eps}
+	\label{fig:exp-1:gdput-200-d}
+}
+\end{figure}
+\begin{figure}[h!]
+\contsubfig
+\centering
+\subfloat[RED queue]{
+	\includegraphics[width=0.9\textwidth]{exp-1/gdput-r-200.eps}
+	\label{fig:exp-1:gdput-200-r}
+}
+\caption{Good put with bottle neck delay 200ms  }
+\label{fig:exp-1:gdput-200}
+\end{figure}
+Similar result produced when bottleneck delay is 200ms (fig \ref{fig:exp-1:gdput-200}). Here also good-put for a particular TCP variant when bottleneck delay 200ms, is lesser than the good-put of bottleneck delay of 100ms. In this case, TCP NewReno achieves good-put below 10\% of bottle neck link bandwidth. TCP NewReno achieves very less good put because of lossy channel.
+\paragraph{} Good-put achieved by EV2-TCP is best here. The reason behind this is, in case of EV2-TCP, it detects congestion by observing the changes in queuing delay. At the same time, EV2-TCP always tries to achieve better utilization, which causes some packet drop. Similarly, E-TCP, EV-TCP and EV2-TCP have larger packet drop rate than that of other variants (fig \ref{fig:exp-1:lsrt-50} to fig \ref{fig:exp-1:lsrt-200}).
+
+\begin{figure}[h!]
+\centering
+\subfloat[DropTail queue]{
+\includegraphics[width=0.9\textwidth]{exp-1/lsrt-d-050.eps}
+\label{fig:exp-1:lsrt-50-d}
+}
+\end{figure}
+\begin{figure}[h!]
+\contsubfig
+\centering
+\subfloat[RED queue]{
+\includegraphics[width=0.9\textwidth]{exp-1/lsrt-r-050.eps}
+\label{fig:exp-1:lsrt-50-r}
+}
+\caption{Drop rate at bottle queue when bottle neck delay 50  }
+\label{fig:exp-1:lsrt-50}
+\end{figure}
+
+
+\begin{figure}[h!]
+\centering
+\subfloat[DropTail queue]{
+\includegraphics[width=0.9\textwidth]{exp-1/lsrt-d-100.eps}
+\label{fig:exp-1:lsrt-100-d}
+}
+\end{figure}
+\begin{figure}[h!]
+\contsubfig
+\centering
+\subfloat[RED queue]{
+\includegraphics[width=0.9\textwidth]{exp-1/lsrt-r-100.eps}
+\label{fig:exp-1:lsrt-100-r}
+}
+\caption{Drop rate at bottle queue when bottle neck delay 100  }
+\label{fig:exp-1:lsrt-100}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\subfloat[DropTail queue]{
+\includegraphics[width=0.9\textwidth]{exp-1/lsrt-d-200.eps}
+\label{fig:exp-1:lsrt-200-d}
+}
+\end{figure}
+\begin{figure}[h!]
+\contsubfig
+\centering
+\subfloat[RED queue]{
+\includegraphics[width=0.9\textwidth]{exp-1/lsrt-r-200.eps}
+\label{fig:exp-1:lsrt-200-r}
+}
+\caption{Drop rate at bottle queue when bottle neck delay 200  }
+\label{fig:exp-1:lsrt-200}
+\end{figure}
+\paragraph{} Packet drop rate is highest for FAST TCP and lowest for TCP NewReno and HSTCP. E-TCP, EV-TCP and EV2-TCP have moderate drop rate. Among these three protocols, EV-TCP and EV2-TCP have lower drop rate than that of E-TCP. Drop rate of FAST TCP decreases, when queue-size increases. This result is similar for both the queuing scheme when bottle neck delay is 50ms, 100ms or 200ms.
+
+\paragraph{} In figure \ref{fig:exp-1:gdpt} to  figure \ref{fig:exp-1:fd}, we have plotted system dynamics in terms of Good-put, packet drop rate at queue-length and fairness respectively.
+
+%good put
+\begin{figure}[h!]
+\centering
+\subfloat[DropTail queue]{
+\includegraphics[width=0.9\textwidth]{exp-1/goodput-I-d-0020-0100.eps}
+\label{fig:exp-1:gdpt-d}
+}
+\end{figure}
+\begin{figure}[h!]
+\contsubfig
+\centering
+\subfloat[RED queue]{
+\includegraphics[width=0.9\textwidth]{exp-1/goodput-I-d-0020-0100.eps}
+\label{fig:exp-1:gdpt-r}
+}
+\caption{Good-put through out the system when queu-size 20 units of packets and bottleneck delay 100ms}
+\label{fig:exp-1:gdpt}
+\end{figure}
+\paragraph{} Good put of TCP NewReno, HSTCP and FAST TCP are below 15Mbps, throughout the simulation. Good put of E-TCP and EV-TCP are similar (i.e. 35Mbps). Gooput of EV2-TCP is highest here which is above 65Mbps (fig \ref{fig:exp-1:gdpt}(a) - fig \ref{fig:exp-1:gdpt}(b)). During start up, EV2-TCP achieves 65Mbps good put on 20th second and stabilizes there. But other variants gets stabilized after 30 seconds of simulation.
+%Loss rate
+\begin{figure}[h!]
+\centering
+\subfloat[DropTail queue]{
+\includegraphics[width=0.9\textwidth]{exp-1/queue-loss-i-d-0020-0100.eps}
+\label{fig:exp-1:ql-d}
+}
+\end{figure}
+\begin{figure}[h!]
+\contsubfig
+\centering
+\subfloat[RED queue]{
+\includegraphics[width=0.9\textwidth]{exp-1/queue-loss-i-d-0020-0100.eps}
+\label{fig:exp-1:ql-r}
+}
+\caption{Loss rate/ Drop rate at bottleneck queue in the system when queu-size 20 units of packets and bottleneck delay 100ms}
+\label{fig:exp-1:ql}
+\end{figure}
+\paragraph{} At steady state TCP FAST drops maximum packets at bottleneck queue i.e. nearly 15\% (fig. \ref{fig:exp-1:ql}(a) - fig. \ref{fig:exp-1:ql}(b)). TCP NewReno and HSTCP have negligible packet drop rate. E-TCP and EV-TCP have constant packet drop rate at steady state. But, at starting EV2-TCP drops almost 25\% packets at bottle neck queue. But this drop rate decreases with time. At 300th second, packet drop rate of EV2-TCP is 4\%.
+% Fairness
+\begin{figure}[h!]
+\centering
+\subfloat[DropTail queue]{
+\includegraphics[width=0.9\textwidth]{exp-1/fair-goodput-d-0020-0100.eps}
+\label{fig:exp-1:fd-d}
+}
+\end{figure}
+\begin{figure}[h!]
+\contsubfig
+\centering
+\subfloat[RED queue]{
+\includegraphics[width=0.9\textwidth]{exp-1/fair-goodput-d-0020-0100.eps}
+\label{fig:exp-1:fd-r}
+}
+\caption{Fairness among flows in the system when queu-size 20 units of packets and bottleneck delay 100ms}
+\label{fig:exp-1:fd}
+\end{figure}
+\paragraph{} We plot fairness in good-put among all the TCP flows in fig. \ref{fig:exp-1:fd}(a) and fig. \ref{fig:exp-1:fd}(b). Fairness is measured by Jain's fairness index. From the figure, we conclude that at steady state every TCP variants is fair except EV-TCP. EV-TCP does not share the bandwidth among different flows fairly. On other hand EV2-TCP is fair from the beginning. Jain's fairness index is almost 1 at steady state.
+
+\paragraph{} From this experiment, we conclude that EV2-TCP is best with respect to good-put and fairness. We  concentrate on these two parameters because these two parameters defines the performance of an application (like FTP, HTTP etc) which uses any of these protocols. 
+
+% \section{Experiment 2}
+\simulation{sim2}
+
+This experiment is performed with bottle-neck bandwidth 1Gbps and bottle-neck queue length 20 units of packet and bottleneck link propagation delay is set to 100ms. We established 100 long lived connection.
+\paragraph{Result:}
+Results of this experiment are shown in graph Fig.\ref{fig:exp-1:bw-i}(a) to Fig. \ref{fig:exp-1:fair-goodput}(b).
+
+\paragraph{}
+\begin{figure}[h!]
+\centering
+\subfloat[DropTail queue]{
+\includegraphics[width=0.9\textwidth]{exp-2/bw-i-d.eps}
+% \caption{Instantaneous Link BandWidth Utilization}
+\label{fig:exp-2:bw-i-d}
+}
+\end{figure}
+\begin{figure}[h!]
+\centering
+\contsubfig
+\subfloat[RED queue]{
+\includegraphics[width=0.9\textwidth]{exp-2/bw-i-r.eps}
+\label{fig:exp-2:bw-i-r}
+}
+\caption{Instantaneous Link BandWidth Utilization}
+\label{fig:exp-2:bw-i}
+\end{figure}
+In figure \ref{fig:exp-2:bw-i}(a) and figure \ref{fig:exp-2:bw-i}(b), we have plotted Instantaneous Link bandwidth Utilization with time quantum 10 sec. Here we can find that, TCP-NewReno has very low utilization, its nearly 150Mbps for both the queuing scheme. E-TCP and EV-TCP have almost 95\% (i.e. 950Mbps) utilization. EV2-TCP achieves utilization around 75\% to 85\% of bottleneck bandwidth. Here, TCP-NewReno has very low utilization because of lossy channel.
+\paragraph{}
+
+\begin{figure}[h!]
+\centering
+\subfloat[DropTail queue]{
+\includegraphics[width=0.9\textwidth]{exp-2/goodput-I-d.eps}
+% \caption{Instantaneous Goodput}
+\label{fig:exp-2:goodput-i-d}
+}
+\end{figure}
+\begin{figure}[h!]
+\centering
+\contsubfig
+\subfloat[RED queue]{
+\includegraphics[width=0.9\textwidth]{exp-2/goodput-I-r.eps}
+\label{fig:exp-2:goodput-i-r}
+}
+\caption{Instantaneous Goodput}
+\label{fig:exp-2:goodput-i}
+\end{figure}
+% Figure \ref{fig:exp-2:goodput-i}(a) and Figure \ref{fig:exp-2:goodput-i}(b) describe in good-put of the different connections. With drop-tail queuing scheme, all the variants achieves almost equal good-put which is around 320Mbps. But, with RED queue management scheme, EV2-TCP achieves good-put of 450Mbps, when TCP NewReno, E-TCP and EV-TCP achieves only 300Mbps.
+Figure \ref{fig:exp-2:goodput-i}(a) and Figure \ref{fig:exp-2:goodput-i}(b) describes good-put of the different connections. In this configuration, EV2-TCP gives maximum good-put for both the queuing scheme. It is 400Mbps for drop-tail queue and 350Mbps for RED queue. E-TCP and EV-TCP gives nearly equivalent good-put, which is around 300Mbps for drop-tail queue and 270Mbps for RED queue. TCP-NewReno gives poor good-put, it is not more than 120 Mbps.
+\paragraph{}
+
+\begin{figure}[h!]
+\centering
+\subfloat[DropTail queue]{
+\includegraphics[width=0.9\textwidth]{exp-2/queue-loss-i-d.eps}
+% \caption{Instantaneous Packet Loss Rate}
+\label{fig:exp-2:queue-loss-i-d}
+}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\contsubfig
+\subfloat[RED queue]{
+\includegraphics[width=0.9\textwidth]{exp-2/queue-loss-i-r.eps}
+\label{fig:exp-2:queue-loss-i-r}
+}
+\caption{Instantaneous Packet Loss Rate}
+\label{fig:exp-2:queue-loss-i}
+\end{figure}
+Loss rate of EV2-TCP is quite high at the beginning. But at steady state it is decreasing. E-TCP and EV-TCP have nearly constant loss rate which is 8\%. TCP-NewReno has drop rate nearly 0(zero) (figure \ref{fig:exp-2:queue-loss-i}).
+
+
+\paragraph{}
+\begin{figure}[h!]
+\centering
+\subfloat[DropTail queue]{
+\includegraphics[width=0.9\textwidth]{exp-2/fair-goodput-d.eps}
+% \caption{fairness in goodput}
+\label{fig:exp-2:fair-goodput-d}
+}
+\end{figure}
+\begin{figure}[h!]
+\centering
+\contsubfig
+\subfloat[RED queue]{
+\includegraphics[width=0.9\textwidth]{exp-2/fair-goodput-r.eps}
+\label{fig:exp-2:fair-goodput-r}
+}
+\caption{fairness in goodput}
+\label{fig:exp-2:fair-goodput}
+\end{figure}
+Figure \ref{fig:exp-2:fair-goodput}(a) and Figure \ref{fig:exp-2:fair-goodput}(b) describes the fairness among the connections. Jain's fairness index is close to 1(one) for every variants except EV-TCP. Jain's fairness index for EV-TCP is considerably poor. It is 0.6 for both the queuing schemes. EV2-TCP is exceptionally fair. It is very close to 1 from the the beginning of the flows.
+
+% Figure \ref{fig:exp-2:fair-goodput.eps} describes the fairness among the connections. Jain fairness index is close to 1(one) for every variants except EV-TCP. In case of EV-TCP with droptail queue management, fairness is acceptable. But with Red queue, fairness index of EV-TCP is around 0.4.
+
+\paragraph{} From this experiment we conclude that EV2-TCP gives better performance with any type of queue management scheme. Although it has little higher loss rate at the beginning, but at steady state loss rate decreases considerably. Like previous experiment, we again find that EV2-TCP is very fair from the beginning. EV2-TCP is more fair than TCP-NewReno.
+
+% \section{Experiment 3}
+\simulation{sim3}
+Another experiment performed to compare performance (in terms of good-put) of different TCP variants, when number of long lived connections are varied. For this experiment, we set bottleneck bandwidth 1Gbps with delay of 100ms and queue size 20 units of packets. Here we established 10, 50, 100 or 150 long lived connections. 
+\paragraph{Result:}
+Result of this experiment are shown in the figure \ref{fig:exp-3:bw} to figure \ref{fig:exp-3:fairness}.
+
+\paragraph{}
+\begin{figure}[h!]
+\centering
+\subfloat[DropTail queue]{
+\includegraphics[width=0.5\textwidth]{exp-3/bw-d.eps}
+% \caption{fairness in goodput}
+\label{fig:exp-3:bw-d}
+}
+% \end{figure}
+% \begin{figure}[h!]
+% \centering
+% \contsubfig
+\subfloat[RED queue]{
+\includegraphics[width=0.5\textwidth]{exp-3/bw-r.eps}
+\label{fig:exp-3:bw-r}
+}
+\caption{Bandwidth utilization}
+\label{fig:exp-3:bw}
+\end{figure}
+According to figure \ref{fig:exp-3:bw}, E-TCP and EV-TCP achieves almost 100\% utilization for any number of connections. For EV2-TCP, bandwidth utilization directly depends on number of active flows in the system. Utilization of EV2-TCP grows with the number of connections. For TCP NewReno, bandwidth utilization also depends on number of connections, but here growth rate is very low (figure \ref{fig:exp-3:bw}).
+\paragraph{}
+\begin{figure}[h!]
+\centering
+\subfloat[DropTail queue]{
+\includegraphics[width=0.5\textwidth]{exp-3/gdpt-d.eps}
+% \caption{fairness in goodput}
+\label{fig:exp-3:gdpt-d}
+}
+% \end{figure}
+% \begin{figure}[h!]
+% \centering
+% \contsubfig
+\subfloat[RED queue]{
+\includegraphics[width=0.5\textwidth]{exp-3/gdpt-r.eps}
+\label{fig:exp-3:gdpt-r}
+}
+\caption{Good put}
+\label{fig:exp-3:gdpt}
+\end{figure}
+Good put is highest for EV2-TCP, but it does not keep any relation with number of flows in the system. Although TCP NewReno achieves lowest good put, but it is increasing when number of connections increases. Good-put achieved by E-TCP and EV-TCP are almost constant for any number of connections (figure \ref{fig:exp-3:gdpt}).
+
+
+\paragraph{}
+\begin{figure}[h!]
+\centering
+\subfloat[DropTail queue]{
+\includegraphics[width=0.5\textwidth]{exp-3/fairness-d.eps}
+% \caption{fairness in goodput}
+\label{fig:exp-3:fairness-d}
+}
+% \end{figure}
+% \begin{figure}[h!]
+% \centering
+% \contsubfig
+\subfloat[RED queue]{
+\includegraphics[width=0.5\textwidth]{exp-3/fairness-r.eps}
+\label{fig:exp-3:fairness-r}
+}
+\caption{Fairness}
+\label{fig:exp-3:fairness}
+\end{figure}
+EV2-TCP shares available bandwidth among different active flows fairly. Jain's fairness index for EV2-TCP is almost 100\% for any number of flows in the system (figure \ref{fig:exp-3:fairness}. E-TCP's fairness index is above 98\%. Only EV-TCP is exceptionally unfair. When system have 10 number of flows, Jain's fairness index for EV-TCP flows are 70\% and it is decreasing, when number of flows increases.
+
+\paragraph{} From this experiment, we conclude that EV2-TCP is good, when number of long lived connection in the system is comparatively less and there exists some lossy channel. For a single connection, EV2-TCP achieves better good put than that of TCP NewReno.
+
+% \section{Experiment 4}
+\simulation{sim4}
+Experiment \simnum  is performed to show responses of EV-TCP and EV2-TCP to new connections. Here we took bottle-neck bandwidth 100Mbps with 100ms delay. We start and end 3 connections in 3 different time instants. First connection starts at 0th second and ends at 300th second. Second connection starts at 60th second and ends at 240th second. Third connection starts at 120th second and ends at 180th second.
+\paragraph{Result:} 
+We have plotted fairness in good-put \textit{vs} time and good-put \textit{vs} time of the two system (Fig. \ref{fig:exp-8:evtcp:fairness} - Fig. \ref{fig:exp-8:ev2tcp:goodput}).
+
+\paragraph{}
+\begin{figure}[h!]
+  \begin{minipage}[b]{0.5\linewidth}
+    \centering
+    \includegraphics[width=1.0\textwidth]{exp-8/evtcp/fairness.eps}
+    \caption{Fairness of EV-TCP system, when three connection starts and ends at different time.}
+    \label{fig:exp-8:evtcp:fairness}
+  \end{minipage}
+  \hspace{0.5cm}
+  \begin{minipage}[b]{0.5\linewidth}
+    \centering
+    \includegraphics[width=1.0\textwidth]{exp-8/evtcp/goodput.eps}
+    \caption{Good-put of three EV-TCP connections with different starts time and ends time.}
+    \label{fig:exp-8:evtcp:goodput}
+  \end{minipage}
+\end{figure}
+Response to new connection for EV-TCP is very poor (Fig. \ref{fig:exp-8:evtcp:fairness} ). When second connection starts fairness index drops to 0.8, but when third connection starts it again drops to 0.6. Reason behind this drop is third connection achieves very low good-put than first connection and second connection (Fig. \ref{fig:exp-8:evtcp:goodput}). Good put of third connection is nearly 0(zero).
+\paragraph{}
+\begin{figure}[h!]
+  \begin{minipage}[b]{0.5\linewidth}
+    \centering
+    \includegraphics[width=1.0\textwidth]{exp-8/ev2tcp/fairness.eps}
+    \caption{Fairness of EV2-TCP system, when three connection starts and ends at different time.}
+    \label{fig:exp-8:ev2tcp:fairness}
+  \end{minipage}
+  \hspace{0.5cm}
+  \begin{minipage}[b]{0.5\linewidth}
+    \centering
+    \includegraphics[width=1.0\textwidth]{exp-8/ev2tcp/goodput.eps}
+    \caption{Good-put of three EV2-TCP connections with different starts time and ends time.}
+    \label{fig:exp-8:ev2tcp:goodput}
+  \end{minipage}
+\end{figure}
+EV2-TCP is fair for all connections (Fig. \ref{fig:exp-8:ev2tcp:fairness}). Fairness index is above 0.9 when three connections are active. Good-put of three connections are nearly equal. Unlike EV-TCP, third connection also achieves more than 1mBps(mega byte per seconds) good-put.

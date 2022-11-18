@@ -1,0 +1,684 @@
+\chapter{Experiments and Results}
+Here write about the work that you have done. The title of this chapter/section may vary depending on the
+problem of your project. You may add some subsection like methods and data set etc. as follows.
+The experiments were conducted using Pytorch
+\textbf{\cite{paszke2019pytorch}} and Hugging Face’s transformers \textbf{\cite{wolf2020huggingfaces}}. For all the experiments in this paper, we used 48-core Xeon processor Linux based system with 126 GB RAM. For training  the  neural networks  we  used 2 NVIDIA P100 GPUs having 16 GB each with CUDA version 10.1. We primarily based our system on Python libraries. Among the neural networks we used Huggingface's transformers library\footnote{https://huggingface.co/} for GPT-2 based models with PyTorch as backend in general. All the libraries used in this research are pip installable. Further we also resort to the code which controls the generation using \textsc{GeDi} models and the code which trains the \textsc{GeDi} models from the authors' git repository\footnote{https://github.com/salesforce/GeDi}.
+
+\section{Evaluation Metrics}
+
+We consider several metrics to evaluate our whole pipeline of controlled counterspeech generation. The \textit{generation metrics} measure the generation capability of the DialoGPTm and \textsc{GeDi} models. The \textit{classification metrics} are mainly to evaluate the \textsc{GeDi} model on the attribute datasets. Finally, we measure the amount of control in the generated counterspeech using external classifiers which we refer to as \textit{controller metrics}. We generate 5 samples for every hate speech instance with DialoGPTm. The GPS framework automatically selects the best response based on the heuristic, hence we keep one sample for every hate speech instance.
+
+\newpage
+
+\noindent\textbf{Generation metrics}: To measure the generation quality, we use different standard metrics. We use \textit{BLEU}, \textit{BLEU-4}~\cite{papineni2002bleu} and \textit{METEOR}~\cite{banerjee2005meteor} to measure how similar the generated counterspeech are to the ground truth counterspeech. While BLEU measures precision based on 1 to n-grams, METEOR measures the harmonic mean of unigram precision and recall. We also measure if the generation model generates a diverse and novel counterspeech. For this purpose, we use the diversity and novelty metrics from previous research~\cite{wang2018sentigan}.\newline
+
+
+\noindent\textbf{\textsc{GeDi} metrics}: For classification, we report \textit{accuracy}, \textit{macro F1-score}, and \textit{AUROC} score for each \textsc{GeDi} model's performance on a test dataset of a particular attribute. We also report the generation performance using the perplexity~\cite{zhang2020dialogpt}.\newline
+
+
+\noindent\textbf{Controller metrics}: In order to evaluate the ability of the \textsc{GeDi} controller to control the attribute, we used third-party classifiers for each attribute. For politeness, we trained a bert-base-uncased model for politeness level detection on a scale of 0 to 7\footnote{\footnotesize https://github.com/AlafateABULIMITI/politeness-detection}. For measuring emotion in the generated text, we used the Ekman version of the GoEmotions models\footnote{\footnotesize https://huggingface.co/monologg/bert-base-cased-goemotions-ekman}. For each post, it returns a confidence score between 0-1 for anger, disgust, fear, joy, sadness, surprise + neutral.  We report the confidence score for a particular emotion as a measure of that emotion in a given post. Finally, to measure toxicity we used the HateXplain model~\cite{mathew2020hatexplain} trained on two classes -- toxic and non-toxic\footnote{\footnotesize https://huggingface.co/Hate-speech-CNERG/bert-base-uncased-hatexplain-rationale-two}. We report the confidence between 0-1 for the non-toxic class.
+
+
+
+\section{Generation results} 
+We compare DialoGPTm model with the generate, prune and select pipeline (GPS) in Table \ref{tab:results-accurate}. We find \textbf{BLEU} and ~\textbf{BLEU4} for the GPS model is better than the DialoGPTm model for two out of three datasets. This might be due to the response selection part which focuses on selecting the semantically similar counterspeech to hate speech. On the other hand, all other scores are higher for the DialoGPTm for all the three datasets. DialoGPTm presents a competitive performance compared to the state-of-the-art model. For the rest of the experiments, we therefore use DialoGPTm. 
+% \bm{I can understand why the results are like what they are, but does it make sense? The ground truth was generated based on guidelines which had nothing to do with attributes. For DialogGPTm this is basically an uphill battle. It's almost sure to lose and it has to generate a sentence closer to the ground truth while trying to maintain the attribute properly. This additional constrain is not present in the ground truth so GPS is bound to perform better. That would also explain the other 3 metrices result.}
+
+% \bm{If we are going to report this, we should atleast justify why our model underperforms.}
+\newpage
+\begin{table}[!htpb]
+\centering
+\scriptsize
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Model & B ($\uparrow$) & B4 ($\uparrow$) & M ($\uparrow$) & N ($\uparrow$) & D ($\uparrow$)\\
+\hline
+\multicolumn{6}{|c|}{\textbf{CONAN}}                                   \\ \hline
+
+GPS & 0.46 & 0.46 & 0.14  & 0.18 & 0.60  \\
+DialoGPTm & \textbf{0.50}& \textbf{0.50}& \textbf{0.18} &\textbf{ 0.84} & \textbf{0.80} \\\hline
+
+\multicolumn{6}{|c|}{\textbf{Reddit}}                                   \\ \hline
+
+ GPS & \textbf{0.36} & \textbf{0.36} & 0.11 & 0.30 & 0.47  \\
+ DialoGPTm & 0.23 & 0.23 & \textbf{0.17} & \textbf{0.82} & \textbf{0.74} \\\hline
+
+\multicolumn{6}{|c|}{\textbf{Gab}}                                   \\ \hline
+           
+
+GPS & \textbf{0.36 }& \textbf{0.36} & 0.12 & 0.15  & 0.41 \\
+DialoGPTm & 0.26 & 0.26 & \textbf{0.17} & \textbf{0.80} & \textbf{0.72} \\
+\hline
+\end{tabular}
+\caption{\scriptsize{Evaluation results for the three datasets. We report BLEU (B), BLEU4 (B4), METEOR (M), novelty (N) and diversity (D) to compare the two baselines: generate-prune-select (GPS) framework and DialoGPTm. For all metrics, higher is better.}}
+\label{tab:results-accurate}
+\end{table}
+
+\noindent\textbf{\textsc{GeDi} metrics}: As reported in Table \ref{tab:attribute-performance}, we find that F1-score and AUCROC scores for politeness and all the four emotions are above 0.9 . This highlights that even with $0.2$ as the weight for the discriminator we are able to get good scores on classification. The perplexity scores for all the test datasets are also around $3.5$\footnote{For reference, perplexity for pretraining GPT-2 comes around 10 after 10K steps (https://tinyurl.com/3vwrvscd)}. \textsc{GeDi} model for toxicity has lower scores than the other attribute tasks. The F1-score for toxicity detection is $\sim0.6$ and AUCROC is $\sim 0.83$. The perplexity is also higher at around $4.5$ for the toxicity dataset. This highlights the difficulty of the task of detecting toxicity.
+\begin{table}[h!]
+\scriptsize
+\centering
+\begin{tabular}{cc|c|c|c|c}
+\hline
+\textbf{Dataset} & \textbf{Positive} & \textbf{F1} ($\uparrow$) & \textbf{Acc} ($\uparrow$) & \textbf{AUC}($\uparrow$) & \textbf{Perplexity} ($\downarrow$)  \\ \hline
+Toxicity & toxic  &   0.60 & 0.85  & 0.84 & 4.428\\ \hline
+Politeness & polite  & 0.93 & 0.96   & 0.93 & 3.476 \\ \hline
+Emotion & joy  & 0.96 & 0.96 & 0.97  & 3.546 \\ %\hline
+Emotion & sadness  & 0.98 & 0.98 & 0.99  & 3.543 \\ %\hline
+Emotion & fear  &  0.94 & 0.97  & 0.98 & 3.774\\ %\hline
+Emotion & anger  & 0.96 & 0.98  & 0.99 & 3.560 \\ \hline
+\end{tabular}
+\caption{\scriptsize{\textsc{GeDi} generation and classification performance on test set of attribute datasets. Generation is evaluated using the Perplexity whereas classification performance is measured using F1-score (F1), Accuracy (Acc) and AUCROC (AUC). For all the metrics except Perplexity, higher is better.}}
+\label{tab:attribute-performance}
+\end{table}
+
+\noindent\textbf{Single-attribute control}: In Table \ref{tab:control-single}, we report the amount of different attributes present in the generated counterspeech for each dataset and for each model. When we compare GPS and DialoGPTm, we find that except anger emotion, all other scores are significantly higher for DialoGPTm. Second, using control for a particular attribute significantly improves the presence of that attribute ($p-value <0.001$). For instance, in Table \ref{tab:control-single}, the politeness score increases from 3.91 to 4.54, from 5.24 to 6.05 and 5.14 to 6.11 for CONAN, Reddit and Gab respectively when the DialoGPTm model is controlled for politeness. This is true for all attributes barring the `anger' emotion. Politeness and detoxification score increased by 15-18\% and 6-8\% respectively across all the datasets. For the emotion attributes, `joy' has the highest scores among all for both controlled and uncontrolled attribute. We see an overall increase in `joy' of around 17\% for Gab, 14\% for Reddit and 88\% for CONAN. Counter responses in CONAN datasets are mostly devoid of any emotions hence bringing a change in them is much easier than the Reddit/Gab datasets which are higher in terms of the joy attribute. We reach closer to GPS baseline for anger emotion while controlling anger emotion and increase the score by 54\%, 55\% and 16\% for Reddit, Gab and CONAN, respectively. While the increase for other emotions -- `sadness' and `fear' increased significantly, the overall scores for them remain low.
+
+% \bm{For all the tables, indicate if a higher value is better or worse. You can use an up/down arrow or write in the caption as well.}\punyajoy{added}
+
+\begin{table}[h!]
+\centering
+\scriptsize
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\textbf{Model} & \textbf{D} ($\uparrow$)  & \textbf{P} ($\uparrow$) & \textbf{J} ($\uparrow$) & \textbf{A} ($\uparrow$) & \textbf{S} ($\uparrow$) & \textbf{F} ($\uparrow$)\\
+\hline
+\multicolumn{7}{|c|}{\textbf{CONAN}}                                   \\ \hline
+ GPS & \textbf{0.68} & 2.01 & 0.16 & \textbf{0.12} & 0.03 & 0.01 \\
+ DialoGPTm & 0.64 & 3.91 & 0.18 & 0.09 & 0.04 & 0.01\\ 
+ DialoGPTm-c & \textbf{0.68} & \textbf{4.54} & \textbf{0.34} & 0.11 & \textbf{0.08} & \textbf{0.05}\\\hline 
+\multicolumn{7}{|c|}{\textbf{Reddit}} \\\hline
+ GPS & 0.82 & 1.62 & 0.23 &\textbf{0.32} & 0.04 & 0.01 \\
+ DialoGPTm & 0.82 & 5.24 & 0.63 & 0.17 & 0.06 & 0.00\\
+ DialoGPTm-c & \textbf{0.87} & \textbf{6.05} & \textbf{0.72} & 0.27 & \textbf{0.10}& \textbf{ 0.02}\\ \hline
+ \multicolumn{7}{|c|}{\textbf{Gab}} \\\hline
+GPS & 0.79 & 1.46 & 0.22 & \textbf{0.28} & 0.04 & 0.01 \\
+DialoGPTm & 0.81 & 5.14 & 0.66 & 0.17 & 0.05 & 0.00\\
+DialoGPTm-c & \textbf{0.85} & \textbf{6.11} & \textbf{0.77} & 0.26 & \textbf{0.10} & \textbf{0.02}\\
+\hline
+\end{tabular}
+\caption{\scriptsize{Performance of single attribute setups with the vanilla baseline generate-prune-select (GPS) and  DialoGPTm models. Each column name represents the attribute being measured. The attributes measured are politeness(P), detoxification (D), sadness(S), joy(J), anger(A) and fear(F). Politeness (P) is measured in a scale of 0-7 whereas others are measured in the scale $[0,1]$. For the last row - controlled DialoGPTm (DialoGPTm-c) the column name also represents the attribute getting controlled. For all the metrics, higher is better.}}
+\label{tab:control-single}
+\end{table}
+
+\noindent\textbf{Multi-attribute control}: We also generate counterspeech with the DialoGPTm with mutli-attribute control. We keep politeness, detoxification and one of the emotion\footnote{One among `joy', `anger', `fear' and `sad'.} as control attributes. This gives us four variations for each dataset. We then measure the individual attribute scores for each of these three attribute and report the results in Table \ref{tab:multi-attribute}. For detoxification scores, the setup - $joy+polite+detox$ outperforms other setups across all the experiment. This setup even outperforms the single-attribute detoxification setup by 8\%, 2\% and 2\% for CONAN, Reddit and Gab, respectively. For politeness score, the best performance occurs for  $joy+polite+detox$ setup for CONAN and Reddit dataset, while the setup - $fear+polite+detox$ performs better in case of the Gab dataset. Compared to single attribute setup for politeness, the politeness scores drop across all the multi-attribute setups. Among the emotions, the attribute score for `joy' in a multi-attribute setting outperforms the single attribute setting by 44\%, 13\% and 10\% for CONAN, Reddit and Gab.  For `anger', the scores in multi-attribute setting decrease around 25-30\% when compared to the single attribute setting. For other attributes like `sadness' and `fear', the multi-attribute results are below 0.1, similar to the single attribute results.  
+
+Overall, we observe that it is possible to control the attributes in the generated outputs using the single attributes. Our experiments with multi-attributes further reveals that there are certain complementing attributes for e.g $joy+polite+detox$  which can be used to further increase the single-attributes setups. For other setups, the attribute scores drops below the single attribute setups. An interesting research direction will be to look into improving attribute scores while using multi-attribute setups.
+
+In order to further understand the influence of each attribute, we perform an ablation study on the multi-attribute setups. For each setup, we remove an attribute and generate the sentences for the other two attributes. Finally, we measure the score for that removed attribute itself. We report the summary of the results in Table \ref{tab:multi-attribute-ablation}. When the detox attribute is removed, we do not see much change in the detoxification score (around 1-2\% drop) across all datasets. On the other hand, removal of the politeness attribute decreases the scores massively. We observe an average of 12\%, 15\% and 14\% drops across CONAN, Reddit and Gab datasets respectively.
+
+Among the emotions, when the `joy' attribute was removed we observe a huge reduction in the attribute score for the CONAN dataset (24\%), while for other datasets the drop remains below 10\%. Most significant change in the emotion score takes place when removing `anger' and `sadness' attributes where the average reduction remains around 40-60\% across all the datasets. Finally, when removing `fear' attribute, we only see a change for CONAN dataset (83\%) but other scores remain almost the same. \fi
+
+\begin{table}[h!]
+\scriptsize
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Attributes}          & \textbf{Detox}($\uparrow$)         & \textbf{Polite}($\uparrow$)        & \textbf{Emotion}($\uparrow$)\\ \hline
+\multicolumn{4}{|c|}{\textbf{CONAN}}                                   \\ \hline
+Joy(J)+Polite+Detox    &   \textbf{0.74}     &  \textbf{4.13}               & 0.49 (J)       \\ \hline
+Anger(A)+Polite+Detox  &    0.67             &  3.06                         & 0.08 (A)      \\ \hline
+Sad(S)+Polite+Detox   &   \underline{0.70}   &  3.56                        & 0.07 (S)       \\ \hline
+Fear(F)+Polite+Detox  &    \underline{0.70}  &  \underline{4.00}            & 0.06 (F)       \\ \hline
+
+\multicolumn{4}{|c|}{\textbf{Reddit}}                                   \\ \hline
+Joy+Polite+Detox    &  \textbf{0.89}     & \textbf{5.79} & 0.82 (J)      \\ \hline
+Anger+Polite+Detox  &  0.85              & \underline{4.24}             & 0.19 (A)      \\ \hline
+Sad+Polite+Detox   &   \underline{0.87}  & 3.56             & 0.09 (S)       \\ \hline
+Fear+Polite+Detox  &  \underline{0.87}   & 4.00             & 0.01 (F)       \\ \hline
+\multicolumn{4}{|c|}{\textbf{Gab}}                                   \\ \hline
+Joy+Polite+Detox    & \textbf{0.87}        & \underline{5.68}             &  0.85 (J)\\ \hline
+Anger+Polite+Detox  & 0.83      & 4.11             &  0.19 (A) \\ \hline
+Sad+Polite+Detox    & 0.85     & 4.70             & 0.09 (S) \\ \hline
+Fear+Polite+Detox   & \underline{0.86}      & \textbf{5.82} & 0.01 (F) \\ \hline
+\end{tabular}
+\caption{\scriptsize{Results of controlling three attributes -- politeness, detoxification and one of the emotions in a multi-attribute setting. The columns represent the amount of the attribute present for each setup. The last column -- \textit{emotion} represents the score of the emotion shown in the parenthesis that is being controlled for that instance.}}
+\label{tab:multi-attribute}
+\end{table}
+
+\if{0}
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Attributes}          & \textbf{Detox}($\uparrow$)          & \textbf{Polite}($\uparrow$)     & \textbf{Emotion}($\uparrow$) \\ \hline
+\multicolumn{4}{|c|}{\textbf{CONAN}}                                   \\ \hline
+Joy(J)+Polite+Detox    &    0.73             &  3.44               & 0.37 (J)        \\ \hline
+Anger(A)+Polite+Detox  &    0.68             &  2.79               & 0.05 (A)       \\ \hline
+Sad(S)+Polite+Detox   &     0.69             &  3.20               & 0.03 (S)        \\ \hline
+Fear(F)+Polite+Detox  &     0.70             &  3.30               & 0.01 (F)        \\ \hline
+
+\multicolumn{4}{|c|}{\textbf{Reddit}}                                   \\ \hline
+Joy+Polite+Detox    &  0.87               & 5.12                & 0.76 (J)       \\ \hline
+Anger+Polite+Detox  &  0.82               & 3.46                & 0.09 (A)    \\ \hline
+Sad+Polite+Detox    &  0.84               & 3.96                & 0.05 (S)       \\ \hline
+Fear+Polite+Detox   &  0.86               & 3.34                & 0.01 (F)       \\ \hline
+\multicolumn{4}{|c|}{\textbf{Gab}}                                   \\ \hline
+Joy+Polite+Detox    & 0.85                & 5.09                & 0.82 (J) \\ \hline
+Anger+Polite+Detox  & 0.80                & 3.41                & 0.08 (A)  \\ \hline
+Sad+Polite+Detox    & 0.82                & 4.19                & 0.04 (S) \\ \hline
+Fear+Polite+Detox   & 0.85                & 4.69                & 0.00 (F)\\ \hline
+\end{tabular}
+\caption{\footnotesize{Results of the ablation study. In each of these setups, we remove one of the attribute and re-estimate that attribute's score. The last column -- \textit{emotion} represents the score of the emotion that is being controlled for that instance. For all the metrics, higher is better.}}
+\label{tab:multi-attribute-ablation}
+\end{table}
+\fi
+
+\section{Human evaluation}
+
+In order to understand, if the improvement in the attribute scores across (while controlling different attributes) would be visible to the moderators, we perform a human evaluation on the generated counterspeech. In this experiment, an annotator is shown three sentences - one generated from the GPS pipeline, another generated using DialoGPTm model and finally, one generated using the DialoGPTm model where some attribute $x$ was getting controlled. We hide the type of model from which the post was generated and further shuffle the posts to remove any ordering bias. Next, the annotator was asked to mark the amount of the attribute $x$ in the given three posts on a scale of 0-5 where 0 presents the absence of the attribute while 5 corresponds to the highest presence of that attribute. Five annotators participated in the annotation with each post getting marked by two annotators. The annotators annotated 20 randomly selected triplets per dataset for each attribute. We do not include the detoxification attribute for these experiments as there is very little difference in detoxification scores when comparing the baseline and the controlled setups. 
+
+We observe an improvement in most of the attribute scores for the controlled model over the two baselines. Three cases where the improvement is not present is while controlling `joy' and 'sad' for the CONAN dataset and controlling `fear' for Reddit dataset. While controlling attribute `sad', we only see an improvement relative to the base DialoGPTm model. The summary of this experiment is presented in the Table ~\ref{tab:human-evaluation-control}.
+
+
+\begin{table}[]
+\centering
+\scriptsize
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{Model} & \textbf{Polite} ($\uparrow$) & \textbf{Joy} ($\uparrow$) & \textbf{Anger} ($\uparrow$)& \textbf{Sad} ($\uparrow$)& \textbf{Fear} ($\uparrow$)\\\hline
+
+\multicolumn{6}{|c|}{\textbf{CONAN}}                    \\ \hline
+GPS         & 0.50 & 1.30 & 2.50 & \textbf{1.00} & 0.00 \\
+DGPTm    & 0.59 & \textbf{2.50} & 3.00 & 0.75 & 0.75 \\
+DGPTm-c & \textbf{2.00} & 1.00 & \textbf{4.00} & \textbf{1.00} & \textbf{2.00} \\ \hline
+\multicolumn{6}{|c|}{\textbf{Reddit}}                   \\ \hline
+GPS         & 1.83 & 0.93 & 1.50 & 0.33 & 0.36 \\
+DGPTm    & 2.66 & 2.50 & 1.50 & 0.66 & \textbf{1.33} \\
+DGPTm-c & \textbf{3.50} & \textbf{3.33} & \textbf{2.00} & \textbf{2.00} & 1.25 \\ \hline
+\multicolumn{6}{|c|}{\textbf{Gab}}                      \\ \hline
+GPS         & 1.56 & 1.28 & 0.81 & 0.4  & 0.17 \\
+DGPTm    & 2.17 & 2.50 & 1.66 & 1.11 & 0.89 \\
+DGPTm-c & \textbf{3.21} & \textbf{2.92} & \textbf{1.90} &\textbf{ 2.03} & \textbf{1.00}\\ \hline
+\end{tabular}
+\caption{\scriptsize{Average human judgement scores (scale 0-5) for each of the models -- GPS, DialoGPTm and controlled DialoGPTm (DGPTm-c). Each column represents the attribute that DialoGPTm-c is controlled for. For all the metrics, higher is better.}}
+\label{tab:human-evaluation-control}
+\end{table}
+
+\section{Ablation study}
+
+In order to further understand the influence of each attribute, we perform an ablation study on the multi-attribute setups. For each setup, we remove an attribute and generate the sentences for the other two attributes. Finally, we measure the score for that removed attribute itself. We report the summary of the results in Table \ref{tab:multi-attribute-ablation-conan} for CONAN, Table \ref{tab:multi-attribute-ablation-reddit} for Reddit and  Table \ref{tab:multi-attribute-ablation-gab} for Gab dataset. When the detox attribute is removed, we do not see much change in the detoxification score (around 1-2\% drop) across all datasets. On the other hand, removal of the politeness attribute decreases the scores massively. We observe an average of 12\%, 15\% and 14\% drops across CONAN, Reddit and Gab datasets respectively.
+
+Among the emotions, when the `joy' attribute is removed we observe a huge reduction in the attribute score for the CONAN dataset (24\%), while for other datasets the drop remains below 10\%. Most significant change in the emotion score takes place when removing `anger' and `sadness' attributes where the average reduction remains around 40-60\% across all the datasets. Finally, when removing `fear' attribute, we only see a change for CONAN dataset (83\%) but other scores remain almost the same.
+\begin{table}[!htpb]
+\centering
+\footnotesize{
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Attributes}          & \textbf{Detox}              & \textbf{Polite}           & \textbf{Emotion} \\ \hline
+Joy(J)+Polite   &    0.73             &  --               & --        \\ 
+Joy+Detox    &    --                &  3.44             & --        \\ 
+Polite+Detox    &    --                &  --               & 0.37 (J)        \\ \hline
+Anger(A)+Polite &    0.68            &  --               & --        \\ 
+Anger+Detox  &     --             &  2.79             & --        \\ 
+Polite+Detox    &     --             &  --               & 0.05 (A)       \\ \hline
+Sad(S)+Polite   &     0.69             & --               & --        \\ \
+Sad+Detox   &     --             &  3.20               & --        \\ 
+Polite+Detox   &     --             &  --               & 0.03 (S)        \\ \hline
+Fear(F)+Polite  &     0.70           & --               & --        \\ 
+Fear+Detox  &      --             &  3.30            & --        \\
+Polite+Detox  &       --             &  --               & 0.01 (F)        \\ \hline
+
+\end{tabular}
+}
+\caption{\footnotesize{Results of the ablation study for $DialoGPT_{medium}$ model trained on CONAN dataset. In each of these setups, we remove one of the attribute and re-estimate that attribute's score. The last column -- \textit{emotion} represents the score of the emotion that is being controlled for that instance.}}
+\label{tab:multi-attribute-ablation-conan}
+\end{table}
+
+
+
+\begin{table}[!htpb]
+\centering
+\footnotesize{
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Attributes}          & \textbf{Detox}              & \textbf{Polite}           & \textbf{Emotion} \\ \hline
+Joy(J)+Polite    &  0.87               & --                & --        \\ 
+Joy+Detox    &  --                  & 5.12              & --        \\
+Polite+Detox    &  --               & --                & 0.76 (J)       \\ \hline
+Anger(A)+Polite  &  0.82               & --                & --    \\ 
+Anger+Detox  &   --                 & 3.46              & --    \\ 
+Polite+Detox  &  --                 & --                & 0.09 (A)    \\ \hline
+Sad(S)+Polite    &  0.84               & --                & --       \\ 
+Sad+Detox     &   --                & 3.96               & --       \\ 
+Polite+Detox  &  --                 & --                & 0.05 (S)       \\ \hline
+Fear(F)+Polite   &  0.86               & --                &        \\ 
+Fear+Detox   &   --                 & 3.34              & --       \\ 
+Polite+Detox   &  --                & --                & 0.01 (F)       \\ \hline
+
+\end{tabular}
+}
+\caption{\footnotesize{Results of the ablation study for $DialoGPT_{medium}$ model trained on Reddit dataset. In each of these setups, we remove one of the attribute and re-estimate that attribute's score. The last column -- \textit{emotion} represents the score of the emotion that is being controlled for that instance.}}
+\label{tab:multi-attribute-ablation-reddit}
+\end{table}
+
+
+
+\begin{table}[!htpb]
+\centering
+\footnotesize
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Attributes}          & \textbf{Detox}              & \textbf{Polite}           & \textbf{Emotion} \\ \hline
+Joy(J)+Polite    & 0.85                & --                & -- \\ 
+Joy+Detox    &  --                  & 5.09              & -- \\ 
+Polite+Detox    & --                & --                & 0.82 (J) \\ \hline
+
+Anger(A)+Polite  & 0.80                & --                & --  \\ 
+Anger+Detox     & --                & 3.41              & --  \\ 
+Polite+Detox     & --                & --               & 0.08 (A)  \\ \hline
+
+Sad(S)+Polite    & 0.82                & --                & -- \\ 
+Sad+Detox     &  --                & 4.19                & -- \\ 
+Polite+Detox  & --                & ---                & 0.04 (S) \\ \hline
+
+Fear(F)+Polite   & 0.85             & --                & --\\ 
+Fear+Detox   & --               & 4.69                & --\\ 
+Polite+Detox   & --                & --                & 0.00 (F)\\ \hline
+
+\end{tabular}
+\caption{\footnotesize{Results of the ablation study for $DialoGPT_{medium}$ model trained on Gab dataset. In each of these setups, we remove one of the attribute and re-estimate that attribute's score. The last column -- \textit{emotion} represents the score of the emotion that is being controlled for that instance.}}
+\label{tab:multi-attribute-ablation-gab}
+\end{table}
+\subsection{Metrics}
+The diversity~\cite{wang2018sentigan} of the given set of generated sentences $s$ is defined in equation  \ref{eq:7}. $\psi$ is the Jaccard similarity function.
+\begin{equation}
+\footnotesize
+\label{eq:7}
+diversity(s) =(1/|s|)*\sum_{i}1-max((\psi(s_{i},s_{j}))_{j=1}^{j=|s|,j!=i}
+\end{equation}
+
+Finally, we measure the novelty of the generated outputs to understand if the outputs are directly copied from the training dataset or not. We calculate the novelty~\cite{wang2018sentigan} using equation \ref{eq:8} where $c$ is the sentence set of training corpus and $\psi$ is the Jaccard similarity function. 
+
+\begin{equation}
+\footnotesize
+    \label{eq:8}
+    novelty(s) =(1/|s|)*\sum_{i}1-max((\psi(s_{i},c_{j}))_{j=1}^{j=|c|}
+\end{equation}
+
+\subsection{Hyperparameters}
+For the generation module, we fix the maximum generation length at 100 tokens due to resource constraints. \textit{No repeat ngram size} was kept at 5, \textit{repetition penalty} was set at 3.5 and \textit{temperature} for generating output was 1.2. These steps were taken to further enhance the diversity of the samples generated.
+
+\section{Limitations}
+
+We rely on the public datasets available for our work. Hence, the generated counterspeech is to some extent based on the properties of the dataset. For example, the CONAN dataset is primarily focused on countering Islamophobic speech. Second, this framework may not directly generalise to more complex type of counterspeech like contradiction or sarcasm. 
+
+
+\subsection{Examples of controlled generation}
+We present examples from controlled counterspeech generation corresponding to few hate speech. \ref{tab:table-example2} and \ref{tab:table-example3} show the generation based on single attribute control, while Tables \ref{tab:table-example4} and \ref{tab:table-example5} show the generated outputs for multi-attribute control.
+
+
+
+
+\begin{table}[!htpb]
+\centering
+\footnotesize{
+\begin{tabular}{p{3cm}p{12cm}}\hline
+Hate speech              &  \textit{Never break bread with a Quranimal. You risk catching HIV and/or Ebola.}.\\\hline
+Counter speech (fear)    &  \textit{How can you expect us to live in peaceful culture if we are afraid of everything that might come after? how can tolerantism do anything but bring fear? also it means focus on your chosen faith not get influenced by outsiders.}\\\hline
+Counterspeech (sadness) &  \textit{how is having people over spreading it such an issue, could you elaborate on this hatred of the quran for how these disgusting disease spread from us to their home countries. please do! its just so sad indeed. not everyone should tolerate hate like this.}\\\hline
+Counterspeech (anger) &  \textit{So not true. Islam can lead the way to salvation, but no one believes that. We should respect diversity! And you know, curing other peoples diseases? That seems very selfish... we should eradicate disease!}\\\hline
+
+\end{tabular}}
+\caption{\footnotesize{This table presents an example hate speech and the counterspeech generation using different control attributes which is marked in the (bracket).}}
+\label{tab:table-example2}
+\end{table}
+
+
+\begin{table}[!htpb]
+\centering
+\footnotesize{
+\begin{tabular}{p{3cm}p{12cm}}\hline
+Hate speech              &  \textit{wats wrong with being a commie jew? don't you want that high-iq baby inside your nazi womb?}.\\\hline
+Counterspeech (politeness)    &  \textit{there is no need to degrade an entire religion based on the actions of a few people here, please moderate your speech outside of this space and think about how using such language could be hurtful or even unfunny. thank you!  happy  new year!}\\\hline
+Counter speech (joy) &  \textit{its inappropriate to use this word when referring specifically to muslims and can be viewed as racist. please do not use these terms or consider them hurtful. thank you for using better language in the future.}\\\hline
+Counterspeech (sad) &  \textit{making fun of nationality, religion and sexual preference is not kosher in todays world. try rereading them both times just in case they are harmful for you or anyone! first time using words used here makes those hurt even more}\\\hline
+\end{tabular}}
+\caption{\footnotesize{This table presents an example hate speech and the counter speech generation using different control attributes which is marked in the (bracket).}}
+\label{tab:table-example3}
+\end{table}
+
+\begin{table}[!htpb]
+\centering
+\footnotesize{
+\begin{tabular}{p{3cm}p{12cm}}\hline
+Hate speech              &  \textit{A black person robbed my friend so fuck you black pieces of shit. One day we will lynch all of you cuz you had it coming.
+}.\\\hline
+Counterspeech (joy + polite)    &  \textit{to use hateful language only shows how intolerant and bigoted you are, in the hopes that you can be more accepting with your experiences. remember to use better language yourself in the future. thank you for your understanding.}\\\hline
+Counter speech (anger + polite) &  \textit{wow. what a hate filled hateful word that should not be used when discussing the color of peoples skin! several such things can contribute to productive discussion, and any further comments could easily be summarized using such words}\\\hline
+\end{tabular}}
+\caption{\footnotesize{This table presents an example hate speech and the counter speech generation using multi-attributes control, which are marked in the (bracket).}}
+\label{tab:table-example4}
+\end{table}
+
+\begin{table}[!htpb]
+\centering
+\footnotesize{
+\begin{tabular}{p{3cm}p{12cm}}\hline
+Hate speech              &  \textit{Remember that time a bunch of people kidnapped a retard and tortured him live?
+}.\\\hline
+Counter speech (joy + polite)    &  \textit{it only happened once but in this instance its not ok to use pejoratively based on medical conditions if you like supporting your opinions further so please feel free to vote out any language that suggests 
+it may be used. thanks}\\\hline
+Counter speech (anger + toxic) &  \textit{wow, how racist these comments are. it actually incredibly disrespectful to generalize people based on their race. we see plenty of genetic variation among people, not just racial variance. 
+let us not thank anyone for missing details
+}\\\hline
+Counter speech (sadness + polite)    &  \textit{i have no idea why you are even posting this. reading through such posts hurt 
+deep down inside with fear by where your women will cry out from these comments when compared to actual victims experiences across history s repulsive has good won t it now would yield illiberal, whatever issues acusot or moronic could look like. alsoplease refrain from using mental illness as an insult ( over here ) thanks for the heads up}\\\hline
+\end{tabular}}
+\caption{\footnotesize{This table presents an example hate speech and the counterspeech generation using multi-attributes control, which are marked in the (bracket).}}
+\label{tab:table-example5}
+\end{table}
+
+\newpage
+% \subsection{System and code requirements}
+% For all the experiments in this paper, we used 48-core Xeon processor Linux based system with 126 GB RAM. For training  the  neural networks  we  used 2 NVIDIA P100 GPUs having 16 GB each with CUDA version 10.1. We primarily based our system on Python libraries. Among the neural networks we used Huggingface's transformers library\footnote{https://huggingface.co/} for GPT-2 based models with PyTorch as backend in general. All the libraries used in this research are pip installable. Further we also resort to the code which controls the generation using \textsc{GeDi} models and the code which trains the \textsc{GeDi} models from the authors' git repository\footnote{https://github.com/salesforce/GeDi}.
+
+\subsection{Human judgement details}
+The annotators include 2 PhD and 3 BTech students. We consider the definitions and use several examples from the relevant attribute datasets to provide examples to the annotators to help them mark the presence of that attribute in the presented counterspeech. The final interface is shown in Figure \ref{fig:interface}. We use  Amazon Mechanical Turk (AMT) sandbox~\footnote{https://requestersandbox.mturk.com/create/projects} environment, where the annotators login using their account and annotate the examples.
+
+
+\begin{figure}[!b]
+    \centering
+    \includegraphics[width=0.5\textwidth]{Graphics/interface.jpg}
+    \caption{The interface design for the Amazon Mechanical Turk platform.}
+    \label{fig:interface}
+\end{figure}
+
+
+
+
+% \section{Performance Metrics}
+% \begin{itemize}
+%     \item \textbf{BLEU : \cite{wieting2019bleu}}The BLEU (bilingual evaluation understudy) algorithm evaluates the accuracy of machine-translated text from one natural language to another. BLEU always returns a number $\in{0,1}$. This number reflects how similar the candidate text is to the reference texts, with higher numbers indicating more similar texts.
+%     \item \textbf{METEOR \cite{silva2020meteor} : }METEOR (Metric for Evaluation of Translation with Explicit Ordering) is a machine translation performance evaluation metric. 
+%     \newpage
+%     The metric is based on the harmonic mean of unigram precision and recall, with recall having a higher weighting than precision.
+%     \newline
+%     \item \textbf{Diversity : \cite{ijcai2018-618}} We're looking to see if the generator will generate a wide range of sentences. The diversity of sentences $S_{i}$ is defined as follows : Given a set of generated sentences $S$: 
+%         \[
+%             Diversity(S_{i}) = 1-max((\psi(S_{i},S_{j}))_{j=1}^{j=|S|,j!=i}
+%         \]
+%     \item \textbf{Novelty : \cite{ijcai2018-618}} We'd like to see how the produced sentences and the training corpus differ. To put it another way, we're looking to see if the generator actually copies the sentences from the corpus rather than creating new ones. We calculate the novelty of each generated sentence $S_{i} as follows : $
+%      \[
+%          Novelty(S_{i}) = 1-max((\psi(S_{i},C_{j}))_{j=1}^{j=|C|}
+%         \]
+%     where $C$ is the sentence set of training corpus and $\psi$ is the Jaccard Similarity Function. 
+% \end{itemize}
+
+
+% \section{Zero-Shot Performance}
+% \par We fine-tuned Dialo-GPT on the Create-Debate Dataset and evaluated directly on the test instances from each of the three datasets. We will now show the metrics evaluated and some responses generated under each strategy and will analyze the quality of responses. Given below is the summary on evaluated metrics in Table - \ref{example-2}.
+
+% \begin{table}[h]
+%  \centering
+% \begin{tabular}{ |c|c|c|c|c|c|}
+%  \hline
+%  \textbf{Datasets} & \textbf{BLEU} & \textbf{BLEU-4} & \textbf{METEOR} & \textbf{Diversity} & \textbf{Novelty}\\
+%  \hline
+%   REDDIT   &  0.1524 &  0.1538 & 0.096 & 0.6806 & 0.700\\
+%  \hline
+%   CONAN & \textbf{0.53} & \textbf{0.536} & \textbf{0.17} & \textbf{0.740} & \textbf{0.731} \\
+%  \hline 
+%   GAB & 0.1320 & 0.1325 & 0.081 & 0.6250 & 0.6838 \\
+%  \hline 
+%   \hline
+% \end{tabular}
+% \caption{Metrics computed on Datasets under Zero-Shot Environment}
+% \label{example-2}
+% \end{table}
+
+% \newpage
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=1.0,width=1.0\linewidth]{Graphics/zero-shot.png}
+%     \caption{The Zero-Shot scores on different Datasets.}
+%     \label{fig:zero}
+% \end{figure}
+
+% \subsection{Performance on CONAN}
+
+% \par The responses generated by fine-tuning the Language-Model on Create-Debate Dataset and tested on the CONAN Dataset are given below. The responses generated by Dialo-GPT were quite good considering this setup was conducted in Zero-Shot Environment.
+% \begin{itemize}
+%     \item \textbf{Hate : }Islam is a cult and not a religion.They rape children, enslave and murder people , attack our values, and there is nothing good about it. It is incompatible with our way of life.
+%     \item \textbf{Response : }It is not a cult, it is a religion, and a religion is defined as a set of beliefs, rules, and values. A cult is defined by the actions of its members.
+%     \item \textbf{Hate : }Shocking. 2 men are murdered in Paris by having their throats cut by some savage shouting 'Allahu Akbar' and the BBC ignore the story. Another cover up.
+%     \item \textbf{Response : }How is that shocking? It is not shocking that muslims are being slaughtered in the name of Islam. The fact that you think that is shocking does not make it any less true. you have no idea what you are talking about, do you?
+% \end{itemize}
+
+% \subsection{Performance on REDDIT}
+
+% \par The responses generated by fine-tuning the Language-Model on Create-Debate Dataset and tested on the REDDIT Dataset are given below. The responses generated by Dialo-GPT were quite good considering this setup was conducted in Zero-Shot Environment but in some cases the responses were toxic and had abusive or offensive slurs present in them.
+% \begin{itemize}
+%     \item \textbf{Hate : }You are a worthless cunt . Is there a pronoun in that ?
+%     \item \textbf{Response : }No, I am not worthless. I have a job and a family, and I do not have to worry about being fired.
+%     \item \textbf{Hate : }Fucking nonce chink cunt!!
+%     \item \textbf{Response : }Why are you so angry at me? I am just trying to help you out. I do not know why you are so upset. Maybe you should stop being such a cunt.
+%     \item \textbf{Hate : }You are the sort of idiot who cries about everyone who does not immediately fall into ideological lockstep with you is a ~ ~ nazi ~ ~ libtard , are not you ?
+%     \item \textbf{Response : }I am not crying about anyone. I am just pointing out that you do not seem to understand the difference between the two.
+% \end{itemize}
+
+% \subsection{Performance on GAB}
+
+% \par The responses generated by fine-tuning the Language-Model on Create-Debate Dataset and tested on the GAB Dataset are given below. The responses generated by Dialo-GPT were similar to that incase of REDDIT as they both contain similar kind of hate-counterspeech pairs.
+% \begin{itemize}
+%     \item \textbf{Hate : }Faggots are soft what if he was just tapping them on the shoulder and there faces inadvertently got in the way .
+%     \item \textbf{Response : }Then he would not be a faggot. he is a man, and he has the right to live his life how he wants to. if you do not like it, that is your prerogative, but i am not going to force you to do anything.
+%     \newpage
+%     \item \textbf{Hate : }The explanation for the bible , as our retarded kosher friend can not seem to explain , was " inspired by " god . so yes , it was written by men and deliberated on by a council which dictated the books it would contain.
+%     \item \textbf{Response : }The bible is not a book. It is a collection of books.
+%   \item \textbf{Hate : }This is fact : niggers have never made anything better , anywhere in the world .
+%     \item \textbf{Response : }You are wrong. they have made everything better in nigeria, africa, china, india, and many other places. I am not sure what you mean by " better ", but they certainly have done a lot to improve the quality of life in those areas. and they are doing it.
+%     \item \textbf{Hate : }You fairy gay neo - nazi faggot socialist bitches make it so easy . 
+%     \item \textbf{Response : }I am not a faget. I am a straight guy. You are a retard.
+% \end{itemize}
+
+% \newpage
+% \par The automated evaluation metrics calculated on the CONAN-test-data is given in \ref{example-2}.
+% \begin{table}[h]
+% \begin{tabular}{ |p{3cm}||p{5cm}|p{5cm}|p{5cm}|}
+%  \hline
+%  \textbf{Metric} & \textbf{GPT2} & \textbf{GPT2-20iter} & \textbf{DIALOGPT}\\
+%  \hline
+%   BLEU-0   &  0.2255 &  \textbf{0.4784} & 0.3549\\
+%  \hline
+%   BLEU-4 & 0.3343 & \textbf{0.5712} & 0.4959\\
+%  \hline 
+%   METEOR & 0.3523 & \textbf{0.5920} & 0.4404\\
+%  \hline 
+%   Perplexity & \textbf{8.1823} & 10.1965 & 8.7566\\
+%   \hline
+% \end{tabular}
+% \caption{Metrics computed on CONAN Test-Data}
+% \label{example-2}
+% \end{table}
+
+% \subsection{Performance on Reddit}
+% \par The responses generated by fine-tuning the Language-Models on Reddit Dataset are given in \ref{example-4} The responses generated by GPT-2 are comparatively of better quality.
+% \begin{table}[h]
+% \begin{tabular}{ |p{3cm}||p{12cm}|  }
+%  \hline
+%  \textbf{Model} & \textbf{Text}\\
+%  \hline
+%  Hate-Speech   &  No, because she's literally a retard and hasn't come to terms with that fact just yet.   \\
+%  \hline
+%  GPT2 & The use of that word is offensive towards people with mental disabilities and is unacceptable.\\
+%  \hline 
+%  DialoGPT & Please refrain from using hateful ableist language in your posts.  It does nothing to enhance your argument or the discussion in this sub.\\
+%  \hline
+% \end{tabular}
+% \begin{tabular}{ |p{3cm}||p{12cm}|  }
+%  \hline
+%  \hline
+%  Hate-Speech   &   Anyone calling themselves a feminist today is either an anachronistic moron, or a female supremacist cunt. \\
+%  \hline
+%  GPT2 & 'Cunt' is a pejorative word that is demeaning and hateful towards women, and should not be used.\\
+%  \hline 
+%  DialoGPT & The use of the word 'cunt' is offensive as its a direct attack to someone based on their gender. Refrain from such words\\
+%  \hline
+% \end{tabular}
+% \caption{Responses generated by different fine-tuned LMs on Reddit}
+% \label{example-4}
+% \end{table}
+% \newpage
+% \par The automated evaluation metrics calculated for the test-data is given in \ref{example-3}.
+
+% \begin{table}[h]
+% \begin{tabular}{ |p{5cm}||p{5cm}|p{5cm}|}
+%  \hline
+%  \textbf{Metric} & \textbf{DIALOGPT} & \textbf{GPT2} \\
+%  \hline
+%   BLEU-0 &  0.027 &  \textbf{0.0384}\\
+%  \hline
+%   BLEU-4 & 0.1806 & \textbf{0.1899} \\
+%  \hline 
+%   METEOR & \textbf{0.1736} & 0.1679 \\
+%  \hline 
+%   Perplexity & 7.597 & \textbf{7.213}\\
+%   \hline
+% \end{tabular}
+% \caption{Metrics computed on Reddit Test-Data}
+% \label{example-3}
+% \end{table}
+
+
+% \subsection{Performance on GAB}
+
+% \par The responses generated by fine-tuning the Language-Models on GAB Dataset are given in \ref{example-5} The responses generated by GPT-2 are comparatively of better quality.
+
+% \begin{table}[h]
+% \begin{tabular}{ |p{3cm}||p{12cm}|  }
+%  \hline
+%  \textbf{Model} & \textbf{Text}\\
+%  \hline
+%  Hate-Speech   &  Hey Lee, do you fuck niggers for fun or is it because no White man would fuck you with a dog dick?   \\
+%  \hline
+%  GPT2 & Use of the slurs here is unacceptable in discourse as it demeans and insults and alienates others.\\
+%  \hline 
+%  DialoGPT & Use of the n-word is unacceptable in our discourse as it demeans and insults blacks.\\
+%  \hline
+% \end{tabular}
+% \begin{tabular}{ |p{3cm}||p{12cm}|  }
+%  \hline
+%  \hline
+%  Hate-Speech   & How retarded is it to proudly wave the flag of the country you are supposedly fleeing. \\
+%  \hline
+%  GPT2 & Use of the r-word is unacceptable in our discourse as it demeans and insults people with mental disabilities.\\
+%  \hline 
+%  DialoGPT & Using a person's mental disability as an insult only shows how narrow minded you are.\\
+%  \hline
+% \end{tabular}
+% \caption{Responses generated by different fine-tuned LMs on GAB}
+% \label{example-5}
+% \end{table}
+
+% \par The automated evaluation metrics calculated for the test-data is given in \ref{example-6}.
+
+% \begin{table}[h]
+% \begin{tabular}{ |p{5cm}||p{5cm}|p{5cm}|}
+%  \hline
+%  \textbf{Metric} & \textbf{DIALOGPT} & \textbf{GPT2} \\
+%  \hline
+%   BLEU-0 &  0.027 &  \textbf{0.0386}\\
+%  \hline
+%   BLEU-4 & 0.2386 & \textbf{0.2517} \\
+%  \hline 
+%   METEOR & 0.1636 & \textbf{0.2148} \\
+%  \hline 
+%   Perplexity & 7.123 & \textbf{6.016}\\
+%   \hline
+% \end{tabular}
+% \caption{Metrics computed on GAB-Test-Data}
+% \label{example-6}
+% \end{table}
+% \newpage
+% \section{Inter-Model Performance}
+
+% \par We also evaluate models fine-tuned in one-setting and evaluated in the other. Given below are the cross-model statistics.
+
+% \begin{table}[h]
+% \begin{tabular}{|p{2cm}||p{1.5cm}|p{1.5cm}|p{1.5cm}|p{1.5cm}|p{1.5cm}|p{1.5cm}|}
+%  \hline
+%  Train & \multicolumn{6}{|c|}{Test} \\
+%  \hline
+%  BLEU-4 & \multicolumn{2}{|c|}{CONAN} & \multicolumn{2}{|c|}{Reddit} & \multicolumn{2}{|c|}{Gab}\\
+%  SCORE &  DIALO  & GPT & DIALO &  GPT  & DIALO & GPT\\
+%  \hline
+%  CONAN &  \textbf{0.49}  & \textbf{0.57} & 0.17 &  0.16  & 0.186 & 0.1847\\
+%  \hline
+%  REDDIT & 0.226  & 0.224 & 0.18 &  0.197  & 0.20 & 0.1899\\
+%  \hline
+%  GAB &  0.23  & 0.19 & \textbf{0.214} &  \textbf{0.218}  & \textbf{0.23} & \textbf{0.2517}\\
+%  \hline
+% \end{tabular}
+% \caption{Responses generated by different fine-tuned LMs on GAB}
+% \label{example-7}
+% \end{table}
+
+% \section{Observations on results of Fine-Tuned(Inter+Intra) Models}
+% \par Our evaluations on Cross Model revealed that a model trained on GAB and tested on Reddit performed better than model trained and tested on Reddit itself. This is primarily because of the type of intervention response is similar in both of the datasets but the average length of labeled hate-speech for GAB is shorter than that of Reddit.
+
+
+
+% \section{Plug and Play Models}
+% \par We carried out experiments with different attribute models to steer the generated response in the direction of a relevant counter-speech. As described in the system architecture the dialo-gpt trained on the CreateDebate-Data is steered by PPLM to generate non-toxic/positive responses to given hate-instances. Some of attribute models we used are described below:
+% \newpage
+% \subsection{PPLM+Positive-Sentiment Discriminator}
+% \par The discriminator is trained on SST dataset which comprises of thousands of movie-reviews labelled as positive and negative. The discriminator steers the GPT in the direction of generating very-positive response when conditioned upon the given hate-speech as input. Some of the generated results are shown in \ref{example-8}.
+
+% \begin{table}[h]
+% \begin{tabular}{ |p{8cm}||p{8cm}|  }
+%  \hline
+%  \textbf{Hate-Speech} & \textbf{LM-GPT2,Discrim(very-positive)}\\
+%  \hline
+%     Not all Muslims are terrorists, but all terrorists are Muslims. & There is a slightly higher proportion of Muslims than Christians (a couple of percentage points higher than white British- certainly not a majority) but the vast majority of Muslims are peaceful, law-abiding and hard-working, not 'thugs'.\\
+%  \hline
+%  Our women and girls are frequently victim of rapes, because our goverment brought Muslims in our country. & The vast majority of rapes are committed in the home, by someone the victim knows, or by a partner. There are numerous examples of rape culture in this country.\\
+%  \hline
+%  Doesn't the Koran say: 'Murder all the non-Muslims wherever they hide'? & The vast majority of verses in the Qu'ran do not advocate killing or murdering non-believers. The killing of a small percentage of people does not represent a sweeping and generalization of a religion to entire communities.\\
+%  \hline
+% \end{tabular}
+% \caption{PPLM(GPT2+Discrim(Very-Positive)}
+% \label{example-8}
+% \end{table}
+
+% \newpage
+
+% \subsection{PPLM+Toxic/Non-Toxic Discriminator}
+% \par The discriminator is trained on Toxic Comment Classification Challenge hosted on Kaggle having toxic and non-toxic as classes to steer upon. The F1 score of the discriminator was recorded at 0.85 with 89.33\% accuracy. The discriminator steers the GPT in the direction of generating a counter response when conditioned upon the given hate-speech as input. Some of the generated results are shown in \ref{example-9}.
+
+% \vspace{1.5cm}
+% \begin{table}[h]
+% \begin{tabular}{ |p{8cm}||p{8cm}|  }
+%  \hline
+%  \textbf{Hate-Speech} & \textbf{LM-DIALOGPT,Discrim(Non-Toxic)}\\
+%  \hline
+%   But here is the thing, I connect to him because I am similar. Because you have a well-developed sense of empathy. These people are emotionally stunted and do not - they simply can't put themselves into the shoes of another because they are emotionally retarded. & It's not that they are emotionally stunted, they're just not interested in making it to the front page.\\
+%  \hline
+% I wonder if all these retards will realize one day, when the entire planet turns conservative, if they were on the wrong side of history?& It's a real possibility I didn't consider, but there's no evidence that all of the people on the Earth were on the wrong sides of history.\\
+%  \hline
+%  If you are a lesbian, you are a woman, not a man. If you claim to be a he/him lesbian you are either a man who just wants to use lesbian instead of gay, or you are a retard.&You clearly have severe mental health issues. You're confusing gender and sexuality, it just doesn't make sense to me.\\
+%  \hline
+%  Yeah he is a retard & No, you are a idiot. you do not know what retard means. it means you have no idea how to use the english language. I am sorry, but that is not how you use it.\\
+%  \hline
+% \end{tabular}
+% \caption{PPLM(DIALOGPT+Discrim(Toxic/Non-Toxic)}
+% \label{example-9}
+% \end{table}
+\newpage
+% \subsection{PPLM+HS/CS Discrim + F/NF Discrim}
+% \par Here we deploy two discriminators in a hierarchial fashion. The first discriminator is trained on Reddit dataset having hate-speech and counter-speech as classes to steer upon. The F1 score of the first discriminator was recorded at 0.95 with 96\% accuracy. The second discriminator was trained upon ICWSM dataset. The ICWSM dataset was grouped into two categories of counter-speech (Factual Based/Non-Factual Based). Presenting facts, Pointing out Hypocrisy, Positive Tone were clubbed into a single group and warning of consequences,showing affiliation and denouncing of hate speech were clubbed into another.The F1 score of the second discriminator was recorded at 0.9 with 83.3\% accuracy.
+% Some of the generated results are shown in \ref{example-10}.
+
+% \begin{table}[h]
+% \begin{tabular}{ |p{8cm}||p{8cm}|  }
+%  \hline
+%  \textbf{Hate-Speech} & \textbf{LM-GPT,Discrim(HS/CS+F/NF)}\\
+%  \hline
+%   Yes, I very much think that the right to vote should be restricted to white, property owning men.& (Control-Factual)I don't care how they choose to identify as a person, or they can be anything they want to be. That's just a basic human right that has nothing to do with race or religion and everything to do with self determination.\\
+%  \hline
+%  Yes, I very much think that the right to vote should be restricted to white, property owning men.& (Control-NonFactual) That's the basic trick that the Republicans have been imposing upon the American People since ages.\\
+%  \hline
+% \end{tabular}
+% \caption{PPLM(DIALOGPT+Discrim(Counter-Speech)}
+% \label{example-10}
+% \end{table}
