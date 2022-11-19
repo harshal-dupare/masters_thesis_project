@@ -1,0 +1,73 @@
+\chapter{Analysis}
+Following are some questions that we consider important and need to be analysed \label{important_questions}
+\begin{enumerate}
+    \item What types of fMOOPs confirm to restrictions on condition number of $f$?
+    \item How to determine $\alpha$ for a given problem and subsets $X_1,X_2,X_3 \subseteq X$?
+    \item For the fMOOPs which confirm such condition number restrictions how does the condition number behave over the domain $X_3$?
+    \item Based on the behaviour of the condition number what types of methods do we expect to work well?
+    \item What all computation methods/algorithms are available for condition number w.r.t. specific fMOOP?
+    \item How the transformed problems with bounds on condition number behave and how close are their solutions to the original problems solutions? 
+\end{enumerate}
+But before we address these questions we mentions a few important results\newline\newline
+\textbf{Condition number over composition of function}: Say we have a function $f=g(h(x)) = g \circ h(x)$ where $f:X\to Y$, $h:X\to Z$, and $g:Z\to Y$ then we can write
+\begin{equation}
+    cond_{abs}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta f(x)||}{||\delta x||} = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta g(h(x))||}{||\delta x||}
+\end{equation}
+$\implies$
+\begin{equation}
+    cond_{abs}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta g(h(x))||}{||\delta h(x)||}\frac{||\delta h(x)||}{||\delta x||}
+\end{equation}
+under the assumption that $\forall \epsilon \ge 0$ and $||\delta x||
+\le \epsilon$ $\exists\hspace{1mm} \delta \ge 0$ such that $||\delta h(x)|| \le \delta$ $\forall x$ and $\underset{\epsilon \to 0}{lim}\hspace{1mm} \delta = 0$. Then we can write
+\begin{equation}
+    cond_{abs}(f,x) = \underset{\delta \to 0}{lim}\underset{||\delta h(x)||\le \delta}{sup} \frac{||\delta g(h(x))||}{||\delta h(x)||} \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta h(x)||}{||\delta x||}
+\end{equation}
+let $h(x) = z \implies \delta h(x) = \delta z $, and since $z$ is a function of $x$, $\delta z$ is not independent of $\delta x$ hence we can write
+\begin{equation}
+    cond_{abs}(f,x) \le \underset{\delta \to 0}{lim}\underset{||\delta z||\le \delta}{sup} \frac{||\delta g(z)||}{||\delta z||} \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta h(x)||}{||\delta x||}
+\end{equation}
+$\implies$
+\begin{equation} \label{cond_fun_comp_bound}
+    cond_{abs}(f,x) \le cond_{abs}(g,h(x))\times cond_{abs}(h,x)
+\end{equation}
+the above \ref{cond_fun_comp_bound} bound can be used to simplify the fMOOP with constraints on condition number for complex functions which are composition of simpler function whose condition number can be bound analytically, for eg. Neural Networks come under such functions.
+\newline\newline \textbf{Relation between absolute and relative condition number}: given a function $f:X\to Y$ its absolute and relative condition number are given by
+\begin{equation}
+    cond_{abs}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta f(x)||}{||\delta x||}
+\end{equation}
+\begin{equation}
+    cond_{rel}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta f(x)||/||f(x)||}{||\delta x||/||x||}
+\end{equation}
+we can write
+\begin{equation}
+    cond_{rel}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta f(x)||}{||\delta x||}\frac{||x||}{||f(x)||}
+\end{equation}
+$\implies$
+\begin{equation} \label{cond_abs_rel_relation}
+    cond_{rel}(f,x) = cond_{abs}(f,x)\frac{||x||}{||f(x)||}
+\end{equation}
+\newline\newline \textbf{$L_2$ regularization and absolute condition number}: Consider the problem of fitting data with $n$ data points $(X_i,Y_i), i \in [n]$, each column being 1 data point $(X,Y) \in (\mathbb{R}^{d\times n},\mathbb{R}^{1\times n})$ using a function $f:\mathbb{R}^{d\times 1}\to \mathbb{R}^{1\times 1}$, for case of simplicity assume $f$ is linear transform i.e. $f(X) = AX \approx Y$ where $A \in \mathbb{R}^{1\times d}$.
+\newline Consider the $L_2$ regularization formulations of this problem as follows
+\begin{equation} \label{l2_reg_prob_obj}
+    \underset{A \in \mathbb{R}^{1\times d}}{min}\hspace{1mm} \frac{1}{n}\mathlarger{\sum}_{i\in [n]} ||AX_i-Y_i||_2 + \lambda ||A||^{2}_{2}
+\end{equation}
+Now, consider the same problem under fMOOP for minimizing the $||\cdot||_{F}$ frobenius norm of the transform $A$ over the aggregation scheme of mean and $X_3 = \mathbb{R}^{d\times 1}$
+\begin{equation} \label{fmoop_l2_rel_obj_1}
+    \underset{A \in \mathbb{R}^{1\times d}}{min}\hspace{1mm} \frac{1}{n}\mathlarger{\sum}_{i\in [n]} ||AX_i-Y_i||_2
+\end{equation}
+\begin{equation} \label{fmoop_l2_rel_obj_2}
+    \underset{A \in \mathbb{R}^{1\times d}}{min}\hspace{1mm} \underset{x \in X_3}{max}\hspace{1mm} cond_{abs}(f,x)
+\end{equation}
+by definition 
+\begin{equation}
+    cond_{abs}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||_F\le \epsilon}{sup} \frac{||A\delta x||_F}{||\delta x||_F}
+\end{equation}
+note that $||A\delta x||_F = \sqrt{(\sum_{i\in [d]} A_i\delta x_i)^2}$ and by Cauchy–Schwarz inequality we can write $(\sum_{i\in [d]} A_i\delta x_i)^2 \le (\sum_{i\in [d]} A^2_i)(\sum_{i\in [d]} x^2_i) =||A||^2_F||\delta x||^2_F $, which implies 
+\begin{equation} \label{cond_forb_ub_1d}
+    cond_{abs}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||_F\le \epsilon}{sup} \frac{||A\delta x||_F}{||\delta x||_F} \le \frac{||A||_F||\delta x||_F}{||\delta x||_F} = ||A||_F
+\end{equation}
+note that for this case $||\cdot||_F$ is equivalent to $||\cdot||_2$, and the above upper bound implies that the problem \ref{fmoop_l2_rel_obj_2} when minimized for the worst case using the upper bound \ref{cond_forb_ub_1d} we get the fMOOP as follows
+\begin{equation} \label{fmoop_l2_rel_obj_new}
+    \underset{A \in \mathbb{R}^{1\times d}}{min}\hspace{1mm} (||A||_2,\underset{A \in \mathbb{R}^{1\times d}}{min}\hspace{1mm} \frac{1}{n}\mathlarger{\sum}_{i\in [n]} ||AX_i-Y_i||_2)
+\end{equation}
+which when scalarized with squaring the norm restriction gives us the standard $L_2$ regularization.

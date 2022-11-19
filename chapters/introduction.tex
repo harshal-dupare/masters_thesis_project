@@ -31,13 +31,13 @@ e.g. Exponential decaying average, given a index-function $t:X\to[|X|]$, where $
 \textbf{\textit{Absolute Condition Number:}} \textit{Absolute Condition Number} is defined for a function $f: X \to Y$, where $X$ and $Y$ have a norm $||.||$ is defined over them. Denoted as follows:
 
 \begin{equation} \label{def_cond_abs}
-cond_{abs}(f) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta f(x)||}{||\delta x||}
+cond_{abs}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta f(x)||}{||\delta x||}
 \end{equation}
 \newline
 \textbf{\textit{Relative Condition Number:}} \textit{Relative Condition Number} is defined for a function $f: X \to Y$, where $X$ and $Y$ have a norm $||.||$ is defined over them. Denoted as follows:
 
 \begin{equation} \label{def_cond_rel}
-cond_{x}(f) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta f(x)||/||f(x)||}{||\delta x||/||x||}
+cond_{rel}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta f(x)||/||f(x)||}{||\delta x||/||x||}
 \end{equation}
 \newline
 \textbf{\textit{Matrix Transform Norm:}} Given a Matrix Transform $T^{m\times k}: \mathbb{R}^{n\times m} \to \mathbb{R}^{n\times k}$ and a norm $||\cdot||$ defined over $\mathbb{R}^{n\times m}$ and $\mathbb{R}^{n\times k}$ we define norm of the matrix transform as 
@@ -47,10 +47,9 @@ cond_{x}(f) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{
 \end{equation}
 \textit{Note}: Whenever the dimensions of the matrix in the context are already defined or are obvious from the context we will omit the superscript denoting its dimension.
 \subsection{Problem} \label{prob_def}
-
-\textbf{Given:}\newline
-Domain $X_1\cup X_2 \subseteq X$ and their associated Ranges $Y_1\cup Y_2 \subseteq Y$, where $X_i\equiv Y_i$ such that for each $x \in X_i$ we have a corresponding $y \in Y_i$ i.e. $y\equiv x$.\newline
-Aggregation schemes $\underset{\forall x\in X_1}{Agg_1}$ defined over $\mathcal{L}: Y \times Y \to \mathbb{R}$ call $\mathcal{L}(\cdot,\cdot)$ the \textit{Loss} function and $\underset{\forall x\in X_2}{Agg_2}$ defined over $\mathcal{R}: Y \times Y \to \mathbb{R}$ call $\mathcal{R}(\cdot,\cdot)$  the \textit{Reward} function.\newline
+\textbf{Given:}
+\newline Domain $X_1\cup X_2 \subseteq X$ and their associated Ranges $Y_1\cup Y_2 \subseteq Y$, where $X_i\equiv Y_i$ such that for each $x \in X_i$ we have a corresponding $y \in Y_i$ i.e. $y\equiv x$.
+\newline Aggregation schemes $\underset{\forall x\in X_1}{Agg_1}$ defined over $\mathcal{L}: Y \times Y \to \mathbb{R}$ call $\mathcal{L}(\cdot,\cdot)$ the \textit{Loss} function and $\underset{\forall x\in X_2}{Agg_2}$ defined over $\mathcal{R}: Y \times Y \to \mathbb{R}$ call $\mathcal{R}(\cdot,\cdot)$  the \textit{Reward} function.\newline
 A scalar $\alpha \in \mathbb{R^+}$ and subset $X_3 \subseteq X$.\newline
 For a given $\mathcal{F}$ a family of functions $f: X \to Y$ we need to find a function $f \in \mathcal{F}$ which solves the following \newline\newline \textbf{Functional Multi-Objective Optimization Problem:}
 
@@ -62,16 +61,16 @@ For a given $\mathcal{F}$ a family of functions $f: X \to Y$ we need to find a f
 \end{equation}
 subject to one of the following
 \begin{equation} \label{cond_abs}
-cond_{abs}(f) \le \alpha 
+\underset{x \in X_3}{max}\hspace{1mm}cond_{abs}(f,x) \le \alpha 
 \end{equation}
 \begin{equation} \label{cond_rel}
-\underset{x \in X_3}{max}\hspace{1mm} cond_{x}(f) \le \alpha 
+\underset{x \in X_3}{max}\hspace{1mm} cond_{rel}(f,x) \le \alpha 
 \end{equation}
 \begin{equation} \label{cond_abs_min}
-\underset{f\in \mathcal{F}}{min}\hspace{1mm}cond_{abs}(f)
+\underset{f\in \mathcal{F}}{min}\hspace{1mm}\underset{x \in X_3}{max}\hspace{1mm} cond_{abs}(f,x)
 \end{equation}
 \begin{equation} \label{cond_rel_min}
-\underset{f\in \mathcal{F}}{min}\hspace{1mm} \underset{x \in X_3}{max}\hspace{1mm}cond_{x}(f)
+\underset{f\in \mathcal{F}}{min}\hspace{1mm} \underset{x \in X_3}{max}\hspace{1mm}cond_{rel}(f,x)
 \end{equation}
 \newline It is very important to mention that the above problem formulation highly depends on the nature of the mapping $f$ and the family $\mathcal{F}$ that it belongs to. For example if $f$ models a function for which we expect smooth change in its value w.r.t. its domain then its a reasonable formulation, and if there are no reasons to believe that it should be smooth over its domain then its not a reasonable formulation. Similarly for a chosen family $\mathcal{F}$ to model $f$, if $\mathcal{F}$ doesn't have smooth functions belonging to it then its not a reasonable formulations irrespective of the nature of the function that $f$ is trying to model.
 \newline\newline
@@ -111,11 +110,11 @@ And the orthonormal condition requires
 \newline
 From the \ref{orthonormal_eq} we can infer that $(A^{d\times k})^T$ belongs to the set of right inverses of $A^{d\times k}$. \newline Further if we relax the \ref{orthonormal_eq} to bounds on condition number by $\alpha \ge 1$
 \begin{equation}
-    \underset{R^{n\times d}_{t\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{R^{n\times d}_{t\times d}}(f) = \underset{\epsilon \to 0}{lim}\underset{||\delta R^{n\times d}_{t\times d}||\le \epsilon}{sup} \frac{||\delta R^{n\times d}_{t\times d}\times A^{d\times k}||}{||\delta R^{n\times d}_{t\times d}||}  \frac{||F^{n\times k}_t \times (A^{d\times k})^{\top} ||}{|| F^{n\times k}_t||}\le \alpha
+    \underset{R^{n\times d}_{t\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{rel}(f,R^{n\times d}_{t\times d}) = \underset{\epsilon \to 0}{lim}\underset{||\delta R^{n\times d}_{t\times d}||\le \epsilon}{sup} \frac{||\delta R^{n\times d}_{t\times d}\times A^{d\times k}||}{||\delta R^{n\times d}_{t\times d}||}  \frac{||F^{n\times k}_t \times (A^{d\times k})^{\top} ||}{|| F^{n\times k}_t||}\le \alpha
 \end{equation}
 which implies\newline
 \begin{equation}
-    \underset{R^{n\times d}_{t\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{R^{n\times d}_{t\times d}}(f) \le ||A^{d\times k}|| ||(A^{d\times k})^{\top} ||\le \alpha
+    \underset{R^{n\times d}_{t\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{rel}(f,R^{n\times d}_{t\times d}) \le ||A^{d\times k}|| ||(A^{d\times k})^{\top} ||\le \alpha
 \end{equation}
 \newline
 Note that $\alpha=1$ contains the set which satisfies \ref{orthonormal_eq} equation since 
@@ -133,7 +132,7 @@ Combining all of that together gives us the \textbf{fMOOP} formulation of this p
 \end{equation}
 subject to
 \begin{equation} \label{lfm_cond}
-\underset{R^{n\times d}_{t\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{R^{n\times d}_{t\times d}}(f) \le \alpha
+\underset{R^{n\times d}_{t\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{rel}(f,R^{n\times d}_{t\times d}) \le \alpha
 \end{equation}
 \newline
 \subsection{Principle Time Series}
@@ -160,7 +159,7 @@ P^{n \times 1}_{t} = g(F^{k\times 1}_t) = C^{n \times k} \times F^{k\times 1}_t
 For small changes in our time series data $\delta R^{n\times d}_{t+1\times d}$ we expect that there is small changes in the latent time series $\delta F^{k\times 1}_t$, which we can model by bounding the absolute condition number by a scalar $\alpha$.
 
 \begin{equation}
-    cond_{abs}(f) = \underset{\epsilon \to 0}{lim}\underset{||\delta R^{n\times d}_{t+1\times d}||\le \epsilon}{sup} \frac{||A^{k\times n}\times \delta R^{n\times d}_{t+1\times d}\times B^{d\times 1}||}{||\delta R^{n\times d}_{t+1\times d}||}
+    \underset{R^{n\times d}_{t+1\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{abs}(f,R^{n\times d}_{t+1\times d}) = \underset{\epsilon \to 0}{lim}\underset{||\delta R^{n\times d}_{t+1\times d}||\le \epsilon}{sup} \frac{||A^{k\times n}\times \delta R^{n\times d}_{t+1\times d}\times B^{d\times 1}||}{||\delta R^{n\times d}_{t+1\times d}||}
 \end{equation}\newline
 Combining all of that together gives us the \textbf{fMOOP} formulation of this problem as
 \begin{equation} \label{pts_loss}
@@ -168,7 +167,7 @@ Combining all of that together gives us the \textbf{fMOOP} formulation of this p
 \end{equation}\newline
 subject to
 \begin{equation} \label{lfm_cond}
-cond_{abs}(f) \le \alpha
+\underset{R^{n\times d}_{t+1\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{abs}(f,R^{n\times d}_{t+1\times d}) \le \alpha
 \end{equation}
 \newline
 
@@ -178,7 +177,7 @@ cond_{abs}(f) \le \alpha
 Say we are given a trained neural network $\mathcal{N}: X \to Y$ which has learnt a mapping from $X$, the input set to $Y$, the output set. If the underlining mapping that $\mathcal{N}$ was modeled to learn was smooth w.r.t. its input then we expect that for a well trained network $\mathcal{N}$ for any input $x\in X$ and for small enough $\delta x \in X$  $\delta x$ the output of the network wont change much, lets say that it won't change more than a constant $\alpha > 0$ times the norm of $x$ i.e. $||\mathcal{N}(x+\delta x) - \mathcal{N}(x)|| = ||\delta \mathcal{N}(x)||\le \alpha ||\delta x||$. Which we can reformulate as follows
 
 \begin{equation}
-    cond_{abs}(\mathcal{N}) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta \mathcal{N}(x)||}{||\delta x||} \le \alpha
+    \underset{x\in X}{min}\hspace{1mm} cond_{abs}(\mathcal{N},x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta \mathcal{N}(x)||}{||\delta x||} \le \alpha
 \end{equation}\newline 
 Most of the networks which are being trained today don't account for such constraints giving the way to Adversarial attacks on them, which exploit this drawbacks of the network to force them to output unreasonably wrong value.
 \begin{equation}
@@ -189,5 +188,5 @@ y& & y'
 \end{tikzcd}
 \end{equation}\newline
 Here $\mathcal{A}_{\epsilon}$ the adversary which takes the input $(x,y,y')$ being the input data $x$, the associate label $y$, and the expected forced wrong output $y'$ and outputs the required perturbation $\delta x$, such that $||\delta x|| \le \epsilon$. When $\delta x$ is added to original input data the new malicious input $x_m = x + \delta x$ forces the network $\mathcal{N}$ to output $y'$ instead of $y$ whereas it would have given output of $y$ on the input $x$. Note that the adversary prefers smaller values of $\epsilon$, since that implies that it can generate malicious input with as little changes as possible.\newline
-This problem can be avoided if we can train the network to also minimize the absolute condition number, $cond_{abs}(\mathcal{N})$ or minimize the maximum relative condition number over a subset $X_{I} \subseteq X$, $\underset{x \in X_{I}}{max}\hspace{1mm} cond_{x}(\mathcal{N})$. We can also provide the constrains on their maximum values and model accordingly.\newline
+This problem can be avoided if we can train the network to also minimize the absolute condition number, $cond_{abs}(\mathcal{N},x)$ over all the input space or minimize the maximum relative condition number over a subset $X_{I} \subseteq X$, $\underset{x \in X_{I}}{max}\hspace{1mm} cond_{rel}(\mathcal{N},x)$. We can also provide the constrains on their maximum values and model accordingly.\newline
 So if the network has been trained such that $||\delta \mathcal{N}(x)||\le \alpha ||\delta x||$ holds, then for the adversary $\mathcal{A}_{\epsilon}$ to make the network's $\mathcal{N}$ output perturb by $||\delta \mathcal{N}(x)||$ it will have to change the input $x$ value perturbation of norm more than $\frac{||\delta \mathcal{N}(x)||}{\alpha} \le ||\delta x||$, which will not be possible for an adversary with $\epsilon < \frac{||\delta \mathcal{N}(x)||}{\alpha}$. Hence training with such constraints will force the adversary to make large changes to the input for designing an malicious input, which is unfavourable for the adversary.
