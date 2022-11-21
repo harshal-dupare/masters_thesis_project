@@ -1,8 +1,8 @@
 \chapter{Introduction}
 
-\hspace{1cm}Optimization problems are of great interest academically along with being core to the functioning of today's society by having application in variety of fields such as social studies, economics, finance, agriculture, automotive, engineering, computer science, networking and many others.
+\hspace{1cm}Optimization problems are of great interest academically along with being core to the functioning of today's society by having application in a variety of fields such as social studies, economics, finance, agriculture, automotive, engineering, computer science, networking, and many others.
 
-In general there can be more than one objective and constraint in the formulation of optimization problems. Optimization problems are classified into 2 broad categories namely \textit{Single Objective Optimization Problems}(SOOP) and \textit{Multi-Objective Optimization Problems} (MOOP), the latter can be considered a super-set of the former. Our focus will be on a special subset of MOOP where the \textit{Unknown}/\textit{Decision Variable} is a \textit{function} lets call them fMOOP. fMOOP are of great interest because of their vast applications in modeling the relation between 2 sets, for e.g. all of the Neural Network so heavily researched today fall into this category with there myriads of applications. 
+In general, there can be more than one objective and constraint in the formulation of optimization problems. Optimization problems are classified into 2 broad categories namely \textit{Single Objective Optimization Problems}(SOOP) and \textit{Multi-Objective Optimization Problems} (MOOP), the latter can be considered a superset of the former. Our focus will be on a special subset of MOOP where the \textit{Unknown}/\textit{Decision Variable} is a \textit{function} let's call them fMOOP. fMOOP are of great interest because of their vast applications in modeling the relation between 2 sets, e.g. all of the Neural Networks so heavily researched today fall into this category with their myriads of applications.
 
 Generally when we have a function, we want it to have some good properties like being correct, easy to compute, easy to store, behave nicely over the input set, or any other desirable properties based on the context. One such very important property for most of such functions of interest is being \textit{Well-Conditioned}, meaning small changes in the input should result in too big changes in the output. We focus on this problem namely the problem to find function solutions of fMOOP which are well-conditioned.
 
@@ -40,7 +40,7 @@ cond_{abs}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsil
 cond_{rel}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta f(x)||/||f(x)||}{||\delta x||/||x||}
 \end{equation}
 \newline
-\textbf{\textit{Matrix Transform Norm:}} Given a Matrix Transform $T^{m\times k}: \mathbb{R}^{n\times m} \to \mathbb{R}^{n\times k}$ and a norm $||\cdot||$ defined over $\mathbb{R}^{n\times m}$ and $\mathbb{R}^{n\times k}$ we define norm of the matrix transform as 
+\textbf{\textit{Induced Norm:}} Given a Matrix Transform $T^{m\times k}: \mathbb{R}^{n\times m} \to \mathbb{R}^{n\times k}$ and a norm $||\cdot||$ defined over $\mathbb{R}^{n\times m}$ and $\mathbb{R}^{n\times k}$ we define norm of the matrix transform as 
 
 \begin{equation}
    ||T^{m\times k}|| = \underset{X \in \mathbb{R}^{n\times m}/\{\Bar{0}\}}{sup} \frac{||X\times T^{m\times k}||}{||X||}
@@ -72,9 +72,9 @@ subject to one of the following
 \begin{equation} \label{cond_rel_min}
 \underset{f\in \mathcal{F}}{min}\hspace{1mm} \underset{x \in X_3}{max}\hspace{1mm}cond_{rel}(f,x)
 \end{equation}
-\newline It is very important to mention that the above problem formulation highly depends on the nature of the mapping $f$ and the family $\mathcal{F}$ that it belongs to. For example if $f$ models a function for which we expect smooth change in its value w.r.t. its domain then its a reasonable formulation, and if there are no reasons to believe that it should be smooth over its domain then its not a reasonable formulation. Similarly for a chosen family $\mathcal{F}$ to model $f$, if $\mathcal{F}$ doesn't have smooth functions belonging to it then its not a reasonable formulations irrespective of the nature of the function that $f$ is trying to model.
+\newline It is very important to mention that the above problem formulation highly depends on the nature of the mapping $f$ and the family $\mathcal{F}$ that it belongs to. For example if $f$ models a function for which we expect smooth change in its value w.r.t. its domain then its a reasonable formulation, and if there are no reasons to believe that it should be smooth over its domain then its not a reasonable formulation. Similarly for a chosen family $\mathcal{F}$ to model $f$, if $\mathcal{F}$ doesn't have smooth functions belonging to it then its not a reasonable formulations irrespective of the nature of the function that $f$ is modeling.
 \newline\newline
-\textbf{\textit{Note}}: Here we restricted the problem to 2 objectives and only 1 condition which majorly characterizes this problem, but in general we can have arbitrary number of objectives and other conditions along with at least 1 of the \ref{cond_abs}, \ref{cond_rel} conditions.\newline
+\textbf{\textit{Note}}: Here we restricted the problem to 2 objectives and only 1 condition which majorly characterizes this problem, but in general we can have arbitrary number of objectives and other conditions along with at least 1 of the \ref{cond_abs}, \ref{cond_rel}, \ref{cond_abs_min}, \ref{cond_rel_min} conditions.\newline
 What we mean by minimizing over a functions $f \in \mathcal{F}$ of a family of functions $\mathcal{F}$ is that we minimize over the parameters of that family of function $\mathcal{F}$.
 
 % \newpage 
@@ -94,7 +94,7 @@ R^{n\times 1}_t \arrow[rr, "\mathcal{L}" description, Rightarrow, no head] \arro
 \end{tikzcd}
 \end{equation}
 \newline
-What makes this model linear is that the function $f(\cdot)$ and $g(\cdot)$ are linear w.r.t. their argument. In this case it can be written as
+Lets assume that the functions $f(\cdot)$ and $g(\cdot)$ are linear w.r.t. their argument. In this case it can be written as
 \begin{equation} \label{f_for_lfm}
 F^{n\times k}_t = f(R^{n\times d}_{t\times d}) = R^{n\times d}_{t\times d}\times A^{d\times k}
 \end{equation}
@@ -188,5 +188,5 @@ y& & y'
 \end{tikzcd}
 \end{equation}\newline
 Here $\mathcal{A}_{\epsilon}$ the adversary which takes the input $(x,y,y')$ being the input data $x$, the associate label $y$, and the expected forced wrong output $y'$ and outputs the required perturbation $\delta x$, such that $||\delta x|| \le \epsilon$. When $\delta x$ is added to original input data the new malicious input $x_m = x + \delta x$ forces the network $\mathcal{N}$ to output $y'$ instead of $y$ whereas it would have given output of $y$ on the input $x$. Note that the adversary prefers smaller values of $\epsilon$, since that implies that it can generate malicious input with as little changes as possible.\newline
-This problem can be avoided if we can train the network to also minimize the absolute condition number, $cond_{abs}(\mathcal{N},x)$ over all the input space or minimize the maximum relative condition number over a subset $X_{I} \subseteq X$, $\underset{x \in X_{I}}{max}\hspace{1mm} cond_{rel}(\mathcal{N},x)$. We can also provide the constrains on their maximum values and model accordingly.\newline
+This problem can be avoided if we can train the network to also minimize the absolute condition number, $cond_{abs}(\mathcal{N},x)$ over all the input space. We can also provide the constrains on their maximum values and model accordingly.\newline
 So if the network has been trained such that $||\delta \mathcal{N}(x)||\le \alpha ||\delta x||$ holds, then for the adversary $\mathcal{A}_{\epsilon}$ to make the network's $\mathcal{N}$ output perturb by $||\delta \mathcal{N}(x)||$ it will have to change the input $x$ value perturbation of norm more than $\frac{||\delta \mathcal{N}(x)||}{\alpha} \le ||\delta x||$, which will not be possible for an adversary with $\epsilon < \frac{||\delta \mathcal{N}(x)||}{\alpha}$. Hence training with such constraints will force the adversary to make large changes to the input for designing an malicious input, which is unfavourable for the adversary.
