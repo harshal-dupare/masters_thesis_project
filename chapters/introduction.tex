@@ -1,10 +1,10 @@
-\chapter{Introduction}
+\level{0}{Introduction}
 
 \hspace{1cm}Optimization problems are of great interest academically along with being core to the functioning of today's society by having application in a variety of fields such as social studies, economics, finance, agriculture, automotive, engineering, computer science, networking, and many others.
 
 In general, there can be more than one objective and constraint in the formulation of optimization problems. Optimization problems are classified into 2 broad categories namely \textit{Single Objective Optimization Problems}(SOOP) and \textit{Multi-Objective Optimization Problems} (MOOP), the latter can be considered a superset of the former. Our focus will be on a special subset of MOOP where the \textit{Unknown}/\textit{Decision Variable} is a \textit{function} let's call them fMOOP. fMOOP are of great interest because of their vast applications in modeling the relation between 2 sets, e.g. all of the Neural Networks so heavily researched today fall into this category with their myriads of applications.
 
-Generally when we have a function, we want it to have some good properties like being correct, easy to compute, easy to store, behave nicely over the input set, or any other desirable properties based on the context. One such very important property for most of such functions of interest is being \textit{Well-Conditioned}, meaning small changes in the input should result in too big changes in the output. We focus on this problem namely the problem to find function solutions of fMOOP which are well-conditioned.
+Generally when we have a function, we want it to have some good properties like being correct, easy to compute, easy to store, behave nicely over the input set, or any other desirable properties based on the context. One such very important property for most of such functions of interest is being \textit{Well-Conditioned}, meaning small changes in the input should not result in too big changes in the output. We focus on this problem namely the problem to find function solutions of fMOOP which are well-conditioned.
 
 Goal of this study is to analyze the implications of restricting the condition number for solutions of fMOOP, and study how the existing methodologies perform on such problems and device new methodologies for finding well-conditioned solutions to fMOOP.
 
@@ -12,8 +12,8 @@ Goal of this study is to analyze the implications of restricting the condition n
 % * Highlight importance of subsections of optimization methods where we are looking for functions belonging to certain family, and give eg\\
 % * Then highlight how important it is for those functions to be stable for small changes in input, i.e. locality of these problems, and show if thats not maintained then how it can lead to bad functions and how they can be exploited \\
 % * Hence its impostant to model this problem wrt MOOP and study it\\
-\section{Preliminaries}
-\subsection{Definitions}
+\level{1}{Preliminaries}
+\level{2}{Definitions}
 
 \textbf{\textit{Aggregation Scheme:}} Given a value function $value(\cdot)$ over $x$, for $x \in X$, a method to aggregate those values to one value. Denoted as follows:
 \begin{equation}
@@ -28,13 +28,13 @@ e.g. Exponential decaying average, given a index-function $t:X\to[|X|]$, where $
 \underset{\forall x\in X}{Agg}\hspace{1mm} value(x) = \mathlarger{\mathlarger{\sum}}_{\forall x\in X} \lambda^{t(x)}value(x)
 \end{equation}
 \newline
-\textbf{\textit{Absolute Condition Number:}} \textit{Absolute Condition Number} is defined for a function $f: X \to Y$, where $X$ and $Y$ have a norm $||.||$ is defined over them. Denoted as follows:
+\textbf{\textit{Absolute Condition Number:}} \textit{Absolute Condition Number} is defined for a function $f: X \to Y$, where $X$ and $Y$ have a norm $||.||$ defined over them. Denoted as follows:
 
 \begin{equation} \label{def_cond_abs}
 cond_{abs}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta f(x)||}{||\delta x||}
 \end{equation}
 \newline
-\textbf{\textit{Relative Condition Number:}} \textit{Relative Condition Number} is defined for a function $f: X \to Y$, where $X$ and $Y$ have a norm $||.||$ is defined over them. Denoted as follows:
+\textbf{\textit{Relative Condition Number:}} \textit{Relative Condition Number} is defined for a function $f: X \to Y$, where $X$ and $Y$ have a norm $||.||$ defined over them. Denoted as follows:
 
 \begin{equation} \label{def_cond_rel}
 cond_{rel}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta f(x)||/||f(x)||}{||\delta x||/||x||}
@@ -46,11 +46,11 @@ cond_{rel}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsil
    ||T^{m\times k}|| = \underset{X \in \mathbb{R}^{n\times m}/\{\Bar{0}\}}{sup} \frac{||X\times T^{m\times k}||}{||X||}
 \end{equation}
 \textit{Note}: Whenever the dimensions of the matrix in the context are already defined or are obvious from the context we will omit the superscript denoting its dimension.
-\subsection{Problem} \label{prob_def}
+\level{2}{Problem} \label{prob_def}
 \textbf{Given:}
 \newline Domain $X_1\cup X_2 \subseteq X$ and their associated Ranges $Y_1\cup Y_2 \subseteq Y$, where $X_i\equiv Y_i$ such that for each $x \in X_i$ we have a corresponding $y \in Y_i$ i.e. $y\equiv x$.
 \newline Aggregation schemes $\underset{\forall x\in X_1}{Agg_1}$ defined over $\mathcal{L}: Y \times Y \to \mathbb{R}$ call $\mathcal{L}(\cdot,\cdot)$ the \textit{Loss} function and $\underset{\forall x\in X_2}{Agg_2}$ defined over $\mathcal{R}: Y \times Y \to \mathbb{R}$ call $\mathcal{R}(\cdot,\cdot)$  the \textit{Reward} function.\newline
-A scalar $\alpha \in \mathbb{R^+}$ and subset $X_3 \subseteq X$.\newline
+A scalar $\alpha \in \mathbb{R^+}$ and subsets $X_i \subseteq X$, $i \in \{3,4,5,6\}$.\newline
 For a given $\mathcal{F}$ a family of functions $f: X \to Y$ we need to find a function $f \in \mathcal{F}$ which solves the following \newline\newline \textbf{Functional Multi-Objective Optimization Problem:}
 
 \begin{equation} \label{opt_loss}
@@ -59,32 +59,31 @@ For a given $\mathcal{F}$ a family of functions $f: X \to Y$ we need to find a f
 \begin{equation} \label{opt_reward}
 \underset{f\in \mathcal{F}}{max}\hspace{1mm} \underset{\forall x\in X_2, y \in Y_2, y \equiv x}{Agg_2} \hspace{1mm} \mathcal{R}(y,f(x))
 \end{equation}
-subject to one of the following
-\begin{equation} \label{cond_abs}
-\underset{x \in X_3}{max}\hspace{1mm}cond_{abs}(f,x) \le \alpha 
-\end{equation}
-\begin{equation} \label{cond_rel}
-\underset{x \in X_3}{max}\hspace{1mm} cond_{rel}(f,x) \le \alpha 
-\end{equation}
+Including other problems specific objectives, but it must have atleast one of the \ref{cond_abs_min}, \ref{cond_rel_min} as objective
 \begin{equation} \label{cond_abs_min}
 \underset{f\in \mathcal{F}}{min}\hspace{1mm}\underset{x \in X_3}{max}\hspace{1mm} cond_{abs}(f,x)
 \end{equation}
 \begin{equation} \label{cond_rel_min}
-\underset{f\in \mathcal{F}}{min}\hspace{1mm} \underset{x \in X_3}{max}\hspace{1mm}cond_{rel}(f,x)
+\underset{f\in \mathcal{F}}{min}\hspace{1mm} \underset{x \in X_4}{max}\hspace{1mm}cond_{rel}(f,x)
+\end{equation}
+or is subject to at least one of the \ref{cond_abs}, \ref{cond_rel} as constraints
+\begin{equation} \label{cond_abs}
+\underset{x \in X_5}{max}\hspace{1mm}cond_{abs}(f,x) \le \alpha 
+\end{equation}
+\begin{equation} \label{cond_rel}
+\underset{x \in X_6}{max}\hspace{1mm} cond_{rel}(f,x) \le \alpha 
 \end{equation}
 \newline It is very important to mention that the above problem formulation highly depends on the nature of the mapping $f$ and the family $\mathcal{F}$ that it belongs to. For example if $f$ models a function for which we expect smooth change in its value w.r.t. its domain then its a reasonable formulation, and if there are no reasons to believe that it should be smooth over its domain then its not a reasonable formulation. Similarly for a chosen family $\mathcal{F}$ to model $f$, if $\mathcal{F}$ doesn't have smooth functions belonging to it then its not a reasonable formulations irrespective of the nature of the function that $f$ is modeling.
 \newline\newline
-\textbf{\textit{Note}}: Here we restricted the problem to 2 objectives and only 1 condition which majorly characterizes this problem, but in general we can have arbitrary number of objectives and other conditions along with at least 1 of the \ref{cond_abs}, \ref{cond_rel}, \ref{cond_abs_min}, \ref{cond_rel_min} conditions.\newline
-What we mean by minimizing over a functions $f \in \mathcal{F}$ of a family of functions $\mathcal{F}$ is that we minimize over the parameters of that family of function $\mathcal{F}$.
+\textbf{\textit{Note}}: What we mean by minimizing over a functions $f \in \mathcal{F}$ of a family of functions $\mathcal{F}$ is that we minimize over the parameters of that family of function $\mathcal{F}$.
 
 % \newpage 
-\section{Motivation and Applications}
+\level{1}{Motivation and Applications}
 
-\subsection{Linear Factor Model}
+\level{2}{Linear Factor Model} \label{problem_linear_factor_model}
 The problems defined in the former section was motivated from the problem on linear factor models with added constraint for the returns-to-factor matrix be orthonormal columns. We describe the problem below.\newline
-\textit{Given}:\newline Returns data for $n$ time series $R^{n\times 1}_t \in \mathbb{R}^{n\times 1}$, for $t\in [T]$ \newline
-and denote $R^{n\times 1}_{t\times d} = [R^{n\times 1}_{t-1},R^{n\times 1}_{t-2},...,R^{n\times 1}_{t-d}] \in \mathbb{R}^{n\times d}$\newline
-We need to design $F^{n\times k}_t \in \mathbb{R}^{n\times k}$ as a function of $R^{n\times d}_{t\times d}$, i.e. $F^{n\times k}_t = f(R^{n\times d}_{t\times d})$ and from that we can derive $P^{n \times 1}_{t} = g(F^{n\times k}_t)$ such that $P^{n \times 1}_{t} \approx R^{n \times 1}_{t}$ which we can measure by \textit{Average} aggregation scheme over the loss function $\mathcal{L}(y,\hat{y}) = ||y-\hat{y}||_2$ which we need to minimize and another \textit{Average} aggregation scheme over the return function $\mathcal{R}(y,\hat{y}) = \frac{\langle y,\hat{y}\rangle}{||y||_2||\hat{y}||_2}$ defined over the testing period of $t \in [T,T+S]= \{T,T+1,...,T+S-1\}$ which we need to maximize.
+\newline A data of returns for $n$ time series $R^{n\times 1}_t \in \mathbb{R}^{n\times 1}$, for $t\in [T]$ and denote $R^{n\times d}_{t\times d} = [R^{n\times 1}_{t-1},R^{n\times 1}_{t-2},...,R^{n\times 1}_{t-d}] \in \mathbb{R}^{n\times d}$ is given. 
+\newline \newline We need to design $F^{n\times k}_t \in \mathbb{R}^{n\times k}$ as a function of $R^{n\times d}_{t\times d}$, i.e. $F^{n\times k}_t = f(R^{n\times d}_{t\times d})$ and from that we can derive $P^{n \times 1}_{t} = g(F^{n\times k}_t)$ such that $P^{n \times 1}_{t} \approx R^{n \times 1}_{t}$ which we can measure by \textit{Average} aggregation scheme over the loss function $\mathcal{L}(y,\hat{y}) = ||y-\hat{y}||_2$ which we need to minimize and another \textit{Average} aggregation scheme over the return function $\mathcal{R}(y,\hat{y}) = \frac{\langle y,\hat{y}\rangle}{||y||_2||\hat{y}||_2}$ defined over the testing period of $t \in [T,T+S]= \{T,T+1,...,T+S-1\}$ which we need to maximize.
 
 \begin{equation} \label{lfm_diagram}
 \begin{tikzcd}
@@ -125,7 +124,7 @@ So any $\alpha \ge 1$ will contain the set specififed by the condition \ref{orth
 Combining all of that together gives us the \textbf{fMOOP} formulation of this problem as
 
 \begin{equation} \label{lfm_loss}
-\underset{\beta^{k \times 1}\in \mathbb{R}^{k\times 1}, A^{d\times k} \in \mathbb{R}^{d\times k}}{min}\hspace{1mm} \frac{1}{T-d+1} \mathlarger{\mathlarger{\sum}}_{\forall t\in [d,T]} \hspace{1mm} ||R^{n\times 1}_t-R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}||_2
+\underset{\beta^{k \times 1}\in \mathbb{R}^{k\times 1}, A^{d\times k} \in \mathbb{R}^{d\times k}}{min}\hspace{1mm} \frac{1}{T-d+1} \mathlarger{\mathlarger{\sum}}_{\forall t\in [d,T]} \hspace{1mm} ||R^{n\times 1}_t-R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}||_2^2
 \end{equation}
 \begin{equation} \label{lfm_reward}
 \underset{\beta^{k \times 1}\in \mathbb{R}^{k\times 1}, A^{d\times k} \in \mathbb{R}^{d\times k}}{max}\hspace{1mm} \frac{1}{S} \mathlarger{\mathlarger{\sum}}_{\forall t\in [T,T+S]} \hspace{1mm} \frac{\langle R^{n\times 1}_t,R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}\rangle}{||R^{n\times 1}_t||_2||R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}||_2}
@@ -135,9 +134,9 @@ subject to
 \underset{R^{n\times d}_{t\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{rel}(f,R^{n\times d}_{t\times d}) \le \alpha
 \end{equation}
 \newline
-\subsection{Principle Time Series}
+\level{2}{Principle Time Series}
 Another task related to time series is to represent a set of $n$ time series by less number of time series $k<n$. Which is some way is an application of the Linear Factor Models.\newline
-\textit{Given}:\newline The definition of $R^{n\times 1}_t$ and  $R^{n\times 1}_{t\times d}$ are same as before, but here we need to design latent time series denote them by $F^{k\times 1}_t \in \mathbb{R}^{k\times 1}$ as a function of $R^{n\times d}_{t+1\times d}$, i.e. $F^{k\times 1}_t = f(R^{n\times d}_{t+1\times d})$ which reduces the $n$ time series observed from time $t-d$ to time $t$ to set of $k$ time series at time $t$ such that its possible to sufficiently recover the $n$ time series at time $t$ by another function $ g(F^{k\times 1}_t) = P^{n \times 1}_{t}$ such that $P^{n \times 1}_{t} \approx R^{n \times 1}_{t}$ which we can measure by \textit{Average} aggregation scheme over the loss function $\mathcal{L}(y,\hat{y}) = ||y-\hat{y}||_2$, which we need to minimize.
+\textit{Given}:\newline The definition of $R^{n\times 1}_t$ and  $R^{n\times d}_{t\times d}$ are same as before, but here we need to design latent time series denote them by $F^{k\times 1}_t \in \mathbb{R}^{k\times 1}$ as a function of $R^{n\times d}_{t+1\times d}$, i.e. $F^{k\times 1}_t = f(R^{n\times d}_{t+1\times d})$ which reduces the $n$ time series observed from time $t-d$ to time $t$ to set of $k$ time series at time $t$ such that its possible to sufficiently recover the $n$ time series at time $t$ by another function $ g(F^{k\times 1}_t) = P^{n \times 1}_{t}$ such that $P^{n \times 1}_{t} \approx R^{n \times 1}_{t}$ which we can measure by \textit{Average} aggregation scheme over the loss function $\mathcal{L}(y,\hat{y}) = ||y-\hat{y}||_2$, which we need to minimize.
 
 \begin{equation} \label{pts_diagram}
 \begin{tikzcd}
@@ -163,7 +162,7 @@ For small changes in our time series data $\delta R^{n\times d}_{t+1\times d}$ w
 \end{equation}\newline
 Combining all of that together gives us the \textbf{fMOOP} formulation of this problem as
 \begin{equation} \label{pts_loss}
-\underset{A\in \mathbb{R}^{k\times n}, B \in \mathbb{R}^{d\times 1}, C \in \mathbb{R}^{n\times k}}{min}\hspace{1mm} \frac{1}{T-d+1} \mathlarger{\mathlarger{\sum}}_{\forall t\in [d,T]} \hspace{1mm} ||R^{n\times 1}_t-C^{n \times k} \times A^{k\times n}\times R^{n\times d}_{t+1\times d}\times B^{d\times 1}||_2
+\underset{A\in \mathbb{R}^{k\times n}, B \in \mathbb{R}^{d\times 1}, C \in \mathbb{R}^{n\times k}}{min}\hspace{1mm} \frac{1}{T-d+1} \mathlarger{\mathlarger{\sum}}_{\forall t\in [d,T]} \hspace{1mm} ||R^{n\times 1}_t-C^{n \times k} \times A^{k\times n}\times R^{n\times d}_{t+1\times d}\times B^{d\times 1}||_2^2
 \end{equation}\newline
 subject to
 \begin{equation} \label{lfm_cond}
@@ -172,14 +171,14 @@ subject to
 \newline
 
 \newpage
-\subsection{Defense Against Adversarial Attacks on Neural Networks}
+\level{2}{Defense Against Adversarial Attacks on Neural Networks} \label{problem_defense_adv_nn_attack}
 
 Say we are given a trained neural network $\mathcal{N}: X \to Y$ which has learnt a mapping from $X$, the input set to $Y$, the output set. If the underlining mapping that $\mathcal{N}$ was modeled to learn was smooth w.r.t. its input then we expect that for a well trained network $\mathcal{N}$ for any input $x\in X$ and for small enough $\delta x \in X$  $\delta x$ the output of the network wont change much, lets say that it won't change more than a constant $\alpha > 0$ times the norm of $x$ i.e. $||\mathcal{N}(x+\delta x) - \mathcal{N}(x)|| = ||\delta \mathcal{N}(x)||\le \alpha ||\delta x||$. Which we can reformulate as follows
 
 \begin{equation}
-    \underset{x\in X}{min}\hspace{1mm} cond_{abs}(\mathcal{N},x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta \mathcal{N}(x)||}{||\delta x||} \le \alpha
+    \underset{x\in X}{max}\hspace{1mm} cond_{abs}(\mathcal{N},x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta \mathcal{N}(x)||}{||\delta x||} \le \alpha
 \end{equation}\newline 
-Most of the networks which are being trained today don't account for such constraints giving the way to Adversarial attacks on them, which exploit this drawbacks of the network to force them to output unreasonably wrong value.
+Most of the networks which are being trained today don't account for such constraints giving the way to adversarial attacks on them, which exploit this drawbacks of the network to force them to output unreasonably wrong value.
 \begin{equation}
 \begin{tikzcd}
 {(x,y,y')} \arrow[rr, "\mathcal{A}_{\epsilon}" description] \arrow[rrd, no head, dashed] \arrow[d, no head, dashed] &  & \delta x \arrow[d, no head, dashed]\\

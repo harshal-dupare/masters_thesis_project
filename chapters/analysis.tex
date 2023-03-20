@@ -1,14 +1,18 @@
-\chapter{Analysis}
+\level{0}{Methodology and Results}
+\level{1}{Scope}
 Following are some questions that we consider important and need to be analysed \label{important_questions}
 \begin{enumerate}
-    \item What types of fMOOPs confirm to restrictions on condition number of $f$?
-    \item How to determine $\alpha$ for a given problem and subsets $X_1,X_2,X_3 \subseteq X$?
-    \item For the fMOOPs which confirm such condition number restrictions how does the condition number behave over the domain $X_3$?
-    \item Based on the behaviour of the condition number what types of methods do we expect to work well?
-    \item What all computation methods/algorithms are available for condition number w.r.t. specific fMOOP?
-    \item How the transformed problems with bounds on condition number behave and how close are their solutions to the original problems solutions? 
+    \item What types of fMOOPs confirm to restrictions on condition number of $f$? \label{question_restriction}
+    \item How to determine minimum feasible value of $\alpha$ for a given problem and subsets $X_1,X_2,X_5,X_6 \subseteq X$? \label{question_alpha_feasible_range}
+    \item For the fMOOPs which confirm such condition number restrictions how does the condition number behave over the domain $X_5,X_6$? \label{question_behaviour_of_cond_over_x5x6}
+    \item Based on the behaviour of the condition number what types of methods do we expect to work well? \label{question_what_methods_we_expect_to_work}
+    \item What all computation methods/algorithms are available for condition number w.r.t. specific fMOOP? \label{question_computation_methods}
+    \item How the transformed problems with bounds on condition number behave and how close are their solutions to the original problems solutions? \label{question_transformed_problems_behaviour}
 \end{enumerate}
-But before we address these questions we mentions a few important results\newline\newline
+In this analysis and results we will consider following 2 main problems derived from the problems \ref{problem_linear_factor_model} and \ref{problem_defense_adv_nn_attack}, both of which are defined in the Applications and Motivation section.
+
+
+\level{1}{Theoretical Results}
 \textbf{Condition number over composition of function}: Say we have a function $f=g(h(x)) = g \circ h(x)$ where $f:X\to Y$, $h:X\to Z$, and $g:Z\to Y$ then we can write
 \begin{equation}
     cond_{abs}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta f(x)||}{||\delta x||} = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta g(h(x))||}{||\delta x||}
@@ -68,6 +72,283 @@ note that $||A\delta x||_F = \sqrt{(\sum_{i\in [d]} A_i\delta x_i)^2}$ and by Ca
 \end{equation}
 note that for this case $||\cdot||_F$ is equivalent to $||\cdot||_2$, and the above upper bound implies that the problem \ref{fmoop_l2_rel_obj_2} when minimized for the worst case using the upper bound \ref{cond_forb_ub_1d} we get the fMOOP as follows
 \begin{equation} \label{fmoop_l2_rel_obj_new}
-    \underset{A \in \mathbb{R}^{1\times d}}{min}\hspace{1mm} (||A||_2,\underset{A \in \mathbb{R}^{1\times d}}{min}\hspace{1mm} \frac{1}{n}\mathlarger{\sum}_{i\in [n]} ||AX_i-Y_i||_2)
+    \underset{A \in \mathbb{R}^{1\times d}}{min}\hspace{1mm} (||A||_2, \frac{1}{n}\mathlarger{\sum}_{i\in [n]} ||AX_i-Y_i||_2)
 \end{equation}
 which when scalarized with squaring the norm restriction gives us the standard $L_2$ regularization.
+
+\level{1}{Experimental Results}
+\level{2}{Problem: Linear Factor Model} \label{results_problem_1}
+This is the same problem as defined in the section \ref{problem_linear_factor_model}.
+\newline A data of returns for $n$ time series $R^{n\times 1}_t \in \mathbb{R}^{n\times 1}$, for $t\in [T]$ and denote $R^{n\times d}_{t\times d} = [R^{n\times 1}_{t-1},R^{n\times 1}_{t-2},...,R^{n\times 1}_{t-d}] \in \mathbb{R}^{n\times d}$ is given.
+\newline \newline We need to design $A^{d\times k} \in  \mathbb{R}^{d\times k}$ and $\beta^{k\times 1} \in \mathbb{R}^{k\times 1}$, such that $F^{n\times k}_t = R^{n\times d}_{t\times d}\times A^{d\times k}$ and $P^{n \times 1}_{t} = F^{n\times k}_t \times \beta^{k \times 1}$ and $P^{n \times 1}_{t} \approx R^{n \times 1}_{t}$. And the performance  which is measured by \textit{Average} aggregation scheme over the loss function $\mathcal{L}(y,\hat{y}) = ||y-\hat{y}||_2$ which we need to minimize and another \textit{Average} aggregation scheme over the return function $\mathcal{R}(y,\hat{y}) = \frac{\langle y,\hat{y}\rangle}{||y||_2||\hat{y}||_2}$ defined over the testing period of $t \in [T,T+S]= \{T,T+1,...,T+S-1\}$ which we need to maximize.
+
+\begin{equation} \label{results_problem_lfm_diagram}
+\begin{tikzcd}
+R^{n\times d}_{t \times d} \arrow[rr, "\times A^{d\times k}" description] \arrow[r, no head]& {}& F^{n\times k}_{t} \arrow[d, "\times \beta^{k\times 1}" description] \\
+R^{n\times 1}_t \arrow[rr, "\mathcal{L}" description, Rightarrow, no head] \arrow[rd, dashed] && P^{n \times 1}_{t} \arrow[ld, dashed]\\
+& \mathcal{R} &
+\end{tikzcd}
+\end{equation}
+\newline
+And the orthonormal condition
+\begin{equation} \label{results_problem_orthonormal_eq}
+ A^{d\times k}(A^{d\times k})^{\top} = I^{d\times d}
+\end{equation}
+From the \ref{results_problem_orthonormal_eq} we can infer that $(A^{d\times k})^\top$ belongs to the set of right inverses of $A^{d\times k}$. 
+\newline With the two objectives as:
+\begin{equation} \label{problem_lfm_loss}
+\underset{\beta^{k \times 1}\in \mathbb{R}^{k\times 1}, A^{d\times k} \in \mathbb{R}^{d\times k}}{min}\hspace{1mm} \mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}
+\end{equation}
+Where $\mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}$ is defined as follows
+\begin{equation} \label{problem_lfm_loss_exprr}
+\mathcal{L}_{\beta^{k \times 1}, A^{d\times k}} = \frac{1}{T-d+1} \mathlarger{\mathlarger{\sum}}_{\forall t\in [d,T]} \hspace{1mm} ||R^{n\times 1}_t-R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}||_2^2
+\end{equation}
+and 
+\begin{equation} \label{problem_lfm_reward}
+\underset{\beta^{k \times 1}\in \mathbb{R}^{k\times 1}, A^{d\times k} \in \mathbb{R}^{d\times k}}{max}\hspace{1mm} \mathcal{R}_{\beta^{k \times 1}, A^{d\times k}}
+\end{equation}
+Where $\mathcal{R}_{\beta^{k \times 1}, A^{d\times k}}$ is defined as follows
+\begin{equation} \label{problem_lfm_reward_exprr}
+\mathcal{R}_{\beta^{k \times 1}, A^{d\times k}} = \frac{1}{S} \mathlarger{\mathlarger{\sum}}_{\forall t\in [T,T+S]} \hspace{1mm} \frac{\langle R^{n\times 1}_t,R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}\rangle}{||R^{n\times 1}_t||_2||R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}||_2}
+\end{equation}
+\level{3}{Data}
+We will be using the data provided by \textit{Qube Research and Technologies (QRT)} on the \textit{Challenge Data} site, under the challenge: \textit{Learning factors for stock market returns prediction} \cite{qrt_challenge}.\newline The data contains (cleaned) daily returns of 50 stocks over a time period of 754 days (three years). And in the original problem they have asked for solutions with $d=250$ and $k=10$.
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{images/cumulative_returns_qrt_timeseries_data.png}
+%     \caption{Cumulative Returns for Daily Returns Time Series}
+%     \label{fig:cumulative_returns}
+% \end{figure}
+% \begin{figure}[htbp]
+%   \centering
+%   \includegraphics[width=0.9\textwidth]{images/correlation_matrix_50by50_timeseries_qtr_data.png}
+%   \caption{Correlation Matrix for returns of 50 time series}
+%   \label{fig:corr_matrix_ts_qrt_data}
+% \end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[t]{0.5789\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/cumulative_returns_qrt_timeseries_data.png}
+        \captionsetup{font=tiny}
+        \caption{Cumulative Returns for Daily Returns Time Series}
+        \label{fig:cumulative_returns}
+    \end{minipage}%
+    \begin{minipage}[t]{0.4211\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/correlation_matrix_50by50_timeseries_qtr_data.png}
+        \captionsetup{font=tiny}
+        \caption{Correlation Matrix of Daily Returns}
+        \label{fig:corr_matrix_ts_qrt_data}
+    \end{minipage}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{images/violin_plots_50_timeseries.png}
+  \caption{Violin Plots for 50 Time Series}
+  \label{fig:violin_plots}
+\end{figure}
+
+\level{3}{Approaches}
+\level{4}{Baseline Method}
+\newline \newline The following method is based on randomized sampling method, which involves generating the matrix $M$ randomly and applying random data and fitting them to the training data set using linear regression. This process is repeated multiple times, and the best result is selected from the attempts.
+Following is the pseudocode for the method:
+\begin{algorithm}[H]
+\caption{Baseline Method}\label{lfm_baseline_method}
+\begin{algorithmic}
+\State Set $N_{iter}$
+\State $\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \emptyset, \emptyset, -\infty $
+\For{$i \gets 1 ... N_{iter}$}
+    \State $M_i \gets sample\_random\_matrix()$
+    \State $A_i \gets gram\_schmidt\_algorithm(M_i)$\Comment{orthonormalize $M_i$ to $A_i$}
+    \State Compute $\{F^{n\times k}_{t, i}\}$ for $A_i$ over $t\in [d,T]$
+    \State $\beta_i \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t, i}\}, t\in [d,T])$
+    \If{$\mathcal{R}_{\beta_i, A_i} > \mathcal{R}_{optimal}$}  \Comment{update the optimal if better solution found}
+        \State $\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \beta_{i}, A_{i}, \mathcal{R}_{\beta_i, A_i} $
+    \EndIf 
+\EndFor
+\end{algorithmic}
+\end{algorithm} In an alternate implementation of this algorithms we can even do grid search over the entries of $A$, but because of the high number of possibilities we restrict this method over randomized search. 
+\level{4}{Gradient Based Methods}
+To compute the partial derivatives of the loss function $\mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}$ with respect to $A^{d\times k}$ and $\beta^{k \times 1}$, we will use the chain rule and the derivative of the matrix multiplication.\newline \newline First, let's compute the derivative of $\mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}$ with respect to $\beta^{k \times 1}$. Lets Define $\Delta_t = R^{n\times 1}_t-R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}$
+\begin{equation}
+    \frac{\partial \mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}}{\partial \beta^{k \times 1}} = \frac{1}{T-d+1} \sum_{\forall t\in [d,T]} \frac{\partial}{\partial \beta^{k \times 1}} ||\Delta_t||_2^2 
+\end{equation}
+\newline Now, let's compute the derivative of $||\Delta_t||_2^2$ with respect to $\beta^{k\times 1}$:
+
+\begin{equation}
+    \frac{\partial}{\partial \beta^{k \times 1}} ||\Delta_t||_2^2 =  \frac{\partial}{\partial \beta^{k \times 1}} \Delta_t^\top \Delta_t = 2F_t^\top (F_t \beta - R_t)
+\end{equation}
+\newline Which gives
+\begin{equation}
+    \frac{\partial \mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}}{\partial \beta^{k \times 1}} = \frac{2}{T-d+1} \sum_{\forall t\in [d,T]} F_t^\top (F_t \beta - R_t)
+\end{equation}
+\newline Similarly consider 
+\begin{equation}
+    \frac{\partial \mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}}{\partial A^{d \times k}} = \frac{1}{T-d+1} \sum_{\forall t\in [d,T]} \frac{\partial}{\partial A^{d \times k}} ||\Delta_t||_2^2 
+\end{equation}
+We will use the following identities when $a$, $b$ and $C$ are not functions of $X$.
+\begin{equation} \label{matrix_calc:id1}
+\frac{\partial (\mathbf{a}^\top \mathbf{X} \mathbf{b})}{\partial \mathbf{X}} = \mathbf{a} \mathbf{b}^\top
+\end{equation}
+\begin{equation}\label{matrix_calc:id2}
+\frac{\partial (\mathbf{a}^\top \mathbf{X}^\top \mathbf{b})}{\partial \mathbf{X}} = \mathbf{b} \mathbf{a}^\top
+\end{equation}
+\begin{equation}\label{matrix_calc:id3}
+\frac{\partial (\mathbf{X} \mathbf{a})^\top \mathbf{C} (\mathbf{X} \mathbf{b})}{\partial \mathbf{X}} = \mathbf{C} \mathbf{X} \mathbf{b} \mathbf{a}^\top + \mathbf{C}^\top \mathbf{X} \mathbf{a} \mathbf{b}^\top
+\end{equation}
+\newline for the equations below we are dropping the dimensions
+\begin{equation}
+    ||\Delta_t||_2^2 = \Delta_t^\top \Delta_t = (R_t-R_{t\times d} A  \beta)^\top (R_t-R_{t\times d} A \beta) = R_t^\top R_t
+\end{equation}
+\begin{equation}
+    ||\Delta_t||_2^2 = R_t^\top R_t - R_t^\top R_{t\times d} A \beta - \beta^\top A^\top  R_{t\times d}^\top R_t+ \beta^\top A^\top  R_{t\times d}^\top R_{t\times d} A \beta
+\end{equation}
+\newline Now using the identities \ref{matrix_calc:id1}, \ref{matrix_calc:id2}, \ref{matrix_calc:id3} we get 
+\begin{equation}
+    \frac{\partial}{\partial A} ||\Delta_t||_2^2 = 2(R_{t\times d}^\top R_{t\times d} A \beta \beta^\top - R_{t\times d}^\top R_t \beta^\top)
+\end{equation}
+\newline Which gives
+\begin{equation}
+    \frac{\partial \mathcal{L}_{\beta, A}}{\partial A} = \frac{2}{T-d+1} \sum_{\forall t\in [d,T]} R_{t\times d}^\top R_{t\times d} A \beta \beta^\top - R_{t\times d}^\top R_t \beta^\top
+\end{equation}
+\newline For vector-valued scalar functions $v(\mathbf{x})$ and $u(\mathbf{x})$ with respect to $\mathbf{x}$, and where $A$ is not a function of $x$.
+
+\begin{equation}\label{eq:partial-derivative-vector-function}
+\frac{\partial}{\partial \mathbf{x}} \left( v(\mathbf{x}) u(\mathbf{x}) \right) =  v \frac{\partial u}{\partial \mathbf{x}} + \frac{\partial v}{\partial \mathbf{x}} u
+\end{equation}
+\begin{equation}\label{eq:partial-derivative-matrix-function}
+\frac{\partial}{\partial \mathbf{x}} (\mathbf{x}^{\top} \mathbf{A} \mathbf{x}) = (\mathbf{A} + \mathbf{A}^{\top}) \mathbf{x}
+\end{equation}
+\begin{equation}
+\frac{\partial (\mathbf{Ax})}{\partial \mathbf{x}} = \mathbf{A}^\top \label{eq:partial_Ax_wrt_x}
+\end{equation}
+\newline define $\rho_t = \frac{\langle R_t,R_{t\times d} A  \beta\rangle}{||R_t||_2||R_{t\times d} A \beta||_2} = \frac{ R_t^\top R_{t\times d} A  \beta}{||R_t||_2||R_{t\times d} A \beta||_2} = \frac{ R_t^\top F_t \beta}{||R_t||_2||F_{t} \beta||_2}$ and $\hat{R}_t=\frac{R_t}{||R_t||_2}$, now using \ref{eq:partial-derivative-matrix-function}, \ref{eq:partial-derivative-vector-function}, \ref{eq:partial_Ax_wrt_x}, \ref{matrix_calc:id1} and \ref{matrix_calc:id3} we get
+\begin{equation} \label{eq:derivative-rho_t_beta}
+    \frac{\partial \rho_t}{\partial \beta} =  \frac{1}{||F_t\beta||_2}F_t^\top \hat{R}_t - \frac{2F_t^\top F_t \beta}{2||F_t\beta||_2^3}\hat{R}_t^\top F_t \beta
+\end{equation}
+\begin{equation} \label{eq:derivative-rho_t_A}
+    \frac{\partial \rho_t}{\partial A} =  \frac{1}{||F_t\beta||_2} R_{t\times d}^\top \hat{R}_t \beta^\top - \frac{2R_{t\times d}^\top R_{t\times d} A \beta \beta^\top }{2||F_t\beta||_2^3}\hat{R}_t^\top F_t \beta
+\end{equation}
+\newline From that we can get
+\begin{equation}
+    \frac{\partial \mathcal{R}_{\beta, A}}{\partial A} = \frac{1}{S} \mathlarger{\mathlarger{\sum}}_{\forall t\in [T,T+S]} \hspace{1mm} \frac{\partial \rho_t}{\partial A} 
+\end{equation}
+\begin{equation}
+    \frac{\partial \mathcal{R}_{\beta, A}}{\partial \beta} = \frac{1}{S} \mathlarger{\mathlarger{\sum}}_{\forall t\in [T,T+S]} \hspace{1mm} \frac{\partial \rho_t}{\partial \beta} 
+\end{equation}
+\newline Also we can get derivative w.r.t. $A$ for the frobenius norm of $AA^\top-I$
+\begin{equation} \label{eq:derivative_forb_norm_ofAAtmI}
+    \frac{\partial ||AA^\top-I||_F}{\partial A} = -4\cdot (I-A\cdot A^\top )\cdot A
+\end{equation}
+\textbf{Observation}\newline 
+Consider the set of matrices $\mathcal{O}_d^k = \{ A | AA^\top = I_d, A \in \mathbb{R}^{d\times k} \}$, observe that $\mathcal{O}_k^k$ is set of all orthonormal square matrix of size $k\times k$ and for a $Q\in \mathcal{O}_k^k$ we have $QQ^\top = I$, which implies $Q^{-1}= Q^\top$ and hence $QQ^\top = Q^\top Q = I$. Using the aforementioned fact we observe that $AQ\in \mathcal{O}_d^k$ as
+\begin{equation} \label{observation:ortho-closure_odk}
+    (AQ)(AQ)^\top = AQQ^\top A^\top = AA^\top 
+\end{equation}
+Now consider and iterative scheme for finding $A, \beta$ which generates $\{A_i, \beta_i\}_{i=0}^{N_{iter}}$ with updates at $i$'th iteration denoted as $\{\Delta A_i, \Delta \beta_i\}$
+\begin{equation}
+\begin{aligned}
+    A_{i+1} = A_i + \Delta A_i \\
+    \beta_{i+1} = \beta_i + \Delta \beta_i
+\end{aligned}
+\end{equation}
+But since in our problem we have added restriction on $A \in \mathcal{O}_d^k$, which we can solve by one of the following 2 approaches 
+\newline \newline \textbf{General approaches to satisfy orthonormality condition}
+\begin{enumerate}
+    \item Design the iteration scheme such that $A_i \in \mathcal{O}_d^k, \forall i \in \{0,1,2,...,N_{iter}\}$
+    \item Relax the Condition on $A \in \mathcal{O}_d^k$ to $A \in \mathbb{R}^{d\times k}$ and solve using an iterative scheme;  then project $A_{N_{iter}}$ to $\mathcal{O}_d^k$ i.e. solve the problem $\underset{A \in \mathcal{O}_d^k}{min} \hspace{2mm} ||A_{N_{iter}}-A||$
+\end{enumerate}
+First we will use the observation \ref{observation:ortho-closure_odk} to design an iterative scheme such that $A_i \in \mathcal{O}_d^k, \forall i \in \{0,1,2,...,N_{iter}\}$
+
+Lets say via some iterative method we get $\Delta A_i$ update for $A_i$ but since $A_{i+1} = A_i + \Delta A_i$ need not belong to $\mathcal{O}_d^k$ we need some way to project $\Delta A_i$ in a space such that $A_{i+1} \in \mathcal{O}_d^k$
+\newline We define $\mathcal{O}_d^k$
+\begin{equation}
+    \delta \mathcal{O}_d^k = \{ \delta | \delta = A - B, A, B \in \mathcal{O}_d^k \}
+\end{equation}
+which implies, we require to project $\Delta A_i$ in $\delta \mathcal{O}_d^k $ or to say $\Delta A_i \to proj_{\delta \mathcal{O}_d^k}(\Delta A_i)$
+\newline \newline \textbf{Properties of $\mathcal{O}_d^k $}
+\begin{enumerate}
+    \item $A \in \mathcal{O}_d^k \implies -A \in \mathcal{O}_d^k$ \label{odk_prop:prop1}
+    \item $A \in \mathcal{O}_d^k$ and $Q\in \mathcal{O}_k^k$ we have $A Q \in \mathcal{O}_d^k$ as in \ref{observation:ortho-closure_odk}
+\end{enumerate}
+\textbf{Properties of $\delta \mathcal{O}_d^k $}
+\begin{enumerate}
+    \item $\bar{\textbf{0}} \in \delta \mathcal{O}_d^k$
+    \item $A, B \in \mathcal{O}_d^k$ we have $A-B, A+B \in \delta \mathcal{O}_d^k$ as by property \ref{odk_prop:prop1} of $\mathcal{O}_d^k$
+    \item $\delta \in \delta \mathcal{O}_d^k$ and $Q\in \mathcal{O}_k^k$ we have $\delta Q \in \delta \mathcal{O}_d^k$ by \ref{observation:ortho-closure_odk}
+\end{enumerate}
+So if we could get an associated $Q_i \in \mathcal{O}_k^k$ with $\Delta A_i$ such that we can replace $A_{i+1} = A_i+proj_{\delta \mathcal{O}_d^k}(\Delta A_i)$ with $A_{i+1} = A_iQ_i$  
+\newline As per the property of $\delta \mathcal{O}_d^k$ for $A, B \in \mathcal{O}_d^k$ we have $A-B, A+B \in \delta \mathcal{O}_d^k$, consider
+\begin{equation}
+\begin{aligned}
+    T &= (A+B)(A-B)^\top \\
+      &= AA^\top - AB^\top +BA^\top - BB^\top \\
+      &= I - AB^\top +BA^\top - I \\
+      &= BA^\top- AB^\top \\
+\end{aligned}
+\end{equation}
+Observe that $T$ is skew symmetric
+\begin{equation}
+\begin{aligned}
+    T^\top &= (BA^\top- AB^\top)^\top\\
+    &= AB^\top - BA^\top \\
+    &= -T
+\end{aligned}
+\end{equation}
+Now recall Cayley Transformation for a $Q$ which doesn't have $-1$ as one of its eigenvalues then there is a skew-symmetric matrix $C$ satisfying the following properties
+\begin{equation} \label{cayley-transformation} 
+\begin{aligned}
+    Q &= (I+C)^{-1}(I-C) = (I-C)(I+C)^{-1} \\
+    C &= (I-Q)(I+Q)^{-1}
+\end{aligned}
+\end{equation}
+Let $B = \Delta A_i$ and $A = A_i$ and consider the $T_i = \Delta A_iA_i^\top- A_i\Delta A_i^\top$ and we generate associated $Q_i = (I-T_i)(I+T_i)^{-1}$ by using Cayley Transformation over $T$.
+
+\level{4}{MOOP Methods}
+\level{5}{No Preference Method}
+First we compute the \textbf{utopia point} as defined in \ref{ideal_point_def} for this problem, here we have 2 dimensions for the objective to minimize namely $-\mathcal{R}_{\beta, A}$ and $\mathcal{L}_{\beta, A}$ and the utopia point values denoted by $-\mathcal{R}_{\beta, A}^* = min -\mathcal{R}_{\beta, A}  = - max\hspace{2mm} \mathcal{R}_{\beta, A} =  - 1 $ as its inner-product between vectors divided by the norms induced by that inner-product in and $\mathcal{L}_{\beta, A}^* =min \hspace{2mm} \mathcal{L}_{\beta, A} = 0$ 
+\level{4}{Condition Number Relaxation}
+For any $\alpha \ge 1$, \ref{problem_lfm_cond} will contain the set specified by the condition \ref{results_problem_orthonormal_eq} as proved in \ref{orthonormal_eq}
+\begin{equation} \label{problem_lfm_cond}
+\underset{R^{n\times d}_{t\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{rel}(f,R^{n\times d}_{t\times d}) \le \alpha
+\end{equation}
+Here $f(X) = X\times A$.
+
+
+
+
+
+% %%% ADVERSARIAL NETWORK
+% \level{2}{Problem: Defense Against Adversarial Attack} \label{results_problem_2} 
+% \hspace{6mm} A dataset of $n$ images ${(X_1, y_1), (X_2, y_2), ..., (X_n, y_n)}$, where $X_i$ represents an image and $y_i$ represents its corresponding label, the task is to develop a function $N(X_i; \theta)$ that takes an image $X_i$ as input and predicts its label $y_i$ using a set of model parameters $\theta$.
+% \newline Formally, the task is to find the optimal set of parameters $\theta^*$ that minimizes the following loss function:
+% \begin{equation} \label{problem_daaamd_opt_thita_expression}
+%     \theta^* = \arg\min_\theta \frac{1}{n}\sum_{i=1}^n L(N(X_i; \theta), y_i)
+% \end{equation}
+% \newline where $L$ is a loss function that measures the difference between the predicted label and the true label.
+
+% An adversarial attack is a perturbation $\delta$ added to the original input image $X_i$ to produce a new image $X_i' = X_i + \delta$ that is designed to cause misclassification of the model. The goal of the attacker is to find the perturbation $\delta$ that maximizes the difference between the predicted label and the true label.
+% \newline Formally, the task is to find the optimal perturbation $\delta^*$ that maximizes the following objective function:
+% \begin{equation} \label{problem_daaamd_adv_delta_expression}
+%     \delta^* = \arg\max_\delta L(N(X_i + \delta; \theta), y_i)
+% \end{equation}
+% \newline where $L$ is a loss function that measures the difference between the predicted label and the true label.
+
+% \level{3}{Data}
+% The MNIST dataset consists of 60,000 grayscale images of handwritten digits (0-9) with a resolution of 28x28 pixels. There is an additional test set of 10,000 images. Each image is labeled with its corresponding digit. The pixel intensity values of the images in the MNIST dataset range over integer values from 0 to 255. 
+% \newline 
+% The MNIST dataset is a widely used benchmark dataset in the field of machine learning, and many different models have been developed to classify the digits in this dataset. However, it has been shown that these models are vulnerable to adversarial attacks, which can cause them to misclassify images with high confidence.
+
+% \begin{figure}[H]
+%   \centering
+%   \includegraphics[width=0.9\textwidth]{images/mnist_60_images_4x15_grid.png}
+%   \caption{Images from the MNIST training set.}
+%   \label{fig:mnist_images}
+% \end{figure}
+
+% \level{3}{Approaches}
+% \level{4}{Preprocessing }
+
+

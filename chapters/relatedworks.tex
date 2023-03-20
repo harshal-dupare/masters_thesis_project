@@ -1,4 +1,4 @@
-\chapter{Related Works}
+\level{0}{Related Works}
 % Write about the literature that you have studied regarding the work that you have carried out for the project\\
 % Have introduction describig the different aspects of the problem and what all type of literature can be similar to it eg. MOOP solution methods, computing conditional number\\
 \hspace{1cm}Before we look for the related works to this problems it is important to understand the different dimensions of this problem and structure the related works accordingly. The problems stated in the section \ref{prob_def} has 1 major characteristic apart from being fMOOP is that it requires the solution to have bounded condition number (absolute or relative), and on top of that since such formulation has many applications it is desirable to have efficient algorithms to compute such solutions. So the following dimensions of the literate that interests us and can have impact of the problem are:
@@ -13,8 +13,8 @@ As we will see that lot of research has been done in solving MOOP and we have fa
 
 % In this chapter, we will review some of the related literature. Several datasets have been collected from various social media platforms such as Twitter, Facebook, Reddit ,etc for hate-speech detection. Largely the focus has been remained on identifying the hate-labeled post by identification of hate-keywords and then taking the necessary action against the user by either suspending his account or removing his posts.There has been some concern about this action because it could trigger an escalation of the discussion about what constitutes hate speech and what is not. Therefore we try to look at both the ends of the pipeline through reviewing the literature for detoxifying the online media through hate-detection systems and deploying generative models for counter-narratives generation.    
 \newpage
-\section{Multi-Objective Optimization}
-\subsection{Definitions}
+\level{1}{Multi-Objective Optimization}
+\level{2}{Definitions}
 In MOOP since there are more than one objectives its unlikely that all of them achieve their optima at the same point, hence typically there is no single global solution. Which makes its necessary to rethink about the definition for an optimum and accordingly determine a set of points that can be deemed as the solutions. The most widely used concept concept in defining an optimal point is that of the \textit{Pareto optimality} \cite{pareto1971manual}, which is defined as follows:\newline 
 Below we will use $F: X \to \mathbb{R}^k$ as the objective function that we need to minimize over the input $x\in X$ and we will use minimization over all the objectives since maximization can be converted to minimization by negating the sign.\newline\newline
 \textbf{Pareto Optimal}: A point, $x^{*} \in X$, is
@@ -35,14 +35,14 @@ The methods to solve MOOP are classified into 4 classes \cite{hwang2012multiple}
     \item \textbf{Interactive methods}: Pareto optimal solution(s) are shown to the \textit{DM}, then the \textit{DM} describes how the solution(s) could be improved. Then the next set of Pareto optimal solution(s) is generated based on the \textit{DM}'s feedback and iteratively the solutions are improved.
 \end{enumerate}
 
-\subsection{No Preference Methods}
+\level{2}{No Preference Methods}
 Since no preference information is provided the general one the approaches followed in \cite{zeleny1973compromise} uses the definition of \textbf{utopia point} in \ref{ideal_point_def} and then by properly scaling the objective function $F$ to $\hat{F}$ and using a $||\cdot||$ norm defined over the objective space the following optimizations problem is formulated to minimize the following objective.
 \begin{equation}
     \underset{x \in X}{min}\hspace{1mm} ||\hat{F}(x) - \hat{F}^{*}||
 \end{equation}
 \newline Other similar methods are described in \cite{miettinen1998}.
 
-\subsection{A Priori Methods}
+\level{2}{A Priori Methods}
 Methods which come under this class can further divided into other smaller classes but all of them have a common feature that is,enough information is provided a priori to compare any candidate pareto optimal solutions.
 \newline Following are some of the Important methods under this class:
 \newline \newline \textbf{Utility Function Methods}: Here we have a utility function $U: \mathbb{R}^k \to \mathbb{R}$, and the goal is to solve the following SOOP
@@ -87,7 +87,7 @@ If the solution of \ref{eps_const_obj},\ref{eps_const_con} exists then it is a w
 \begin{equation}
     \underset{x\in X}{min} \hspace{1mm}\mathlarger{\mathlarger{\sum}}_{\forall i\in [k]} |g_i - F_i(x)|
 \end{equation}
-\subsection{A Posteriori Methods} \label{a_posteriori_method}
+\level{2}{A Posteriori Methods} \label{a_posteriori_method}
 As the name suggest that the \textit{DM} is involved a posteriori of finding solution, these apprpaches are also known as generate-first-choose-later approaches \cite{messac2002generating}. The goal is to produce a good enough representative subset of solutions which are Pareto optimal. In general they are classified into 2 classes.
 
 \begin{enumerate}
@@ -95,7 +95,7 @@ As the name suggest that the \textit{DM} is involved a posteriori of finding sol
     \item \textbf{Evolutionary algorithms}, which produce a set of Pareto optimal solutions per iteration/run of the algorithm.
 \end{enumerate}
 
-\subsubsection{Mathematical Programming Methods}
+\level{3}{Mathematical Programming Methods}
 Few of the well known methods in this class are:
 \begin{enumerate}
     \item Normal Boundary Intersection Method
@@ -114,7 +114,7 @@ Where $\Phi \in \mathbb{R}^{k\times k}$ is the pay-off matrix whose $\Phi_{ij}$ 
 \newline\newline \textbf{Modified Normal Boundary Intersection Method (NBIm)}: \label{nbim_method_def} As stated in \ref{nbi_method_def} the NBI method suffers from not even being a necessary condition for pareto optimal solutions, Das \cite{das1999improved} and R de S Motta \cite{de2012modified} proposed modified methods to cover these drawbacks
 \newline\newline \textbf{Normal Constraint Method (NC)}: \label{nc_method_def} Messac et al. \cite{messac2003normalized}\cite{messac2004normal} proposed the NC method as an alternative to the NBI method, which provided some improvements. It uses the utopia point \ref{ideal_point_def} to normalize the objective vector $F(x)$ to $\hat{F}(x)$ along with a pareto filter which removes the non-dominant solutions to keep only the dominant solutions.Also it always produces pareto optimal solutions along with it's performance being independent of design objective scales. 
 
-\subsubsection{Evolutionary Algorithms (EA)}
+\level{3}{Evolutionary Algorithms (EA)}
 Evolutionary algorithms are one of the very actively researched methods \cite{vikhar2016evolutionary} for solving MOOP and finding pareto optimal solutions. EA are subset of the paradigm which is inspired by nature and evolution in designing algorithms for various purposes including solving optimization problems. The general procedure that and EA follows is described below:
 \begin{algorithm}
 \caption{Generic EA}\label{algo_generic_ea}
@@ -138,7 +138,7 @@ Evolutionary algorithms are one of the very actively researched methods \cite{vi
 \newline\newline \textbf{Particle Swarm Optimization (PSO)}: \label{partical_swarm_opt} PSO is based on the flocking behaviour of the birds where each particle has a position (the solution) and a velocity (change in the solution) where the velocity is influenced by some neighbourhood of the particle \cite{poli2007particle}.
 \newline\newline The advantage the EA provides is that it can quickly provide a sets of solutions which even though are not guaranteed to be pareto optimal, but are non-dominant set and serve as good approximation to the entirety of the Pareto front. The disadvantages being that these algorithms are relatively slow and pareto optimality cant be guaranteed.
 
-\subsection{Interactive methods}
+\level{2}{Interactive methods}
 Interactive methods require the \textit{DM} to actively take part in pruning the candidates solutions suggested by the method, and based on the input of the \textit{DM} the method adopts and suggest new solutions which are then again evaluated by the \textit{DM} and the process is repeated to improve and adopt the solutions as per the needs of \textit{DM}.
 \newline\newline The generic structure of the Interactive methods is as follows \cite{miettinen2008introduction}:
 \begin{algorithm}
@@ -160,7 +160,7 @@ The above method can be classified based on the which method is used as $\mathca
     \item \textbf{Classification of Objectives}: Here for a given $\mathcal{P}$ the \textit{DM} classifies different objectives of the solutions such as to get more preferred solutions, and based on the classification the updates solution set $\mathcal{P}$ is generated.
 \end{enumerate}
 \newpage
-\section{Condition Number}
+\level{1}{Condition Number}
 The term \textbf{\textit{Condition Number}} was first coined by Alan Turing in 1947 in his paper on Rounding-Off Errors in Matrix Processes \cite{turing1948rounding}. He defined the condition number for matrices, further in 1966, John Rice in his paper \textit{A Theory of Condition} \cite{rice1966theory} showed how to formulate the definition of condition number other classes of problems.
 \newline\newline In our problem formulation may we not only require to compute the condition number of the function $f$ to check if its bounded or not \ref{cond_abs},\ref{cond_rel}; but also to minimize the maximum over a set $X_3$ \ref{cond_abs_min},\ref{cond_rel_min}.
 \newline\newline Hence we need to methods which can either be used to 
@@ -169,10 +169,10 @@ The term \textbf{\textit{Condition Number}} was first coined by Alan Turing in 1
     \item Compute relative/absolute condition number efficiently
 \end{enumerate}
 Extensive amount of literature is available on condition number of matrices compared to that of general functions. Below we will see some results on condition number of matrix and also for general function.
-\subsection{Condition Number of Matrices}
+\level{2}{Condition Number of Matrices}
 There are several papers which have proved various important properties of matrix condition number. Pierre Maréchal and Jane J. Ye in their paper \textit{Optimizing Condition Numbers}\cite{marechal2009optimizing} showed that for a symmetric positive semi-definite $n\times n$ matrix $A$ minimizing the condition number $\kappa (A)$.
 \begin{equation} \label{cond_matrix}
-    \kappa_2 (A) = ||A||_2||A^{-1}||_@
+    \kappa_2 (A) = ||A||_2||A^{-1}||_2
 \end{equation}
 \begin{equation} \label{min_cond_matrix}
     \underset{A}{min}\hspace{1mm} \kappa_2 (A)
@@ -207,7 +207,7 @@ Hongyi Li et al. in their paper \cite{li2011note} have proved the following lowe
 \end{equation}
 Note that \ref{cond_f_low_bound_2} follows from \ref{cond_f_low_bound_1} using AM-GM inequality. Further Nicholas J. Higham in their paper \cite{higham1987survey} have presented survey for computing condition number of triangular matrices
 \newpage
-\subsection{Condition Number of Functions}
+\level{2}{Condition Number of Functions}
 Edvin Deadman and Samuel D. Relton in their paper \cite{deadman2016taylor} extended the taylor's theorem for a complex function of matrices where $f:\mathbb{C}\to \mathbb{C}$ extended over matrices over $\mathbb{C}^{n\times n}$ i.e. $f:\mathbb{C}^{n\times n}\to \mathbb{C}$. For $f$ satisfying some conditions they proved the bound on the absolute condition number of $f$ at $A$ for $\epsilon>0$.
 \begin{equation}
     cond_{abs}(f,A) \le \frac{L_{\epsilon}}{2\pi\epsilon^2}\hspace{1mm}\underset{z\in \Gamma_{\epsilon}}{max}\hspace{1mm} |f(z)|
