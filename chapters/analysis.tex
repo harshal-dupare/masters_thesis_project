@@ -151,14 +151,13 @@ We will be using the data provided by \textit{Qube Research and Technologies (QR
 \end{figure}
 
 \level{3}{Approaches}
-\level{4}{Baseline Method}
-\newline \newline The following method is based on randomized sampling method, which involves generating the matrix $M$ randomly and applying random data and fitting them to the training data set using linear regression. This process is repeated multiple times, and the best result is selected from the attempts.
+\level{4}{Baseline Method} The following method is based on randomized sampling method, which involves generating the matrix $M$ randomly and applying random data and fitting them to the training data set using linear regression. This process is repeated multiple times, and the best result is selected from the attempts.
 Following is the pseudocode for the method:
 \begin{algorithm}[H]
-\caption{Baseline Method}\label{lfm_baseline_method}
-\begin{algorithmic}
-\State Set $N_{iter}$
-\State $\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \emptyset, \emptyset, -\infty $
+\caption{$\mathcal{A}_{0}$ : Baseline Method}\label{lfm_baseline_method}
+\begin{algorithmic}[1]
+\Require{$N_{iter}$}
+\Ensure{$\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \emptyset, \emptyset, -\infty $}
 \For{$i \gets 1 ... N_{iter}$}
     \State $M_i \gets sample\_random\_matrix()$
     \State $A_i \gets gram\_schmidt\_algorithm(M_i)$\Comment{orthonormalize $M_i$ to $A_i$}
@@ -258,11 +257,10 @@ But since in our problem we have added restriction on $A \in \mathcal{O}_d^k$, w
 \newline \newline \textbf{General approaches to satisfy orthonormality condition}
 \begin{enumerate}
     \item Design the iteration scheme such that $A_i \in \mathcal{O}_d^k, \forall i \in \{0,1,2,...,N_{iter}\}$
-    \item Relax the Condition on $A \in \mathcal{O}_d^k$ to $A \in \mathbb{R}^{d\times k}$ and solve using an iterative scheme;  then project $A_{N_{iter}}$ to $\mathcal{O}_d^k$ i.e. solve the problem $\underset{A \in \mathcal{O}_d^k}{min} \hspace{2mm} ||A_{N_{iter}}-A||$
+    \item Relax the Condition on $A \in \mathcal{O}_d^k$ to $A \in \mathbb{R}^{d\times k}$ and solve using an iterative scheme;  then project $A_{N_{iter}}$ to $\mathcal{O}_d^k$ i.e. solve the problem $\underset{\beta \in \mathbb{R}^{k \times 1}, A \in \mathcal{O}_d^k}{min} \hspace{2mm} ||A_{N_{iter}}-A||$ subject to $\mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta_{N_{iter}}, A_{N_{iter}}}$ $\mathcal{L}_{\beta, A} \le \mathcal{L}_{\beta_{N_{iter}}, A_{N_{iter}}}$
 \end{enumerate}
 First we will use the observation \ref{observation:ortho-closure_odk} to design an iterative scheme such that $A_i \in \mathcal{O}_d^k, \forall i \in \{0,1,2,...,N_{iter}\}$
-
-Lets say via some iterative method we get $\Delta A_i$ update for $A_i$ but since $A_{i+1} = A_i + \Delta A_i$ need not belong to $\mathcal{O}_d^k$ we need some way to project $\Delta A_i$ in a space such that $A_{i+1} \in \mathcal{O}_d^k$
+\newline Lets say via some iterative method we get $\Delta A_i$ update for $A_i$ but since $A_{i+1} = A_i + \Delta A_i$ need not belong to $\mathcal{O}_d^k$ we need some way to project $\Delta A_i$ in a space such that $A_{i+1} \in \mathcal{O}_d^k$
 \newline We define $\mathcal{O}_d^k$
 \begin{equation}
     \delta \mathcal{O}_d^k = \{ \delta | \delta = A - B, A, B \in \mathcal{O}_d^k \}
@@ -305,50 +303,277 @@ Now recall Cayley Transformation for a $Q$ which doesn't have $-1$ as one of its
 \end{aligned}
 \end{equation}
 Let $B = \Delta A_i$ and $A = A_i$ and consider the $T_i = \Delta A_iA_i^\top- A_i\Delta A_i^\top$ and we generate associated $Q_i = (I-T_i)(I+T_i)^{-1}$ by using Cayley Transformation over $T$.
+\newline Based on the above observation we can write the following iterative scheme
+
+\begin{algorithm}[H]
+\caption{$\mathcal{A}_{1}(\mathcal{U_{A}},\mathcal{U_{\beta}})$ : Orthogonal Property Iterative Scheme (OPI Scheme)}\label{lfm_orthogonal_property_iterative_scheme}
+\begin{algorithmic}[1]
+\Require{$N_{iter}$}
+\State $A_{0} \gets random(\mathbb{R}^{d\times k}) $
+\State $A_{0} \gets gram\_schmidt\_algorithm(A_0)$\Comment{orthonormalize $A_0$, as $A_0 \in \mathcal{O}_d^k $}
+\State $\beta_0 \gets \mathcal{U_{\beta}}(\mathcal{R}_{\beta, A_0},\mathcal{L}_{\beta, A_0},\Vec{0},A_{0})$
+\For{$i \gets 0 ... N_{iter}$}
+    \State $ \Delta A_i \gets \mathcal{U_{A}}(\mathcal{R}_{\beta, A},\mathcal{L}_{\beta, A},\beta_i,A_i)-A_i$
+    \State $T_i \gets  \Delta A_iA_i^\top- A_i\Delta A_i^\top$
+    \State $Q_i = (I-T_i)(I+T_i)^{-1}$
+    \State $A_{i+1} \gets A_iQ_i$
+    \State $\beta_{i+1} \gets \mathcal{U_{\beta}}(\mathcal{R}_{\beta, A_{i+1}},\mathcal{L}_{\beta, A_{i+1}},\beta_{i}, A_{i})$
+\EndFor
+\State \textbf{Output} $\beta_{N_{iter}},A_{N_{iter}}$
+\end{algorithmic}
+\end{algorithm} For the second case were we relax the Condition on $A \in \mathcal{O}_d^k$ to $A \in \mathbb{R}^{d\times k}$ we can write a general iterative scheme as follows
+\begin{algorithm}[H]
+\caption{$\mathcal{A}_{2}(\mathcal{U_{A}},\mathcal{U_{\beta}}, \mathcal{U_{O}})$ : Delayed Orthogonalization Iterative Scheme (DOI Scheme)}\label{lfm_orthogonal_property_iterative_scheme}
+\begin{algorithmic}[1]
+\Require{$N_{iter}$}
+\State $A_{0} \gets random(\mathbb{R}^{d\times k}) $
+\State $\beta_0 \gets \mathcal{U_{\beta}}(\mathcal{R}_{\beta, A_0},\mathcal{L}_{\beta, A_0},\Vec{0},A_{0})$
+\For{$i \gets 0 ... N_{iter}$}
+    \State $A_{i+1} \gets  \mathcal{U_{A}}(\mathcal{R}_{\beta, A},\mathcal{L}_{\beta, A},\beta_i,A_i)$
+    \State $\beta_{i+1} \gets \mathcal{U_{\beta}}(\mathcal{R}_{\beta, A_{i+1}},\mathcal{L}_{\beta, A_{i+1}},\beta_{i}, A_{i})$
+\EndFor
+\State \textbf{Gives} $\beta_{N_{iter}},A_{N_{iter}}$
+\State $\beta^{*}, A^{*} \gets \mathcal{U_{O}}(\mathcal{R}_{\beta_{N_{iter}}, A_{N_{iter}}},\mathcal{L}_{\beta_{N_{iter}}, A_{N_{iter}}},\beta_{N_{iter}}, A_{N_{iter}})$
+\State \textbf{Output} $\beta^{*},A^{*}$
+\end{algorithmic}
+\end{algorithm} \hspace{0mm} \newline The above defined iterative scheme requires internal methods for getting $\Delta A_i$ and $\beta_{i+1}$ which are $\mathcal{U_{A}}(\mathcal{R}_{\beta, A},\mathcal{L}_{\beta, A},\beta_i,A_i)$ and $\mathcal{U_{\beta}}(\mathcal{R}_{\beta, A_{i+1}},\mathcal{L}_{\beta, A_{i+1}},\beta_i,A_i)$ respectively. And the $\mathcal{U_{O}}(\mathcal{R}_{\beta_{N_{iter}}, A_{N_{iter}}},\mathcal{L}_{\beta_{N_{iter}}, A_{N_{iter}}},\beta_i,A_i)$ solves for the following problem \hspace{2mm}
+\begin{equation}
+\begin{aligned}
+    \underset{\beta \in \mathbb{R}^{k \times 1}, A \in \mathcal{O}_d^k}{min}& \hspace{2mm} ||A_{N_{iter}}-A||\\
+    \text{s.t.}& \hspace{2mm} \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta_{N_{iter}}, A_{N_{iter}}}\\
+    & \hspace{2mm} \mathcal{L}_{\beta, A} \le \mathcal{L}_{\beta_{N_{iter}}, A_{N_{iter}}}
+\end{aligned}
+\end{equation}
+\newline \textbf{Possibilities for $\mathcal{U_{A}}(\mathcal{R}_{\beta, A},\mathcal{L}_{\beta, A},\beta_i,A_i)$}
+\hspace{2mm} \newline \textbf{Possibilities for $\mathcal{U_{\beta}}(\mathcal{R}_{\beta, A_{i+1}},\mathcal{L}_{\beta, A_{i+1}},\beta_i,A_i)$}
+\hspace{2mm} \newline \textbf{Possibilities for $\mathcal{U_{O}}(\mathcal{R}_{\beta_{N_{iter}}, A_{N_{iter}}},\mathcal{L}_{\beta_{N_{iter}}, A_{N_{iter}}},\beta_i,A_i)$}
 
 \level{4}{MOOP Methods}
 \level{5}{No Preference Method}
-First we compute the \textbf{utopia point} as defined in \ref{ideal_point_def} for this problem, here we have 2 dimensions for the objective to minimize namely $-\mathcal{R}_{\beta, A}$ and $\mathcal{L}_{\beta, A}$ and the utopia point values denoted by $-\mathcal{R}_{\beta, A}^* = min -\mathcal{R}_{\beta, A}  = - max\hspace{2mm} \mathcal{R}_{\beta, A} =  - 1 $ as its inner-product between vectors divided by the norms induced by that inner-product in and $\mathcal{L}_{\beta, A}^* =min \hspace{2mm} \mathcal{L}_{\beta, A} = 0$ 
-\level{4}{Condition Number Relaxation}
-For any $\alpha \ge 1$, \ref{problem_lfm_cond} will contain the set specified by the condition \ref{results_problem_orthonormal_eq} as proved in \ref{orthonormal_eq}
-\begin{equation} \label{problem_lfm_cond}
-\underset{R^{n\times d}_{t\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{rel}(f,R^{n\times d}_{t\times d}) \le \alpha
+First we compute the \textbf{utopia point} as defined in \ref{ideal_point_def} for this problem, here we have 2 dimensions for the objective to minimize namely $-\mathcal{R}_{\beta, A}$ and $\mathcal{L}_{\beta, A}$ and the utopia point values denoted by $-\mathcal{R}_{\beta, A}^* = min -\mathcal{R}_{\beta, A}  = - max\hspace{2mm} \mathcal{R}_{\beta, A} =  - 1 $ as its inner-product between vectors divided by the norms induced by that inner-product in and $\mathcal{L}_{\beta, A}^* =min \hspace{2mm} \mathcal{L}_{\beta, A} = 0$ . And finally we have the condition that $AA^\top = I$, which either we can view as constraint or consider $I$ as the utopia point value of $AA^\top$. Finally we can consider one of the 2 optimization problem framed under \textit{No preference method}
+\newline \textbf{No Preference Method Optimization Problem 1}
+\begin{equation} \label{NPMOP_1:objective}
+\begin{aligned}
+    \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathcal{O}^{k}_{d}}{min} || [\mathcal{L}_{\beta, A}-\mathcal{L}_{\beta, A}^*,-\mathcal{R}_{\beta, A}+\mathcal{R}_{\beta, A}^*]||
+\end{aligned}
 \end{equation}
-Here $f(X) = X\times A$.
+Here we can use any norm $||\cdot ||$ defiend on $\mathbb{R}^2$ for example euclidean norm.
+\hspace{2mm}
+\newline \textbf{No Preference Method Optimization Problem 2}
+\begin{equation} \label{NPMOP_2:objective}
+\begin{aligned}
+    \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathbb{R}^{d\times k}}{min} || [\mathcal{L}_{\beta, A}-\mathcal{L}_{\beta, A}^*,-\mathcal{R}_{\beta, A}+\mathcal{R}_{\beta, A}^*, AA^\top - I]||
+\end{aligned}
+\end{equation}
+Here we can use any norm $||\cdot ||$ defiend on $\mathbb{R}^{2+d^2}$ as $AA^\top -I$ is a $d\times d$ matrix which can vectorize to get a $d\times d$ vector for the purposes of computing the norm.
+
+\level{5}{$\epsilon$-Constraint Method}
+To apply $\epsilon$-Constraint Method to this problem we need to first define the most important single objective, in our case that is $\mathcal{R}_{\beta, A}$ and we can relax the other objective to an constraint namely $\mathcal{L}_{\beta, A} \le \epsilon$ so now the problem that we need to solve reduces to one of the 2 cases depending on how we handle the condition $AA^\top = I$
+\newline \textbf{$\epsilon$-Constraint Method Optimization Problem 1}
+\begin{equation} \label{ECMOP_1}
+\begin{aligned}
+    \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathcal{O}^{k}_{d}}{max}& \hspace{3mm} \mathcal{R}_{\beta, A}\\
+    \text{st.  }& \mathcal{L}_{\beta, A} \le \epsilon
+\end{aligned}
+\end{equation}
+\newline \textbf{$\epsilon$-Constraint Method Optimization Problem 2}
+\begin{equation} \label{ECMOP_2}
+\begin{aligned}
+    \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathbb{R}^{d\times k}}{max}& \hspace{3mm} \mathcal{R}_{\beta, A}\\
+    \text{st.  }& \mathcal{L}_{\beta, A} \le \epsilon\\
+     & ||AA^\top - I|| \le \epsilon_1
+\end{aligned}
+\end{equation}
+
+\level{5}{Lexicographic Method}
+To reduce the problem for this method we need the order of important of the objectives, which in our case $\mathcal{R}_{\beta, A}$ being more important than $\mathcal{L}_{\beta, A}$. And similarly as before based on how we handle the condition $AA^\top = I$ we can get 2 optimization problems.
+\newline \textbf{Lexicographic Method Optimization Problem 1}
+\newline \textbf{Step 1}
+\begin{equation} \label{LMOP_1:step_1}
+\begin{aligned}
+    \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathcal{O}^{k}_{d}}{max}& \hspace{3mm} \mathcal{R}_{\beta, A}\\
+\end{aligned}
+\end{equation}
+let $\beta^{*}, A^{*}$ be the solution of \textbf{Step 1}, then \textbf{Step 2} can be formulated as follows
+\newline \textbf{Step 2}
+\begin{equation}\label{LMOP_1:step_2}
+\begin{aligned}
+    \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathcal{O}^{k}_{d}}{min}& \hspace{3mm} \mathcal{L}_{\beta, A}\\
+    \text{st.  }& \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}
+\end{aligned}
+\end{equation}
+\newline \textbf{Lexicographic Method Optimization Problem 2}
+\newline Note that when we relax $A \in \mathcal{O}_d^k$ to $A \in \mathbb{R}^{d\times k}$ we get one more objective namely 
+\begin{equation}
+\begin{aligned}
+\underset{A\in \mathbb{R}^{d\times k}}{min} \hspace{3mm} || AA^\top -I|| 
+\end{aligned}
+\end{equation}
+which gives us the new added step \textbf{Step 3} for the problem 3 along with the \textbf{Step 1, 2} 
+\newline \textbf{Step 1}
+\begin{equation} \label{LMOP_2:step_1}
+\begin{aligned}
+    \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathbb{R}^{d\times k}}{max}& \hspace{3mm} \mathcal{R}_{\beta, A}\\
+\end{aligned}
+\end{equation}
+let $\beta^{*}, A^{*}$ be the solution of \textbf{Step 1}, then \textbf{Step 2} can be formulated as follows
+\newline \textbf{Step 2}
+\begin{equation} \label{LMOP_2:step_2}
+\begin{aligned}
+    \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathbb{R}^{d\times k}}{min}& \hspace{3mm} \mathcal{L}_{\beta, A}\\
+    \text{st.  }& \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}
+\end{aligned}
+\end{equation}
+let $\beta^{**}, A^{**}$ be the solution of \textbf{Step 2}, then \textbf{Step 3} can be formulated as follows
+\newline \textbf{Step 3}
+\begin{equation} \label{LMOP_2:step_3}
+\begin{aligned}
+\underset{A\in \mathbb{R}^{d\times k}}{min}& \hspace{3mm} || AA^\top -I|| \\ 
+\text{st.  }& \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}\\
+\text{st.  }& \mathcal{L}_{\beta, A} \le \mathcal{L}_{\beta^{**}, A^{**}}\\
+\end{aligned}
+\end{equation}
+\newline \newline Note that all the problems \ref{NPMOP_1:objective}, \ref{NPMOP_2:objective}, \ref{ECMOP_1}, \ref{ECMOP_2}, \ref{LMOP_1:step_1}, \ref{LMOP_1:step_2}, \ref{LMOP_2:step_1}, \ref{LMOP_2:step_2} and \ref{LMOP_2:step_3} are \textbf{Single Objective Optimization Problem} and we can use various methods to solve them. As all the objectives are differentiable we can use Stochastic Gradient Descent (SGD) algorithm and its variants to get an optimal solution. For problem \ref{NPMOP_2:objective} we can directly apply SGD, but  for other problems we need to address the condition and modify SGD accordingly. The problems where $A \in \mathcal{O}_d^k$ are \ref{NPMOP_1:objective}, \ref{ECMOP_1} and \ref{LMOP_1:step_1} to solve them we need to modify the SGD accordingly. For the problems \ref{ECMOP_2}, \ref{LMOP_2:step_2} and \ref{LMOP_2:step_3} we have inequality constraints for which we can use \textbf{Constraint Guided Gradient Descent (CGGD)} algorithm \cite{karsmakers2022constraint} to get the solution. For the remaining problems, namely \ref{ECMOP_1} and \ref{LMOP_1:step_2} we need to modify \textbf{CGGD} algorithm to account for the condition $A \in \mathcal{O}_d^k$ and get the solution.
+\newline \textbf{Case $A \in \mathbb{R}^{d \times k}$ and No Inequality Condition}
+\newline \textbf{Case $A \in \mathcal{O}_d^k$ and No Inequality Condition}
+\newline \textbf{Case $A \in \mathbb{R}^{d \times k}$ and With Inequality Condition}
+\newline \textbf{Case $A \in \mathcal{O}_d^k$ and With Inequality Condition}
+\level{4}{Evolutionary Algorithms}
+The main problem with applying Evolutionary Algorithms for this problem is that we need to search for $A,\beta$ but $A \in \mathcal{O}^{k}_{d}$ which is not closed under addition of any random matrix in $\mathbb{R}^{d\times k}$ so instead for perturbing $A$ for purposes of mutation and crossover we will use the Cayley Transformation \ref{cayley-transformation} over the perturbation to get the $Q$, which will be used to multiplicatively perturb $A$.
+
+\level{5}{NSGA-II}
+NSGA-II (Non-dominated Sorting Genetic Algorithm II) is a multi-objective optimization algorithm that uses genetic algorithms to search for Pareto-optimal solutions. Pareto-optimal solutions are solutions that cannot be improved in one objective without sacrificing another objective. NSGA-II was proposed by Kalyanmoy Deb in 2002, and it has become a popular algorithm for solving multi-objective optimization problems.
+
+The NSGA-II algorithm can be summarized as follows:
+
+Initialize the population: Create an initial population of candidate solutions randomly. Each candidate solution consists of a set of decision variables.
+
+Evaluate the fitness of the population: Evaluate the fitness of each candidate solution in the population using the objective functions defined for the problem.
+
+Non-dominated sorting: Sort the population into different non-dominated fronts based on the Pareto-dominance relationship. The first front contains the non-dominated solutions, which cannot be improved in any objective function without sacrificing the performance in another objective function. The second front contains the solutions that are dominated by the solutions in the first front, and so on.
+
+Crowding distance calculation: Calculate the crowding distance of each candidate solution in each front. The crowding distance is a measure of how crowded a solution is in a front. Solutions with larger crowding distances are preferred because they have more diversity.
+
+Selection: Select the candidate solutions for the next generation based on their non-dominated fronts and crowding distances.
+
+Variation: Apply genetic operators such as crossover and mutation to the selected candidate solutions to generate new candidate solutions for the next generation.
+
+Repeat steps 2 to 6 until a stopping criterion is met (e.g., a maximum number of generations or a satisfactory level of convergence).
+
+Here is the pseudocode for NSGA-II:
+
+\begin{algorithm}[H]
+\caption{NSGA-II}\label{nsga2}
+\begin{algorithmic}[1]
+\Require{Population size $N$, maximum number of generations $G$, crossover probability $p_c$, mutation probability $p_m$}
+\Ensure{Set of non-dominated solutions $P$}
+\State Initialize population $P_0$ with $N$ random candidate solutions
+\State Evaluate the fitness of each candidate solution in $P_0$
+\For{$t = 1$ to $G$}
+\State Create an empty set $Q$
+\State Perform binary tournament selection to select $N$ candidate solutions from $P_{t-1}$
+\For{$i = 1$ to $N$ with a step size of $2$}
+\State Select two parent candidate solutions $x_1$ and $x_2$ from the selected set using binary tournament selection
+\If{Random number $< p_c$}
+\State Perform crossover on $x_1$ and $x_2$ to generate two offspring candidate solutions $y_1$ and $y_2$
+\Else
+\State $y_1 = x_1$ and $y_2 = x_2$
+\EndIf
+\If{Random number $< p_m$}
+\State Perform mutation on $y_1$ and $y_2$
+\EndIf
+\State Evaluate the fitness of $y_1$ and $y_2$
+\State Add $y_1$ and $y_2$ to $Q$
+\EndFor
+\State Merge $P_{t-1}$ and $Q$ into a single population $R$
+\State Perform non-dominated sorting on $R$ to obtain different non-dominated fronts
+\State Set $P_t$ to be an empty set
+\State
+\end{algorithmic}
+\end{algorithm}
+
+\level{5}{Particle Swarm Optimization}
+Particle Swarm Optimization (PSO) is a metaheuristic optimization algorithm that is inspired by the social behavior of bird flocking or fish schooling. The algorithm is based on a population of particles, where each particle represents a candidate solution to the optimization problem. The particles move through the search space and adjust their position based on their own experience and the experience of their neighbors, in order to find the best solution to the problem.
+
+The PSO algorithm can be described using the following pseudocode:
+
+\begin{algorithm}[H]
+\caption{Particle Swarm Optimization}
+\label{alg:pso}
+\begin{algorithmic}[1]
+\State Initialize the population of particles randomly
+\State Evaluate the fitness of each particle
+\State Set the best position of each particle as its initial position
+\State Set the global best position as the position of the particle with the best fitness
+\While{termination criterion is not met}
+\For{each particle in the population}
+\State Update the velocity of the particle based on its current position, its best position, and the global best position
+\State Update the position of the particle based on its new velocity
+\State Evaluate the fitness of the new position
+\If{the new position is better than the current best position of the particle}
+\State Update the best position of the particle
+\EndIf
+\If{the new position is better than the global best position}
+\State Update the global best position
+\EndIf
+\EndFor
+\EndWhile
+\State \Return the global best position
+\end{algorithmic}
+\end{algorithm}
+
+In the PSO algorithm, each particle is characterized by its position and velocity vectors, which are updated at each iteration based on the particle's own best position and the global best position. The velocity vector determines the direction and speed of the particle's movement through the search space, while the position vector represents the current location of the particle.
+
+The PSO algorithm has several parameters that need to be set, such as the size of the population, the maximum number of iterations, the cognitive and social learning parameters, and the inertia weight. These parameters can be tuned to improve the performance of the algorithm on specific optimization problems.
+
+PSO has been applied to a wide range of optimization problems, such as function optimization, parameter estimation, and machine learning. Its simplicity and effectiveness have made it a popular choice for many optimization tasks.
 
 
-
-
-
-% %%% ADVERSARIAL NETWORK
-% \level{2}{Problem: Defense Against Adversarial Attack} \label{results_problem_2} 
-% \hspace{6mm} A dataset of $n$ images ${(X_1, y_1), (X_2, y_2), ..., (X_n, y_n)}$, where $X_i$ represents an image and $y_i$ represents its corresponding label, the task is to develop a function $N(X_i; \theta)$ that takes an image $X_i$ as input and predicts its label $y_i$ using a set of model parameters $\theta$.
-% \newline Formally, the task is to find the optimal set of parameters $\theta^*$ that minimizes the following loss function:
-% \begin{equation} \label{problem_daaamd_opt_thita_expression}
-%     \theta^* = \arg\min_\theta \frac{1}{n}\sum_{i=1}^n L(N(X_i; \theta), y_i)
+% %% Condition number part
+% \level{4}{Condition Number Relaxation}
+% For any $\alpha \ge 1$, \ref{problem_lfm_cond} will contain the set specified by the condition \ref{results_problem_orthonormal_eq} as proved in \ref{orthonormal_eq}
+% \begin{equation} \label{problem_lfm_cond}
+% \underset{R^{n\times d}_{t\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{rel}(f,R^{n\times d}_{t\times d}) \le \alpha
 % \end{equation}
-% \newline where $L$ is a loss function that measures the difference between the predicted label and the true label.
+% Here $f(X) = X\times A$.
 
-% An adversarial attack is a perturbation $\delta$ added to the original input image $X_i$ to produce a new image $X_i' = X_i + \delta$ that is designed to cause misclassification of the model. The goal of the attacker is to find the perturbation $\delta$ that maximizes the difference between the predicted label and the true label.
-% \newline Formally, the task is to find the optimal perturbation $\delta^*$ that maximizes the following objective function:
-% \begin{equation} \label{problem_daaamd_adv_delta_expression}
-%     \delta^* = \arg\max_\delta L(N(X_i + \delta; \theta), y_i)
-% \end{equation}
-% \newline where $L$ is a loss function that measures the difference between the predicted label and the true label.
 
-% \level{3}{Data}
-% The MNIST dataset consists of 60,000 grayscale images of handwritten digits (0-9) with a resolution of 28x28 pixels. There is an additional test set of 10,000 images. Each image is labeled with its corresponding digit. The pixel intensity values of the images in the MNIST dataset range over integer values from 0 to 255. 
-% \newline 
-% The MNIST dataset is a widely used benchmark dataset in the field of machine learning, and many different models have been developed to classify the digits in this dataset. However, it has been shown that these models are vulnerable to adversarial attacks, which can cause them to misclassify images with high confidence.
 
-% \begin{figure}[H]
-%   \centering
-%   \includegraphics[width=0.9\textwidth]{images/mnist_60_images_4x15_grid.png}
-%   \caption{Images from the MNIST training set.}
-%   \label{fig:mnist_images}
-% \end{figure}
 
-% \level{3}{Approaches}
-% \level{4}{Preprocessing }
+\newpage
+%%% ADVERSARIAL NETWORK
+\level{2}{Problem: Defense Against Adversarial Attack} \label{results_problem_2} 
+\hspace{6mm} A dataset of $n$ images ${(X_1, y_1), (X_2, y_2), ..., (X_n, y_n)}$, where $X_i$ represents an image and $y_i$ represents its corresponding label, the task is to develop a function $N(X_i; \theta)$ that takes an image $X_i$ as input and predicts its label $y_i$ using a set of model parameters $\theta$.
+\newline Formally, the task is to find the optimal set of parameters $\theta^*$ that minimizes the following loss function:
+\begin{equation} \label{problem_daaamd_opt_thita_expression}
+    \theta^* = \arg\min_\theta \frac{1}{n}\sum_{i=1}^n L(N(X_i; \theta), y_i)
+\end{equation}
+\newline where $L$ is a loss function that measures the difference between the predicted label and the true label.
+
+An adversarial attack is a perturbation $\delta$ added to the original input image $X_i$ to produce a new image $X_i' = X_i + \delta$ that is designed to cause misclassification of the model. The goal of the attacker is to find the perturbation $\delta$ that maximizes the difference between the predicted label and the true label.
+\newline Formally, the task is to find the optimal perturbation $\delta^*$ that maximizes the following objective function:
+\begin{equation} \label{problem_daaamd_adv_delta_expression}
+    \delta^* = \arg\max_\delta L(N(X_i + \delta; \theta), y_i)
+\end{equation}
+\newline where $L$ is a loss function that measures the difference between the predicted label and the true label.
+
+\level{3}{Data}
+The MNIST dataset consists of 60,000 grayscale images of handwritten digits (0-9) with a resolution of 28x28 pixels. There is an additional test set of 10,000 images. Each image is labeled with its corresponding digit. The pixel intensity values of the images in the MNIST dataset range over integer values from 0 to 255. 
+\newline 
+The MNIST dataset is a widely used benchmark dataset in the field of machine learning, and many different models have been developed to classify the digits in this dataset. However, it has been shown that these models are vulnerable to adversarial attacks, which can cause them to misclassify images with high confidence.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/mnist_60_images_4x15_grid.png}
+  \caption{Images from the MNIST training set.}
+  \label{fig:mnist_images}
+\end{figure}
+
+\level{4}{Preprocessing }
+
+\level{3}{Approaches}
+\level{4}{Linear Classifier}
+\level{4}{Linear Classifier with $L_2$ Norm}
+\level{4}{Linear Classifier with $\kappa_2$ Minimization}
 
 

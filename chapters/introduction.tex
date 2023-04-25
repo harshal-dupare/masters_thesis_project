@@ -107,7 +107,7 @@ And the orthonormal condition requires
  A^{d\times k}(A^{d\times k})^{\top} = I^{d\times d}
 \end{equation}
 \newline
-From the \ref{orthonormal_eq} we can infer that $(A^{d\times k})^T$ belongs to the set of right inverses of $A^{d\times k}$. \newline Further if we relax the \ref{orthonormal_eq} to bounds on condition number by $\alpha \ge 1$
+From the \ref{orthonormal_eq} we can infer that $(A^{d\times k})^T$ belongs to the set of right inverses of $A^{d\times k}$. \newline Further if we relax the \ref{orthonormal_eq} to bounds on condition number by $\alpha \ge 1$. Here we note that $d\ge k$ for \ref{orthonormal_eq} to have a solution.
 \begin{equation}
     \underset{R^{n\times d}_{t\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{rel}(f,R^{n\times d}_{t\times d}) = \underset{\epsilon \to 0}{lim}\underset{||\delta R^{n\times d}_{t\times d}||\le \epsilon}{sup} \frac{||\delta R^{n\times d}_{t\times d}\times A^{d\times k}||}{||\delta R^{n\times d}_{t\times d}||}  \frac{||F^{n\times k}_t \times (A^{d\times k})^{\top} ||}{|| F^{n\times k}_t||}\le \alpha
 \end{equation}
