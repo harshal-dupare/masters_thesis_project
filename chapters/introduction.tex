@@ -19,11 +19,11 @@ Goal of this study is to analyze one such problem of interest belonging to cond-
 \begin{equation}
 \underset{\forall x\in X}{Agg}\hspace{1mm} value(x)
 \end{equation}
-e.g. Expectation over given probability distribution $p(\cdot)$ over $X$.
+e.g. expectation over given probability distribution $p(\cdot)$ over $X$.
 \begin{equation}
 \underset{\forall x\in X}{Agg}\hspace{1mm} value(x) = \mathlarger{\mathlarger{\int}}_{\forall x\in X} value(x)p(x)\hspace{1mm}dx
 \end{equation}
-e.g. Exponential decaying average, given a index-function $t:X\to[|X|]$, where $[n] = \{0,1,2,...,n-1\}$.
+e.g. exponential decaying average, given a index-function $t:X\to[|X|]$, where $[n] = \{0,1,2,...,n-1\}$.
 \begin{equation}
 \underset{\forall x\in X}{Agg}\hspace{1mm} value(x) = \mathlarger{\mathlarger{\sum}}_{\forall x\in X} \lambda^{t(x)}value(x)
 \end{equation}
@@ -59,7 +59,7 @@ For a given $\mathcal{F}$ a family of functions $f: X \to Y$ we need to find a f
 \begin{equation} \label{opt_reward}
 \underset{f\in \mathcal{F}}{max}\hspace{1mm} \underset{\forall x\in X_2, y \in Y_2, y \equiv x}{Agg_2} \hspace{1mm} \mathcal{R}(y,f(x))
 \end{equation}
-Including other problems specific objectives, but it must have atleast one of the \ref{cond_abs_min}, \ref{cond_rel_min} as objective
+including other problems specific objectives, but it must have atleast one of the \ref{cond_abs_min}, \ref{cond_rel_min} as objective
 \begin{equation} \label{cond_abs_min}
 \underset{f\in \mathcal{F}}{min}\hspace{1mm}\underset{x \in X_3}{max}\hspace{1mm} cond_{abs}(f,x)
 \end{equation}
@@ -93,7 +93,7 @@ R^{n\times 1}_t \arrow[rr, "\mathcal{L}" description, Rightarrow, no head] \arro
 \end{tikzcd}
 \end{equation}
 \newline
-Lets assume that the functions $f(\cdot)$ and $g(\cdot)$ are linear w.r.t. their argument. In this case it can be written as
+lets assume that the functions $f(\cdot)$ and $g(\cdot)$ are linear w.r.t. their argument. In this case it can be written as
 \begin{equation} \label{f_for_lfm}
 F^{n\times k}_t = f(R^{n\times d}_{t\times d}) = R^{n\times d}_{t\times d}\times A^{d\times k}
 \end{equation}
@@ -102,7 +102,7 @@ F^{n\times k}_t = f(R^{n\times d}_{t\times d}) = R^{n\times d}_{t\times d}\times
 P^{n \times 1}_{t} = g(F^{n\times k}_t) = F^{n\times k}_t \times \beta^{k \times 1}
 \end{equation}
 \newline
-And the orthonormal condition requires
+and the orthonormal condition requires
 \begin{equation} \label{orthonormal_eq}
  A^{d\times k}(A^{d\times k})^{\top} = I^{d\times d}
 \end{equation}
@@ -116,12 +116,12 @@ which implies\newline
     \underset{R^{n\times d}_{t\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{rel}(f,R^{n\times d}_{t\times d}) \le ||A^{d\times k}|| ||(A^{d\times k})^{\top} ||\le \alpha
 \end{equation}
 \newline
-Note that $\alpha=1$ contains the set which satisfies \ref{orthonormal_eq} equation since 
+note that $\alpha=1$ contains the set which satisfies \ref{orthonormal_eq} equation since 
 \begin{equation}
 1= || I^{d\times d}||= || A^{d\times k}(A^{d\times k})^{\top} ||  \le || A^{d\times k}||||(A^{d\times k})^{\top} || \le \alpha
 \end{equation}\newline
-So any $\alpha \ge 1$ will contain the set specififed by the condition \ref{orthonormal_eq}\newline
-Combining all of that together gives us the \textbf{cond-fMOOP} formulation of this problem as
+so any $\alpha \ge 1$ will contain the set specififed by the condition \ref{orthonormal_eq}. \newline
+combining all of that together gives us the \textbf{cond-fMOOP} formulation of this problem as
 
 \begin{equation} \label{lfm_loss}
 \underset{\beta^{k \times 1}\in \mathbb{R}^{k\times 1}, A^{d\times k} \in \mathbb{R}^{d\times k}}{min}\hspace{1mm} \frac{1}{T-d+1} \mathlarger{\mathlarger{\sum}}_{\forall t\in [d,T]} \hspace{1mm} ||R^{n\times 1}_t-R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}||_2^2
@@ -145,7 +145,7 @@ R^{n\times 1}_t \arrow[rr, "\mathcal{L}" description, Rightarrow, no head] \arro
 & \mathcal{R} &
 \end{tikzcd}
 \end{equation}\newline 
-Further we can restrict the functions $f(\cdot)$ and $g(\cdot)$ to be linear w.r.t. their argument. In that case it can be written as
+further we can restrict the functions $f(\cdot)$ and $g(\cdot)$ to be linear w.r.t. their argument. In that case it can be written as
 
 \begin{equation} \label{f_for_pts}
 F^{k\times 1}_t = f(R^{n\times d}_{t+1\times d}) = A^{k\times n}\times R^{n\times d}_{t+1\times d}\times B^{d\times 1}
@@ -160,7 +160,7 @@ For small changes in our time series data $\delta R^{n\times d}_{t+1\times d}$ w
 \begin{equation}
     \underset{R^{n\times d}_{t+1\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{abs}(f,R^{n\times d}_{t+1\times d}) = \underset{\epsilon \to 0}{lim}\underset{||\delta R^{n\times d}_{t+1\times d}||\le \epsilon}{sup} \frac{||A^{k\times n}\times \delta R^{n\times d}_{t+1\times d}\times B^{d\times 1}||}{||\delta R^{n\times d}_{t+1\times d}||}
 \end{equation}\newline
-Combining all of that together gives us the \textbf{cond-fMOOP} formulation of this problem as
+combining all of that together gives us the \textbf{cond-fMOOP} formulation of this problem as
 \begin{equation} \label{pts_loss}
 \underset{A\in \mathbb{R}^{k\times n}, B \in \mathbb{R}^{d\times 1}, C \in \mathbb{R}^{n\times k}}{min}\hspace{1mm} \frac{1}{T-d+1} \mathlarger{\mathlarger{\sum}}_{\forall t\in [d,T]} \hspace{1mm} ||R^{n\times 1}_t-C^{n \times k} \times A^{k\times n}\times R^{n\times d}_{t+1\times d}\times B^{d\times 1}||_2^2
 \end{equation}\newline

@@ -49,11 +49,11 @@ Methods which come under this class can further divided into other smaller class
 \begin{equation}
     \underset{x \in X}{min}\hspace{1mm} U(F(x))
 \end{equation}
-\newline Notable methods which come under this utility model are
+\newline notable methods which come under this utility model are
 \begin{equation} \label{lin_utility_model}
     U(F(x)) = \mathlarger{\mathlarger{\sum}}_{\forall i\in [k]} w_i F_i(x)
 \end{equation}
-\newline Known as the Linear scalarization method, if all $\forall i \in [k], w_i > 0$ is a sufficient condition for the solution of \ref{lin_utility_model} to be a pareto optima \cite{zadeh1963optimality}, but it is not a necessary condition \cite{zionts1989multiple}.
+\newline known as the Linear scalarization method, if all $\forall i \in [k], w_i > 0$ is a sufficient condition for the solution of \ref{lin_utility_model} to be a pareto optima \cite{zadeh1963optimality}, but it is not a necessary condition \cite{zionts1989multiple}.
 \begin{equation} \label{eq11}
     U(F(x)) = \mathlarger{\mathlarger{( \sum}}_{\forall i\in [k]} w_i (F_i(x)-F^{*}_i)^p \mathlarger{\mathlarger{) }}^{1/p}
 \end{equation}
@@ -141,17 +141,16 @@ Evolutionary algorithms are one of the very actively researched methods \cite{vi
 \level{2}{Interactive methods}
 Interactive methods require the \textit{DM} to actively take part in pruning the candidates solutions suggested by the method, and based on the input of the \textit{DM} the method adopts and suggest new solutions which are then again evaluated by the \textit{DM} and the process is repeated to improve and adopt the solutions as per the needs of \textit{DM}.
 \newline\newline The generic structure of the Interactive methods is as follows \cite{miettinen2008introduction}:
-\begin{algorithm}
-\caption{Generic Interactive Method}\label{algo_generic_interactive_method}
-\begin{algorithmic}
+\begin{algorithm}[H]
+\caption{Generic Interactive Method} \label{algo_generic_interactive_method}
+\begin{algorithmic}[1]
 \State $\mathcal{P} \gets initialize(\mathcal{M})$ \Comment{pareto optimal solution set: $\mathcal{P}$; no-preference method: $\mathcal{M}$}
 \Do
     \State $\mathcal{R} \gets getPreference(\mathcal{P},DM)$\Comment{preference information: $\mathcal{R}$, decision maker: $DM$ }
     \State $\mathcal{P} \gets newSolutionSet(\mathcal{P},\mathcal{R},\mathcal{M})$\Comment{update solution set based on $\mathcal{R}$}
 \doWhile{$converges(\mathcal{P},DM) \lor terminate(\mathcal{P},DM)$}\Comment{till convergence or termination}
 \end{algorithmic}
-\end{algorithm}
-The above method can be classified based on the which method is used as $\mathcal{M}$ and what type of preference information $\mathcal{R}$ is available/provided by the \textit{DM}.
+\end{algorithm} The above method can be classified based on the which method is used as $\mathcal{M}$ and what type of preference information $\mathcal{R}$ is available/provided by the \textit{DM}.
 \newline \newline $\mathcal{M}$ can be chosen from the various options available in a posteriori methods/no preference method \ref{a_posteriori_method} based on the problem type.
 \newline \newline Generally the choices of $\mathcal{R}$ are classified into 3 classes \cite{miettinen2008introduction}.
 \begin{enumerate}
@@ -163,7 +162,7 @@ The above method can be classified based on the which method is used as $\mathca
 \level{1}{Condition Number}
 The term \textbf{\textit{Condition Number}} was first coined by Alan Turing in 1947 in his paper on Rounding-Off Errors in Matrix Processes \cite{turing1948rounding}. He defined the condition number for matrices, further in 1966, John Rice in his paper \textit{A Theory of Condition} \cite{rice1966theory} showed how to formulate the definition of condition number other classes of problems.
 \newline\newline In our problem formulation may we not only require to compute the condition number of the function $f$ to check if its bounded or not \ref{cond_abs},\ref{cond_rel}; but also to minimize the maximum over a set $X_3$ \ref{cond_abs_min},\ref{cond_rel_min}.
-\newline\newline Hence we need to methods which can either be used to 
+\newline\newline Hence, we need to methods which can either be used to 
 \begin{enumerate}
     \item Bound the relative/absolute condition number
     \item Compute relative/absolute condition number efficiently
@@ -205,7 +204,7 @@ Hongyi Li et al. in their paper \cite{li2011note} have proved the following lowe
 \begin{equation} \label{cond_f_low_bound_2}
     \kappa_F(A) \ge 2\frac{tr(A^{\beta+1})tr(A^{\beta-1})}{tr(A^{2\beta})} -n
 \end{equation}
-Note that \ref{cond_f_low_bound_2} follows from \ref{cond_f_low_bound_1} using AM-GM inequality. Further Nicholas J. Higham in their paper \cite{higham1987survey} have presented survey for computing condition number of triangular matrices
+note that \ref{cond_f_low_bound_2} follows from \ref{cond_f_low_bound_1} using AM-GM inequality. Further Nicholas J. Higham in their paper \cite{higham1987survey} have presented survey for computing condition number of triangular matrices
 \newpage
 \level{2}{Condition Number of Functions}
 Edvin Deadman and Samuel D. Relton in their paper \cite{deadman2016taylor} extended the taylor's theorem for a complex function of matrices where $f:\mathbb{C}\to \mathbb{C}$ extended over matrices over $\mathbb{C}^{n\times n}$ i.e. $f:\mathbb{C}^{n\times n}\to \mathbb{C}$. For $f$ satisfying some conditions they proved the bound on the absolute condition number of $f$ at $A$ for $\epsilon>0$.

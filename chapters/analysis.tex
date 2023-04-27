@@ -1,16 +1,11 @@
 \level{0}{Methodology and Results}
-We will focus our attention on the problem which motivated this formulation, i.e. the problem of finding well conditioned solution for a Linear Factor Model \ref{problem_linear_factor_model}.
-\newline \newline  We also derive some interesting results that highlight the importance of the cond-fMOOP, and how indirectly some standard practices in the Machine Learning such as $L_2$ regularization is an approximation to a form of a cond-fMOOP.
-\newline \newline In the context of the general class of problems of cond-fMOOP, we note a list of questions, whose answers we think will be important contributors in solving the problems belonging to cond-fMOOP.
-\label{important_questions}
-\begin{enumerate}
+We will focus on the problem that motivated this formulation - finding a well-conditioned solution for a Linear Factor Model \ref{problem_linear_factor_model}. \newline We derive interesting results that show the importance of cond-fMOOP, and show how machine learning practices such as $L_2$ regularization approximate a form of cond-fMOOP. \newline For the general class of cond-fMOOP problems, we note a list of questions, whose answers we think will be important contributors in solving the problems belonging to cond-fMOOP.
+\begin{enumerate} \label{important_questions}
 \setlength\itemsep{-1pt}
     \item For a solvable $\mathcal{P} \in \text{fMOOP}$ and $\mathcal{P}^{'} \in \text{cond-fMOOP, derived from } \mathcal{P}$. Is $\mathcal{P}^{'}$ solvable?
-    \item For $\mathcal{P} \in \text{cond-fMOOP}$ defined over $X$ and subsets $X_1,X_2,X_5,X_6 \subseteq X$, how to determine minimum feasible value of $\alpha$?
-    \item For the fMOOPs which confirm such condition number restrictions how does the condition number behave over the domain $X_5,X_6$? \label{question_behaviour_of_cond_over_x5x6}
-    \item How the transformed problems with bounds on condition number behave and how close are their solutions to the original problems solutions? \label{question_transformed_problems_behaviour}
-\end{enumerate}
-
+    \item For $\mathcal{P} \in \text{cond-fMOOP}$ over $X$ and subsets $X_5,X_6 \subseteq X$. How to determine minimum value of $\alpha$ for which $\mathcal{P}$ is solvable?
+    \item For a $\mathcal{P} \in \text{cond-fMOOP}$, if we transform the condition number restriction using bounds, call the new problem $\mathcal{P}^{'}$. How close are the solutions of $\mathcal{P}^{'}$ and $\mathcal{P}$? \label{question_transformed_problems_behaviour}
+\end{enumerate} \textbf{Question (1)} is essential because not all fMOOP problems have solutions with bounded condition numbers. Therefore, having a method to identify such problems will enable us to focus on problems that do have solutions with bounded condition numbers and develop methods to solve them accordingly. \textbf{Question (2)} is crucial because even if a problem has solutions with bounded condition numbers, it may not have solutions with arbitrary small condition numbers. Thus, having a method to find the minimum value of $\alpha$ can determine the optimality of developed methods and how close they are to the optimal value. \textbf{Question (3)} is also significant because computing the condition number is a costly task. However, we have many easy-to-compute bounds for the condition number. Thus, it is essential to know how close the solutions of $\mathcal{P}^{'}$ and $\mathcal{P}$ are to judge the degree of approximation produced by using the bounds, which resolve the computational problem.
 \newpage 
 \level{1}{Theoretical Results}
 \level{2}{Relation between Absolute \& Relative Condition Number}
@@ -60,7 +55,7 @@ Consider the problem of fitting data with $n$ data points $(X_i,Y_i), i \in [n]$
 \begin{equation} \label{l2_reg_prob_obj}
     \underset{A \in \mathbb{R}^{1\times d}}{min}\hspace{1mm} \frac{1}{n}\mathlarger{\sum}_{i\in [n]} ||AX_i-Y_i||_2 + \lambda ||A||^{2}_{2}
 \end{equation}
-Now, consider the same problem under fMOOP for minimizing the $||\cdot||_{F}$ frobenius norm of the transform $A$ over the aggregation scheme of mean and $X_3 = \mathbb{R}^{d\times 1}$
+now, consider the same problem under fMOOP for minimizing the $||\cdot||_{F}$ frobenius norm of the transform $A$ over the aggregation scheme of mean and $X_3 = \mathbb{R}^{d\times 1}$
 \begin{equation} \label{fmoop_l2_rel_obj_1}
     \underset{A \in \mathbb{R}^{1\times d}}{min}\hspace{1mm} \frac{1}{n}\mathlarger{\sum}_{i\in [n]} ||AX_i-Y_i||_2
 \end{equation}
@@ -95,29 +90,29 @@ R^{n\times 1}_t \arrow[rr, "\mathcal{L}" description, Rightarrow, no head] \arro
 \end{tikzcd}
 \end{equation}
 \newline
-And the orthonormal condition
+and the orthonormal condition
 \begin{equation} \label{results_problem_orthonormal_eq}
  A^{d\times k}(A^{d\times k})^{\top} = I^{d\times d}
 \end{equation}
-From the \ref{results_problem_orthonormal_eq} we can infer that $(A^{d\times k})^\top$ belongs to the set of right inverses of $A^{d\times k}$. 
-\newline With the two objectives as:
+from the \ref{results_problem_orthonormal_eq} we can infer that $(A^{d\times k})^\top$ belongs to the set of right inverses of $A^{d\times k}$. 
+\newline with the two objectives as:
 \begin{equation} \label{problem_lfm_loss}
 \underset{\beta^{k \times 1}\in \mathbb{R}^{k\times 1}, A^{d\times k} \in \mathbb{R}^{d\times k}}{min}\hspace{1mm} \mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}
 \end{equation}
-Where $\mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}$ is defined as follows
+where $\mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}$ is defined as follows
 \begin{equation} \label{problem_lfm_loss_exprr}
-\mathcal{L}_{\beta^{k \times 1}, A^{d\times k}} = \frac{1}{T-d+1} \mathlarger{\mathlarger{\sum}}_{\forall t\in [d,T]} \hspace{1mm} ||R^{n\times 1}_t-R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}||_2^2
+\mathcal{L}_{\beta^{k \times 1}, A^{d\times k}} = \frac{1}{2(T-d+1)} \mathlarger{\mathlarger{\sum}}_{\forall t\in [d,T]} \hspace{1mm} ||R^{n\times 1}_t-R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}||_2^2
 \end{equation}
 and 
 \begin{equation} \label{problem_lfm_reward}
 \underset{\beta^{k \times 1}\in \mathbb{R}^{k\times 1}, A^{d\times k} \in \mathbb{R}^{d\times k}}{max}\hspace{1mm} \mathcal{R}_{\beta^{k \times 1}, A^{d\times k}}
 \end{equation}
-Where $\mathcal{R}_{\beta^{k \times 1}, A^{d\times k}}$ is defined as follows
+where $\mathcal{R}_{\beta^{k \times 1}, A^{d\times k}}$ is defined as follows
 \begin{equation} \label{problem_lfm_reward_exprr}
 \mathcal{R}_{\beta^{k \times 1}, A^{d\times k}} = \frac{1}{S} \mathlarger{\mathlarger{\sum}}_{\forall t\in [T,T+S]} \hspace{1mm} \frac{\langle R^{n\times 1}_t,R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}\rangle}{||R^{n\times 1}_t||_2||R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}||_2}
 \end{equation}
 \level{2}{ Methodologies }
-\level{3}{Baseline Method} The following method is based on randomized sampling method, which involves generating the matrix $M$ randomly and applying random data and fitting them to the training data set using linear regression. This process is repeated multiple times, and the best result is selected from the attempts.
+\level{3}{Baseline Method} The following method is based on randomized sampling method, which involves generating the matrix $M$ randomly and is orthonormalized to get $A$ then using linear regression we get the value for $\beta$. This process is repeated multiple times, and the best result is selected from the attempts.
 Following is the pseudocode for the method:
 \begin{algorithm}[H]
 \caption{$\mathcal{A}_{0}[N]$ : Baseline Method}\label{lfm_baseline_method}
@@ -136,26 +131,26 @@ Following is the pseudocode for the method:
 \State \textbf{complexity: } $O(N(dk+dk^2+ndS+d^2k)) = 
  O(Nd(dk+nS))$
 \end{algorithmic}
-\end{algorithm} In an alternate implementation of this algorithms we can even do grid search over the entries of $A$, but because of the high number of possibilities we restrict this method over randomized search. Note that the step $5,6$ together only take $O(d^2k)$ time with one time overhead of $O(Tndk)$ as we can compute $\mathbf{D}, \mathbf{N}$ as in \ref{dk2_complexity_method_for_regg} and for each $A$ compute $\beta$ with just 4 matrix multiplications and 1 matrix inversion taking $O(d^2k)$ operations.
+\end{algorithm} In an alternate implementation of this algorithms we can even do grid search over the entries of $A$, but because $A\in \mathbb{R}^{d\times k}$, which is a very large space we restrict this method over randomized search. Note that the step $5,6$ together only take $O(d^2k)$ time with one time overhead of $O(Tndk)$ as we can compute $\mathbf{D}, \mathbf{N}$ as in \ref{regg_D}, \ref{regg_N}, then $A$ compute $\beta$ with just 4 matrix multiplications and 1 matrix inversion taking $O(d^2k)$ operations.
 \level{3}{Gradient Based Methods}
-To compute the partial derivatives of the loss function $\mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}$ with respect to $A^{d\times k}$ and $\beta^{k \times 1}$, we will use the chain rule and the derivative of the matrix multiplication.\newline \newline First, let's compute the derivative of $\mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}$ with respect to $\beta^{k \times 1}$. Lets Define $\Delta_t = R^{n\times 1}_t-R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}$
+To compute the partial derivatives of the loss function $\mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}$ with respect to $A^{d\times k}$ and $\beta^{k \times 1}$, we will use the chain rule and the derivative of the matrix multiplication.\newline \newline first, let's compute the derivative of $\mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}$ with respect to $\beta^{k \times 1}$. Lets Define $\Delta_t = R^{n\times 1}_t-R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}$
 \begin{equation}
-    \frac{\partial \mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}}{\partial \beta^{k \times 1}} = \frac{1}{T-d+1} \sum_{\forall t\in [d,T]} \frac{\partial}{\partial \beta^{k \times 1}} ||\Delta_t||_2^2 
+    \frac{\partial \mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}}{\partial \beta^{k \times 1}} = \frac{1}{2(T-d+1)} \sum_{\forall t\in [d,T]} \frac{\partial}{\partial \beta^{k \times 1}} ||\Delta_t||_2^2 
 \end{equation}
-\newline Now, let's compute the derivative of $||\Delta_t||_2^2$ with respect to $\beta^{k\times 1}$:
+\newline now, let's compute the derivative of $\frac{1}{2}||\Delta_t||_2^2$ with respect to $\beta^{k\times 1}$:
 
 \begin{equation}
-    \frac{\partial}{\partial \beta^{k \times 1}} ||\Delta_t||_2^2 =  \frac{\partial}{\partial \beta^{k \times 1}} \Delta_t^\top \Delta_t = 2F_t^\top (F_t \beta - R_t)
+    \frac{\partial}{2\partial \beta^{k \times 1}} ||\Delta_t||_2^2 =  \frac{\partial}{2\partial \beta^{k \times 1}} \Delta_t^\top \Delta_t = F_t^\top (F_t \beta - R_t)
 \end{equation}
-\newline Which gives
+\newline which gives
 \begin{equation}\label{Loss_diff_wrt_beta}
-    \frac{\partial \mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}}{\partial \beta^{k \times 1}} = \frac{2}{T-d+1} \sum_{\forall t\in [d,T]} F_t^\top (F_t \beta - R_t)
+    \frac{\partial \mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}}{\partial \beta^{k \times 1}} = \frac{1}{T-d+1} \sum_{\forall t\in [d,T]} F_t^\top (F_t \beta - R_t)
 \end{equation}
-\newline Similarly consider 
+\newline similarly consider 
 \begin{equation}
-    \frac{\partial \mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}}{\partial A^{d \times k}} = \frac{1}{T-d+1} \sum_{\forall t\in [d,T]} \frac{\partial}{\partial A^{d \times k}} ||\Delta_t||_2^2 
+    \frac{\partial \mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}}{\partial A^{d \times k}} = \frac{1}{2(T-d+1)} \sum_{\forall t\in [d,T]} \frac{\partial}{\partial A^{d \times k}} ||\Delta_t||_2^2 
 \end{equation}
-We will use the following identities when $a$, $b$ and $C$ are not functions of $X$.
+we will use the following identities when $a$, $b$ and $C$ are not functions of $X$.
 \begin{equation} \label{matrix_calc:id1}
 \frac{\partial (\mathbf{a}^\top \mathbf{X} \mathbf{b})}{\partial \mathbf{X}} = \mathbf{a} \mathbf{b}^\top
 \end{equation}
@@ -165,22 +160,22 @@ We will use the following identities when $a$, $b$ and $C$ are not functions of 
 \begin{equation}\label{matrix_calc:id3}
 \frac{\partial (\mathbf{X} \mathbf{a})^\top \mathbf{C} (\mathbf{X} \mathbf{b})}{\partial \mathbf{X}} = \mathbf{C} \mathbf{X} \mathbf{b} \mathbf{a}^\top + \mathbf{C}^\top \mathbf{X} \mathbf{a} \mathbf{b}^\top
 \end{equation}
-\newline for the equations below we are dropping the dimensions
+\newline for the equations below and onwards we are dropping the dimensions
 \begin{equation}
-    ||\Delta_t||_2^2 = \Delta_t^\top \Delta_t = (R_t-R_{t\times d} A  \beta)^\top (R_t-R_{t\times d} A \beta) = R_t^\top R_t
+    ||\Delta_t||_2^2 = \Delta_t^\top \Delta_t = (R_t-R_{t\times d} A  \beta)^\top (R_t-R_{t\times d} A \beta)
 \end{equation}
 \begin{equation}
     ||\Delta_t||_2^2 = R_t^\top R_t - R_t^\top R_{t\times d} A \beta - \beta^\top A^\top  R_{t\times d}^\top R_t+ \beta^\top A^\top  R_{t\times d}^\top R_{t\times d} A \beta
 \end{equation}
-\newline Now using the identities \ref{matrix_calc:id1}, \ref{matrix_calc:id2}, \ref{matrix_calc:id3} we get 
+\newline now using the identities \ref{matrix_calc:id1}, \ref{matrix_calc:id2}, \ref{matrix_calc:id3} we get 
 \begin{equation}
-    \frac{\partial}{\partial A} ||\Delta_t||_2^2 = 2(R_{t\times d}^\top R_{t\times d} A \beta \beta^\top - R_{t\times d}^\top R_t \beta^\top)
+    \frac{\partial}{2\partial A} ||\Delta_t||_2^2 = R_{t\times d}^\top R_{t\times d} A \beta \beta^\top - R_{t\times d}^\top R_t \beta^\top
 \end{equation}
-\newline Which gives
+\newline which gives
 \begin{equation}
-    \frac{\partial \mathcal{L}_{\beta, A}}{\partial A} = \frac{2}{T-d+1} \sum_{\forall t\in [d,T]} R_{t\times d}^\top R_{t\times d} A \beta \beta^\top - R_{t\times d}^\top R_t \beta^\top
+    \frac{\partial \mathcal{L}_{\beta, A}}{\partial A} = \frac{1}{T-d+1} \sum_{\forall t\in [d,T]} R_{t\times d}^\top R_{t\times d} A \beta \beta^\top - R_{t\times d}^\top R_t \beta^\top
 \end{equation}
-\newline For vector-valued scalar functions $v(\mathbf{x})$ and $u(\mathbf{x})$ with respect to $\mathbf{x}$, and where $A$ is not a function of $x$.
+\newline for vector-valued scalar functions $v(\mathbf{x})$ and $u(\mathbf{x})$ with respect to $\mathbf{x}$, and where $A$ is not a function of $x$.
 
 \begin{equation}\label{eq:partial-derivative-vector-function}
 \frac{\partial}{\partial \mathbf{x}} \left( v(\mathbf{x}) u(\mathbf{x}) \right) =  v \frac{\partial u}{\partial \mathbf{x}} + \frac{\partial v}{\partial \mathbf{x}} u
@@ -198,14 +193,14 @@ We will use the following identities when $a$, $b$ and $C$ are not functions of 
 \begin{equation} \label{eq:derivative-rho_t_A}
     \frac{\partial \rho_t}{\partial A} =  \frac{1}{||F_t\beta||_2} R_{t\times d}^\top \hat{R}_t \beta^\top - \frac{2R_{t\times d}^\top R_{t\times d} A \beta \beta^\top }{2||F_t\beta||_2^3}\hat{R}_t^\top F_t \beta
 \end{equation}
-\newline From that we can get
+\newline from that we can get
 \begin{equation}
     \frac{\partial \mathcal{R}_{\beta, A}}{\partial A} = \frac{1}{S} \mathlarger{\mathlarger{\sum}}_{\forall t\in [T,T+S]} \hspace{1mm} \frac{\partial \rho_t}{\partial A} 
 \end{equation}
 \begin{equation}
     \frac{\partial \mathcal{R}_{\beta, A}}{\partial \beta} = \frac{1}{S} \mathlarger{\mathlarger{\sum}}_{\forall t\in [T,T+S]} \hspace{1mm} \frac{\partial \rho_t}{\partial \beta} 
 \end{equation}
-\newline Also we can get derivative w.r.t. $A$ for the frobenius norm square of $AA^\top-I$
+\newline also we can get derivative w.r.t. $A$ for the frobenius norm square of $AA^\top-I$
 \begin{equation} \label{eq:derivative_forb_norm_ofAAtmI}
     \frac{\partial ||AA^\top-I||^2_F}{\partial A} = -4\cdot (I-A\cdot A^\top )\cdot A
 \end{equation}
@@ -218,22 +213,22 @@ and for $A \in\mathcal{O}_d^k$ and $Q \in\mathcal{O}_d^d$ we observe that $QA\in
 \begin{equation} \label{observation:ortho-closure_odk_2}
     (QA)(QA)^\top = QAA^\top Q^\top = QQ^\top  = I
 \end{equation}
-Now consider and iterative scheme for finding $A, \beta$ which generates $\{A_i, \beta_i\}_{i=0}^{N}$ with updates at $i$'th iteration denoted as $\{\Delta A_i, \Delta \beta_i\}$
+now consider and iterative scheme for finding $A, \beta$ which generates $\{A_i, \beta_i\}_{i=0}^{N}$ with updates at $i$'th iteration denoted as $\{\Delta A_i, \Delta \beta_i\}$
 \begin{equation}
 \begin{aligned}
     A_{i+1} = A_i + \Delta A_i \\
     \beta_{i+1} = \beta_i + \Delta \beta_i
 \end{aligned}
 \end{equation}
-But since in our problem we have added restriction on $A \in \mathcal{O}_d^k$, which we can solve by one of the following 2 approaches 
+but since in our problem we have added restriction on $A \in \mathcal{O}_d^k$, which we can solve by one of the following 2 approaches 
 \newline \newline \textbf{General approaches to satisfy orthonormality condition}
 \begin{enumerate}
     \item Design the iteration scheme such that $A_i \in \mathcal{O}_d^k, \forall i \in \{0,1,2,...,N\}$
     \item Relax the Condition on $A \in \mathcal{O}_d^k$ to $A \in \mathbb{R}^{d\times k}$ and solve using an iterative scheme;  then project $A_{N}$ to $\mathcal{O}_d^k$ i.e. solve the problem $\underset{A \in \mathcal{O}_d^k}{min} \hspace{2mm} ||A_{N}-A||$ with $\mathcal{R}_{\beta, A}, \mathcal{L}_{\beta, A}$ being reasonabaly close to $\mathcal{R}_{\beta_{N}, A_{N}}, \mathcal{L}_{\beta_{N}, A_{N}}$ respectively.
 \end{enumerate}
-First we will use the observation \ref{observation:ortho-closure_odk} to design an iterative scheme such that $A_i \in \mathcal{O}_d^k, \forall i \in \{0,1,2,...,N\}$
-\newline Lets say via some iterative method we get $\Delta A_i$ update for $A_i$ but since $A_{i+1} = A_i + \Delta A_i$ need not belong to $\mathcal{O}_d^k$ we need some way to project $\Delta A_i$ in a space such that $A_{i+1} \in \mathcal{O}_d^k$
-\newline We define $\mathcal{O}_d^k$
+first we will use the observation \ref{observation:ortho-closure_odk} to design an iterative scheme such that $A_i \in \mathcal{O}_d^k, \forall i \in \{0,1,2,...,N\}$
+\newline lets say via some iterative method we get $\Delta A_i$ update for $A_i$ but since $A_{i+1} = A_i + \Delta A_i$ need not belong to $\mathcal{O}_d^k$ we need some way to project $\Delta A_i$ in a space such that $A_{i+1} \in \mathcal{O}_d^k$
+\newline we define $\mathcal{O}_d^k$
 \begin{equation}
     \delta \mathcal{O}_d^k = \{ \delta | \delta = A - B, A, B \in \mathcal{O}_d^k \}
 \end{equation}
@@ -252,15 +247,15 @@ which implies, we require to project $\Delta A_i$ in $\delta \mathcal{O}_d^k $ o
     \item $\delta \in \delta \mathcal{O}_d^k$ and $Q\in \mathcal{O}_d^d$ we have $ Q\delta \in \delta \mathcal{O}_d^k$ by \ref{observation:ortho-closure_odk_2}
 \end{enumerate}
 So if we could get an associated $Q_i \in \mathcal{O}_k^k$ with $\Delta A_i$ such that we can replace $A_{i+1} = A_i+proj_{\delta \mathcal{O}_d^k}(\Delta A_i)$ with $\hat{A}_{i+1} = A_iQ_i$, such that $\hat{A}_{i+1} \approx A_{i+1}$.
-\newline \newline Now recall Cayley Transformation for a $Q$ which doesn't have $-1$ as one of its eigenvalues then there is a skew-symmetric matrix $T = -T^\top$ satisfying the following properties
+\newline \newline now recall Cayley Transformation for a $Q$ which doesn't have $-1$ as one of its eigenvalues then there is a skew-symmetric matrix $T = -T^\top$ satisfying the following properties
 \begin{equation} \label{cayley-transformation} 
 \begin{aligned}
     Q &= (I+T)^{-1}(I-T) = (I-T)(I+T)^{-1} \\
     T &= (I-Q)(I+Q)^{-1}
 \end{aligned}
 \end{equation}
-Let $2T_i = \Delta A_i^\top A_i- A_i^\top \Delta A_i$ and we generate associated $Q_i = (I-T_i)(I+T_i)^{-1}$ by using Cayley Transformation over $T$.
-\newline Then observe that $X = A_iQ_i-A_i = A_i(Q_i-I)$, multiplying by $(1+T_i)$ on right side gives 
+let $2T_i = \Delta A_i^\top A_i- A_i^\top \Delta A_i$ and we generate associated $Q_i = (I-T_i)(I+T_i)^{-1}$ by using Cayley Transformation over $T$.
+\newline then observe that $X = A_iQ_i-A_i = A_i(Q_i-I)$, multiplying by $(1+T_i)$ on right side gives 
 \begin{equation}
 \begin{aligned}
     X(1+T_i) =& A_i((1-T_i)-(1+T_i)) \\
@@ -301,7 +296,7 @@ using which we can write
 \State \Return $\beta_{N},A_{N}$
 \State \textbf{complexity: } $O(N(dk^2+|\mathcal{U_{A}}[\vec{\alpha}]|+|\mathcal{U_{\beta}}[\vec{\phi}]|))$
 \end{algorithmic}
-\end{algorithm} For the second case were we relax the Condition on $A \in \mathcal{O}_d^k$ to $A \in \mathbb{R}^{d\times k}$ we can write a general iterative scheme as follows
+\end{algorithm} for the second case were we relax the Condition on $A \in \mathcal{O}_d^k$ to $A \in \mathbb{R}^{d\times k}$ we can write a general iterative scheme as follows
 \begin{algorithm}[H]
 \caption{$\mathcal{A}_{2}[N,\mathcal{U_{A}},\mathcal{U_{\beta}}, \mathcal{U_{O}}]$ : Delayed Orthogonalization Iterative Scheme (DOI Scheme)}\label{lfm_orthogonal_property_iterative_scheme}
 \begin{algorithmic}[1]
@@ -370,7 +365,7 @@ using which we can write
 \State $\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \beta, A, \mathcal{R}_{\beta, A}$
 \For{$i \gets 1$ to $N$}
     \State $\Delta A \gets A^{*} - A$
-    \State $Q \gets cayley\_transformation(\frac{\lambda_1}{2} \Delta A)$ \Comment{Where $\vec{\lambda} = (\lambda_1)$}
+    \State $Q \gets \text{cayley\_transformation}(\frac{\lambda_1}{2} \Delta A)$ \Comment{Where $\vec{\lambda} = (\lambda_1)$}
     \State $A \gets AQ$
     \State Compute $\{F^{n\times k}_{t}\}$ for $A$ over $t\in [d,T]$
     \State $\beta \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t}\}, t\in [d,T])$
@@ -382,7 +377,7 @@ using which we can write
 \State \Return  $\beta_{optimal}, A_{optimal}$
 \State \textbf{complexity: } $O()$
 \end{algorithmic}
-\end{algorithm} \newline \textbf{Observation:} For a given $A$ and for $\{F^{n\times k}_{t}\}$ computed w.r.t. $A$ over $t\in [d,T]$ and $\beta \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t}\}, t\in [d,T])$. Here we are using $L_2$ norm for regression which gives us the formula for $\beta$ as we know that $\beta$ is the solution of the equation \ref{Loss_diff_wrt_beta} and using the fact that $F^{n\times k}_{t} = R^{n\times d}_{t}A$, we can write a formula for $\beta$ as follows
+\end{algorithm} \newline \textbf{Observation:} For a given $A$ and for $\{F^{n\times k}_{t}\}$ computed w.r.t. $A$ over $t\in [d,T]$ and $\beta \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t}\}, t\in [d,T])$. Here we are using $L_2$ norm for regression which gives us the formula for $\beta$, as we know that $\beta$ is the solution of the equation \ref{Loss_diff_wrt_beta} and using the fact that $F^{n\times k}_{t} = R^{n\times d}_{t}A$, we can write a formula for $\beta$ as follows
 \begin{equation}\label{expaned_bets_diff_loss}
 \begin{aligned}
     \frac{\partial \mathcal{L}_{\beta, A}}{\partial \beta} = 0\\
@@ -399,12 +394,12 @@ we can write $(F^{n\times k}_t)^\top F^{n\times k}_t = A^\top(R^{n\times d}_{t})
     \sum_{\forall t\in [d,T]} A^\top (R^{n\times d}_t)^\top R^{n\times d}_t A \beta - \sum_{\forall t\in [d,T]} A^\top (R^{n\times d}_t)^\top R^{n\times 1}_t = 0\\
 \end{aligned}
 \end{equation}
-\begin{equation}
+\begin{equation} \label{regg_D}
 \begin{aligned}
     \mathbf{D} = \sum_{\forall t\in [d,T]} (R^{n\times d}_t)^\top R^{n\times d}_t\\
 \end{aligned}
 \end{equation}
-\begin{equation}
+\begin{equation}\label{regg_N}
 \begin{aligned}
      \mathbf{N} = \sum_{\forall t\in [d,T]} (R^{n\times d}_t)^\top R^{n\times 1}_t\\
 \end{aligned}
@@ -428,7 +423,7 @@ we can write $(F^{n\times k}_t)^\top F^{n\times k}_t = A^\top(R^{n\times d}_{t})
     \bar{\beta} &= Q^\top \beta\\
 \end{aligned}
 \end{equation}
-Hence if $\bar{A} = AQ$ then if $\beta, \bar{\beta}$ solve regression problem generated by $A, \bar{A}$ respectively then we get $\bar{\beta} = Q^\top\beta$. 
+Hence, if $\bar{A} = AQ$ then if $\beta, \bar{\beta}$ solve regression problem generated by $A, \bar{A}$ respectively then we get $\bar{\beta} = Q^\top\beta$. 
 
 \newpage
 \level{3}{Evolutionary Algorithms}
@@ -442,7 +437,7 @@ NSGA-II (Non-dominated Sorting Genetic Algorithm II) is a multi-objective optimi
 \caption{NSGA-II($N,G,p_c,p_m,\mathcal{C},\mathcal{M}$)}
 \begin{algorithmic}[1]
 \State $P \gets$ random\_candidate\_solutions$(N)$ 
-\State Evaluate the fitness of each candidate solution in $P$
+\State Evaluate the fitness of each candidate solution in $P$ \Comment{fitness : objective fuction}
 \For{$t \gets 1$ to $G$}
 \State $C \gets \text{get\_offspring\_population}(P,N, \mathcal{C}, \mathcal{M})$
 \State $F_1, F_2,..., F_t \gets \text{non\_dominated\_sorting}(P \cup C)$ \Comment{$F_i$ is the $i$'th front}
@@ -464,7 +459,7 @@ NSGA-II (Non-dominated Sorting Genetic Algorithm II) is a multi-objective optimi
 We need to define the 2 sub-procedure namely non\_dominated\_sorting$(P)$ and the calculation of crowding distance and the corresponding crowded-comparator operator 
 \newline non\_dominated\_sorting$(P)$ : Sorts the population $P$ into different non-dominated fronts $F_1,F_2,...$ based on the Pareto-dominance relationship i.e. we say $x \preceq y$ or $x$ dominates $y$ if $x$ is no worst when compared to $y$ in all the objectives but is better at at least some of the objective. The first front $F_1$ contains the non-dominated solutions, the subset of $P$ which contains all the solutions which are not dominated by any other solution in $P$. For $i>1$, the $i$'th front $F_i$ contains the solutions that are only dominated by the solutions in the first $i-1$ sets namely $F_1,F_2...F_{i-1}$, for more details and algorithm to compute the $F_i$'s refer \cite{deb2002fast}.
 \newline \newline  Crowding distance and crowding comparator: The crowding distance is a measure of crowdedness around a solution in its a front $F_i$. Larger the value of crowding distances implies that there aren't many closeby solution in the front, hence solutions with larger crowding distances are preferred, as they give more diversity to the population. For exact definition of the Crowding distance refer \cite{deb2002fast}.
-\newline Since $S = (\beta,A)$ and $A \in \mathcal{O}^{k}_{d}$, we need to use custom $crossover[\mathcal{C}](S_1,S_2)$ and $mutate[\mathcal{M}](S_1,S_2)$ to ensure that new updated solution after crossover and mutation have $A's \in \mathcal{O}^{k}_{d}$ and also need to modify $random\_candidate\_solutions(N)$ so that the initial solutions have $A's \in \mathcal{O}^{k}_{d}$. For initial population we can simply orthonormalize $A$'s in the initial population.
+\newline Since $S = (\beta,A)$ and $A \in \mathcal{O}^{k}_{d}$, we need to use $crossover[\mathcal{C}](S_1,S_2)$ and $mutate[\mathcal{M}](S_1,S_2)$ which are  customized for our problem to ensure that new updated solution after crossover and mutation have $A's \in \mathcal{O}^{k}_{d}$ and also need to modify $random\_candidate\_solutions(N)$ so that the initial solutions have $A's \in \mathcal{O}^{k}_{d}$. For initial population we can simply orthonormalize $A$'s in the initial population.
 \begin{algorithm}[H]
 \caption{get\_offspring\_population($P,N,\mathcal{C},\mathcal{M}$)}\label{nsga2:generate_offspring_population}
 \begin{algorithmic}[1]
@@ -493,7 +488,7 @@ We need to define the 2 sub-procedure namely non\_dominated\_sorting$(P)$ and th
 \State $A^{'}_1, A^{'}_2\gets gram\_schmidt\_algorithm(\frac{A_1+A_2}{2}), gram\_schmidt\_algorithm(\frac{A_1-A_2}{2})$
 \State $\beta^{'}_1, \beta^{'}_2 \gets \frac{\beta_1+\beta_2}{2}, \frac{\beta_1-\beta_2}{2}$
 \State \Return $(\beta^{'}_1,A^{'}_1),(\beta^{'}_2,A^{'}_2)$
-\State \textbf{complexity: } $O()$
+\State \textbf{complexity: } $O(dk^2)$
 \end{algorithmic}
 \end{algorithm}
 \begin{algorithm}[H]
@@ -505,7 +500,7 @@ We need to define the 2 sub-procedure namely non\_dominated\_sorting$(P)$ and th
 \State Compute $\{F^{n\times k}_{t, i}\}$ for $A^{'}_i$ over $t\in [d,T]$ for $i\in \{1,2\}$
 \State $\beta^{'}_i \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t, i}\}, t\in [d,T])$ for $i\in \{1,2\}$
 \State \Return $(\beta^{'}_1,A^{'}_1),(\beta^{'}_2,A^{'}_2)$
-\State \textbf{complexity: } $O()$
+\State \textbf{complexity: } $O(dk^2+d^2k) = O(d^2k$
 \end{algorithmic}
 \end{algorithm}
 \begin{algorithm}[H]
@@ -514,7 +509,7 @@ We need to define the 2 sub-procedure namely non\_dominated\_sorting$(P)$ and th
 \Require{$A \in \mathcal{O}^{k}_{d}$, $\lambda \in \mathbb{R}^{+}$}
 \State $(\beta, A)\gets S$
 \State $\Delta A, \Delta \beta \gets Random(\mathbb{R}^{d\times k}),Random(\mathbb{R}^{k\times 1})$
-\State $Q \gets cayley\_transformation(\frac{\lambda}{2} \Delta A)$
+\State $Q \gets \text{cayley\_transformation}(\frac{\lambda}{2} \Delta A)$
 \State \Return $(\beta + \lambda \Delta \beta, AQ)$
 \State \textbf{complexity: } $O()$
 \end{algorithmic}
@@ -685,21 +680,21 @@ Originally developed for solving single objective optimization problems, Particl
     \State $V\gets V \cup \{v_i\}$
 \EndFor
 \State \Return $P, V$
-\State \textbf{complexity: } $O()$
+\State \textbf{complexity: } $O(N(dk+d^2k+computing\_grads))$
 \end{algorithmic}
 \end{algorithm}
 
 \newpage
 \level{3}{MOOP Methods}
 \level{4}{No Preference Method}
-First we compute the \textbf{utopia point} as defined in \ref{ideal_point_def} for this problem, here we have 2 dimensions for the objective to minimize namely $-\mathcal{R}_{\beta, A}$ and $\mathcal{L}_{\beta, A}$ and the utopia point values denoted by $-\mathcal{R}_{\beta, A}^* = min -\mathcal{R}_{\beta, A}  = - max\hspace{2mm} \mathcal{R}_{\beta, A} =  - 1 $ as its inner-product between vectors divided by the norms induced by that inner-product in and $\mathcal{L}_{\beta, A}^* =min \hspace{2mm} \mathcal{L}_{\beta, A} = 0$ . And finally we have the condition that $AA^\top = I$, which either we can view as constraint or consider $I$ as the utopia point value of $AA^\top$. Finally we can consider one of the 2 optimization problem framed under \textit{No preference method}
+First we compute the \textbf{utopia point} as defined in \ref{ideal_point_def} for this problem, here we have 2 dimensions for the objective to minimize namely $-\mathcal{R}_{\beta, A}$ and $\mathcal{L}_{\beta, A}$ and the utopia point values denoted by $-\mathcal{R}_{\beta, A}^* = min -\mathcal{R}_{\beta, A}  = - max\hspace{2mm} \mathcal{R}_{\beta, A} =  - 1 $ as its inner-product between vectors divided by the norms induced by that inner-product in and $\mathcal{L}_{\beta, A}^* =min \hspace{2mm} \mathcal{L}_{\beta, A} = 0$. And finally we have the condition that $AA^\top = I$, which either we can view as constraint or consider $I$ as the utopia point value of $AA^\top$. Finally we can consider one of the 2 optimization problem framed under \textit{No preference method}
 \newline \textbf{No Preference Method Optimization Problem 1}
 \begin{equation} \label{NPMOP_1:objective}
 \begin{aligned}
     \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathcal{O}^{k}_{d}}{min} || [\mathcal{L}_{\beta, A}-\mathcal{L}_{\beta, A}^*,-\mathcal{R}_{\beta, A}+\mathcal{R}_{\beta, A}^*]||
 \end{aligned}
 \end{equation}
-Here we can use any norm $||\cdot ||$ defiend on $\mathbb{R}^2$ for example euclidean norm.
+in this case we can use any norm $||\cdot ||$ defiend on $\mathbb{R}^2$ for example euclidean norm.
 \hspace{2mm}
 \newline \textbf{No Preference Method Optimization Problem 2}
 \begin{equation} \label{NPMOP_2:objective}
@@ -707,10 +702,10 @@ Here we can use any norm $||\cdot ||$ defiend on $\mathbb{R}^2$ for example eucl
     \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathbb{R}^{d\times k}}{min} || [\mathcal{L}_{\beta, A}-\mathcal{L}_{\beta, A}^*,-\mathcal{R}_{\beta, A}+\mathcal{R}_{\beta, A}^*, AA^\top - I]||
 \end{aligned}
 \end{equation}
-Here we can use any norm $||\cdot ||$ defiend on $\mathbb{R}^{2+d^2}$ as $AA^\top -I$ is a $d\times d$ matrix which can vectorize to get a $d\times d$ vector for the purposes of computing the norm.
+in this case we can use any norm $||\cdot ||$ defiend on $\mathbb{R}^{2+d^2}$ as $AA^\top -I$ is a $d\times d$ matrix which can vectorize to get a $d\times d$ vector for the purposes of computing the norm.
 
 \level{4}{$\epsilon$-Constraint Method}
-To apply $\epsilon$-Constraint Method to this problem we need to first define the most important single objective, in our case that is $\mathcal{R}_{\beta, A}$ and we can relax the other objective to an constraint namely $\mathcal{L}_{\beta, A} \le \epsilon$ so now the problem that we need to solve reduces to one of the 2 cases depending on how we handle the condition $AA^\top = I$
+To apply $\epsilon$-Constraint Method to this problem we need to first define the most important single objective, in our case that is $\mathcal{R}_{\beta, A}$ and we can relax the other objective to an constraint namely $\mathcal{L}_{\beta, A} \le \epsilon$ so now the problem that we need to solve reduces to one of the 2 cases depending on how we handle the condition $AA^\top = I$.
 \newline \textbf{$\epsilon$-Constraint Method Optimization Problem 1}
 \begin{equation} \label{ECMOP_1}
 \begin{aligned}
@@ -745,7 +740,7 @@ let $\beta^{*}, A^{*}$ be the solution of \textbf{Step 1}, then \textbf{Step 2} 
 \end{aligned}
 \end{equation}
 \newline \textbf{Lexicographic Method Optimization Problem 2}
-\newline Note that when we relax $A \in \mathcal{O}_d^k$ to $A \in \mathbb{R}^{d\times k}$ we get one more objective namely 
+\newline note that when we relax $A \in \mathcal{O}_d^k$ to $A \in \mathbb{R}^{d\times k}$ we get one more objective namely 
 \begin{equation}
 \begin{aligned}
 \underset{A\in \mathbb{R}^{d\times k}}{min} \hspace{3mm} || AA^\top -I|| 
@@ -775,7 +770,7 @@ let $\beta^{**}, A^{**}$ be the solution of \textbf{Step 2}, then \textbf{Step 3
 \text{st.  }& \mathcal{L}_{\beta, A} \le \mathcal{L}_{\beta^{**}, A^{**}}\\
 \end{aligned}
 \end{equation}
-\newline \newline Note that all the problems \ref{NPMOP_1:objective}, \ref{NPMOP_2:objective}, \ref{ECMOP_1}, \ref{ECMOP_2}, \ref{LMOP_1:step_1}, \ref{LMOP_1:step_2}, \ref{LMOP_2:step_1}, \ref{LMOP_2:step_2} and \ref{LMOP_2:step_3} are \textbf{Single Objective Optimization Problem} and we can use various methods to solve them. As all the objectives are differentiable we can use Gradient Descent (GD) algorithm and its variants to get an optimal solution. For problems \ref{NPMOP_2:objective} and \ref{LMOP_2:step_1} we can directly apply GD, but  for other problems we need to address the condition and modify SGD accordingly. The problems where $A \in \mathcal{O}_d^k$ are \ref{NPMOP_1:objective} and \ref{LMOP_1:step_1} to solve them we need to modify the GD accordingly. For the problems \ref{ECMOP_2}, \ref{LMOP_2:step_2} and \ref{LMOP_2:step_3} we have inequality constraints for which we can use \textbf{Constraint Guided Gradient Descent (CGGD)} algorithm \cite{karsmakers2022constraint} to get the solution. For the remaining problems, namely \ref{ECMOP_1} and \ref{LMOP_1:step_2} we need to modify \textbf{CGGD} algorithm to account for the condition $A \in \mathcal{O}_d^k$ and get the solution.
+\newline \newline Note that all the problems \ref{NPMOP_1:objective}, \ref{NPMOP_2:objective}, \ref{ECMOP_1}, \ref{ECMOP_2}, \ref{LMOP_1:step_1}, \ref{LMOP_1:step_2}, \ref{LMOP_2:step_1}, \ref{LMOP_2:step_2} and \ref{LMOP_2:step_3} are \textbf{Single Objective Optimization Problem} and we can use various methods to solve them. As all the objectives are differentiable we can use Gradient Descent (GD) algorithm and its variants to get an optimal solution. For problems \ref{NPMOP_2:objective} and \ref{LMOP_2:step_1} we can directly apply GD, but  for other problems we need to address the condition and modify GD accordingly. The problems where $A \in \mathcal{O}_d^k$ are \ref{NPMOP_1:objective} and \ref{LMOP_1:step_1} to solve them we need to modify the GD accordingly. For the problems \ref{ECMOP_2}, \ref{LMOP_2:step_2} and \ref{LMOP_2:step_3} we have inequality constraints for which we can use \textbf{Constraint Guided Gradient Descent (CGGD)} algorithm \cite{karsmakers2022constraint} to get the solution. For the remaining problems, namely \ref{ECMOP_1} and \ref{LMOP_1:step_2} we need to modify \textbf{CGGD} algorithm to account for the condition $A \in \mathcal{O}_d^k$ and get the solution.
 \newline \textbf{Constraint Guided Gradient Descent (CGGD) Algorithm}
 \newline Constraint Guided Gradient Descent (CGGD) is a type of optimization algorithm that is used to solve constrained optimization problems. For the problem defined  below 
 \begin{equation}
@@ -790,7 +785,7 @@ then CGGD algorithm at step $i$ updates the value of $\vec{x}_i$ to $\vec{x}_{i+
     \vec{x}_{i+1} =& \vec{x}_i - \eta_i(\nabla f(\vec{x}_i) + C \vec{dir}(\vec{x}_i-\vec{x}^{*}) max(\epsilon,||\nabla f(\vec{x}_i)||))\\
 \end{aligned}
 \end{equation}
-where $x^{*}$ is belongs to the set of points for which $\forall i \in \{1...k\} \hspace{2mm}  g_i(\vec{x}) \le 0$ is satisfied and $\vec{dir}(\vec{x}_i-\vec{x}^{*})$ represents the direction vector from $\vec{x}^{*}$ to $\vec{x}_i$. 
+where $x^{*}$ is belongs to the set of points for which $\forall i \in \{1...k\} \hspace{2mm}  g_i(\vec{x}) \le 0$ is satisfied and $\vec{dir}(\vec{x}_i-\vec{x}^{*})$ represents the direction vector from $\vec{x}^{*}$ to $\vec{x}_i$. Even though with any $x^{*}$ eventually the solution will converge, but choice of the $x^{*}$ at each iteration has a huge impact on the convergence speed. 
 \newline \newline \textbf{Case $A \in \mathbb{R}^{d \times k}$ and No Inequality Condition}
 \newline Here we have the problems \ref{NPMOP_2:objective} and \ref{LMOP_2:step_1}, so for \ref{NPMOP_2:objective} we directly apply GD method to get the solution. Following is the update rule for the norm defined as follows $||x,y,A|| = \sqrt{x^2+y^2+||A||^2_F}$ after we minimize the $\frac{1}{2}||\cdot||^2$ using GD method with learning rate of $\epsilon_A,\epsilon_{\beta}$
 \begin{equation}
@@ -834,14 +829,14 @@ A_{i+1} &= A_{i} - \epsilon_A ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\par
 \beta_{i+1} &= \beta_{i} - \epsilon_{\beta} ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta} + C \vec{dir}(\beta_i-\bar{\beta}) max(\epsilon,||\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta}||))
 \end{aligned}    
 \end{equation}
-\newline For \ref{LMOP_2:step_2}, let $X = \{(\beta, A) | \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}\}$, $\bar{x} = (\bar{\beta},\bar{A}), \epsilon_A, \epsilon_{\beta}, C, \epsilon$ follow similar definition as before and we can write
+\newline for \ref{LMOP_2:step_2}, let $X = \{(\beta, A) | \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}\}$, $\bar{x} = (\bar{\beta},\bar{A}), \epsilon_A, \epsilon_{\beta}, C, \epsilon$ follow similar definition as before and we can write
 \begin{equation}
 \begin{aligned}
 A_{i+1} &= A_{i} - \epsilon_A ( \frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial A} + C \vec{dir}(A_i-\bar{A}) max(\epsilon,||\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial A}||))\\
 \beta_{i+1} &= \beta_{i} - \epsilon_{\beta} ( \frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial \beta} + C \vec{dir}(\beta_i-\bar{\beta}) max(\epsilon,||\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial \beta}||))
 \end{aligned}    
 \end{equation}
-\newline For \ref{LMOP_2:step_3}, let $X = \{(\beta, A) | \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}, \mathcal{L}_{\beta, A} \le \mathcal{L}_{\beta^{**}, A^{**}}\}$, $\bar{x} = (\bar{\beta},\bar{A}), \epsilon_A, \epsilon_{\beta}, C, \epsilon$ follow similar definition as before and $|| AA^\top -I|| = || AA^\top -I||_F$ and we will minimize the $\frac{1}{2}||\cdot||^2_F$
+\newline for \ref{LMOP_2:step_3}, let $X = \{(\beta, A) | \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}, \mathcal{L}_{\beta, A} \le \mathcal{L}_{\beta^{**}, A^{**}}\}$, $\bar{x} = (\bar{\beta},\bar{A}), \epsilon_A, \epsilon_{\beta}, C, \epsilon$ follow similar definition as before and $|| AA^\top -I|| = || AA^\top -I||_F$ and we will minimize the $\frac{1}{2}||\cdot||^2_F$
 \begin{equation}
 \begin{aligned}
 A_{i+1} &= A_{i} - \epsilon_A ( \frac{\partial || A_iA^\top_i -I||^2_F}{2\partial A} + C \vec{dir}(A_i-\bar{A}) max(\epsilon,||\frac{\partial || A_iA^\top_i -I||^2_F}{2\partial A}||_F))\\
@@ -850,7 +845,7 @@ A_{i+1} &= A_{i} - \epsilon_A ( \frac{\partial || A_iA^\top_i -I||^2_F}{2\partia
 \end{equation}
 \newline \textbf{Case $A \in \mathcal{O}_d^k$ and With Inequality Condition}
 \newline Here we have the problems \ref{ECMOP_1} and \ref{LMOP_1:step_2} 
-\newline For \ref{ECMOP_1}, let $X = \{(\beta, A) |  \mathcal{L}_{\beta, A} \le \epsilon \}$, $\bar{x} = (\bar{\beta},\bar{A}), \epsilon_A, \epsilon_{\beta}, C, \epsilon$ follow similar definition as before and we can write the update rule as follows
+\newline for \ref{ECMOP_1}, let $X = \{(\beta, A) |  \mathcal{L}_{\beta, A} \le \epsilon \}$, $\bar{x} = (\bar{\beta},\bar{A}), \epsilon_A, \epsilon_{\beta}, C, \epsilon$ follow similar definition as before and we can write the update rule as follows
 \begin{equation}
 \begin{aligned}
 \Delta A_{i} &= - \epsilon_A ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A} + C \vec{dir}(A_i-\bar{A}) max(\epsilon,||\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A}||))\\
@@ -859,7 +854,7 @@ Q_i &= \hspace{2mm} \text{cayley\_transformation}(\frac{1}{2} \Delta A_i)\\
 A_{i+1} &= \hspace{2mm} A_i Q_i \\
 \end{aligned}    
 \end{equation}
-\newline For \ref{LMOP_1:step_2}, let $X = \{(\beta, A) | \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}\}$, $\bar{x} = (\bar{\beta},\bar{A}), \epsilon_A, \epsilon_{\beta}, C, \epsilon$ follow similar definition as before and we can write the update rule as follows
+\newline for \ref{LMOP_1:step_2}, let $X = \{(\beta, A) | \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}\}$, $\bar{x} = (\bar{\beta},\bar{A}), \epsilon_A, \epsilon_{\beta}, C, \epsilon$ follow similar definition as before and we can write the update rule as follows
 \begin{equation}
 \begin{aligned}
 \Delta A_{i} &= - \epsilon_A ( -\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial A} + C \vec{dir}(A_i-\bar{A}) max(\epsilon,||\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial A}||))\\
@@ -919,7 +914,7 @@ We will be using the data provided by \textit{Qube Research and Technologies (QR
 
 \level{3}{Preprocessing}
 
-For statistical significance of results we will use multiple samples from the set of 50 timeseries for $n = 5,8,13,21,34$ being the sample sizes.
+For statistical significance of results we will use multiple samples from the set of 50 timeseries for $n = 5,8,13,21,34,50$ being the sample sizes and $m=10,7,4,3,1$ being the number of such samples for each $n$.
 
 
 
