@@ -1,6 +1,5 @@
 import numpy as np
 from tqdm import tqdm
-from logger import *
 
 class Solution:
     error_eps = 1e-6
@@ -26,17 +25,15 @@ class Solution:
 
         pass
 
-    def __init__(self, beta, A):
-        self.beta = beta
-        self.A = A
-        pass
-
-    def __init__(self, beta, A,vel_beta, vel_A):
+    def __init__(self, beta, A,vel_beta =None, vel_A=None):
         self.beta = beta
         self.A = A
         self.vel_beta = vel_beta
         self.vel_A = vel_A
         pass
+
+    def __str__(self):
+        return f"{self.R},{self.L}"
 
     def assign_RL(self, R, L):
         self.R = R
@@ -51,12 +48,12 @@ class Solution:
         pass
 
     def first_set_RL_MOPSO(self, R, L):
-        self.best_beta = self.beta
-        self.best_A = self.A
         self.R = R
         self.L = L
         self.obj = [-self.R, self.L]
 
+        self.best_beta = self.beta
+        self.best_A = self.A
         self.best_R = R
         self.best_L = L
         self.best_obj = [-self.best_R, self.best_L]
@@ -70,13 +67,13 @@ class Solution:
         self.best_obj = [-self.best_R, self.best_L]
         pass
     
-    def update_best_pos_obj(self,pos_candi):
+    def update_best_pos_obj_MOPSO(self,pos_candi):
         if pos_candi.dominates(self):
-            self.set_best_pos_obj(pos_candi.beta,pos_candi.A,pos_candi.R,pos_candi.L)
+            self.set_best_pos_obj_MOPSO(pos_candi.beta,pos_candi.A,pos_candi.R,pos_candi.L)
             return True
         elif not self.dominates(pos_candi):
             if np.random.random() > 0.5:
-                self.set_best_pos_obj(pos_candi.beta,pos_candi.A,pos_candi.R,pos_candi.L)
+                self.set_best_pos_obj_MOPSO(pos_candi.beta,pos_candi.A,pos_candi.R,pos_candi.L)
                 return True
         return False
 
@@ -116,7 +113,7 @@ def non_dominated_sorting(P, serialize = False):
             if i!=j:
                 if P[i].dominates(P[j]):
                     P[j].domination_count += 1
-    sorted(P[i], key=lambda p:p.domination_count)
+    P = sorted(P, key=lambda p:p.domination_count)
 
     F_list = [[P[0]]]
     last_dom_c, i =P[0].domination_count,1
@@ -126,6 +123,7 @@ def non_dominated_sorting(P, serialize = False):
         else:
             F_list.append([P[i]])
             last_dom_c = P[i].domination_count
+        i+=1
     
     F_list_return = []
     if serialize:
@@ -147,7 +145,7 @@ def compute_crowding_distance(P, is_nondominant=False, serialize=False, to_sort=
         for p in F_i:
             p.crowding_distance = 0
         for j in range(2):
-            sorted(F_i,key= lambda p: p.obj[j])
+            F_i = sorted(F_i,key= lambda p: p.obj[j])
             for k in range(1, len(F_i)-1):
                 F_i[k].crowding_distance += abs(F_i[k +1].obj[j]-F_i[k-1].obj[j])
             F_i[0].crowding_distance = np.inf
@@ -155,7 +153,7 @@ def compute_crowding_distance(P, is_nondominant=False, serialize=False, to_sort=
     
     if is_nondominant:
         if to_sort:
-            sorted(F_list[0], key=lambda p:p.crowding_distance)
+            F_list[0] = sorted(F_list[0], key=lambda p:p.crowding_distance)
         return F_list[0]
     else:
         if serialize:

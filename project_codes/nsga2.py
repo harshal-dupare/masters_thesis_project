@@ -40,48 +40,19 @@ class NSGA2:
 
         return sample
     
-    def get_offspring_population(self, N, P, p_c,p_m, p_t,mutation_step_size,use_reg_for_crossover):
+    def get_offspring_population(self, N, P, p_c, p_m, p_t, mutation_step_size,crossover_step_size, use_reg_for_crossover):
         C = []
-        for i in range(N/2):
-            sids = self.get_binary_tournament_selection(2,N,p_t)
+        for i in range(N//2):
+            sids = list(self.get_binary_tournament_selection(2,N,p_t))
             S1, S2 = P[sids[0]], P[sids[1]]
 
             if np.random.random() < p_c:
-                S1,S2 = self.crossover(S1,S2,use_reg_for_crossover)
+                S1,S2 = self.crossover(S1,S2,crossover_step_size, use_reg_for_crossover)
             if np.random.random() < p_m:
                 S1 = self.mutate(S1,mutation_step_size)
                 S2 = self.mutate(S2,mutation_step_size)
+            C += [S1,S2]
         return C
-
-    def run(self, N, G, p_c, p_m,p_t, mutation_step_size,crossover_step_size,use_reg_for_crossover:bool):
-        """
-        p_t ~ 1/n add a factor of n to algorithm i.e. 1/p_t so keep p_t constant
-        """
-        assert(N%2==0)
-        P = self.get_random_solution_population(N)
-        for p in P:
-            _R = self.data_handler.compute_reward(p.beta,p.A)
-            _L = self.data_handler.compute_loss(p.beta,p.A)
-            p.first_set_RL_NSGA(_R,_L)
-        P = non_dominated_sorting(P,True)
-        for gen in tqdm(range(G), desc="Generation of NSGA2"):
-            C = self.get_offspring_population(N, P, p_c, p_m,p_t,mutation_step_size,crossover_step_size, use_reg_for_crossover)
-            for c in C:
-                _R = self.data_handler.compute_reward(c.beta,c.A)
-                _L = self.data_handler.compute_loss(c.beta,c.A)
-                c.first_set_RL_NSGA(_R,_L)
-            F_list = non_dominated_sorting(P+C)
-            P = []
-            n_gen = len(F_list)
-            i = 0
-            while i < n_gen and len(P)+len(F_list[i]) < N:
-                P += F_list[i]
-                i += 1
-            if len(P) < N and i < n_gen:
-                F_list[i] = compute_crowding_distance(F_list[i],True)
-                sorted(F_list[i], key = lambda p:p.crowding_distance)
-                P += F_list[i][:N-len(P)]
-        return P
 
     def crossover(self,S1:Solution,S2:Solution,crossover_step_size,use_reg_for_crossover):
         C1, C2 = copy.deepcopy(S1), copy.deepcopy(S2)
@@ -90,8 +61,8 @@ class NSGA2:
         T_2 =  0.5*(-np.matmul(deltaA.T,C2.A) + np.matmul(C2.A.T,deltaA))
         Q1 = cayley_transformation(T_1)
         Q2 = cayley_transformation(T_2)
-        C1.A = C1.A*Q1
-        C2.A = C2.A*Q2
+        C1.A = np.matmul(C1.A,Q1)
+        C2.A = np.matmul(C2.A,Q2)
 
         deltabeta = crossover_step_size*(C2.beta -C1.beta)
         if use_reg_for_crossover:
@@ -108,6 +79,43 @@ class NSGA2:
         deltaA = random_matrix((self.d,self.k))
         T_ =  0.5*mutation_step_size*(np.matmul(deltaA.T,Sm.A) - np.matmul(Sm.A.T,deltaA))
         Q =  cayley_transformation(T_)
-        Sm.A = Sm.A*Q
+        Sm.A = np.matmul(Sm.A,Q)
         Sm.beta = Sm.beta+mutation_step_size*deltabeta
         return Sm
+
+    def run(self, N, G, p_c, p_m,p_t, mutation_step_size,crossover_step_size,use_reg_for_crossover:bool,logger:Logger=None):
+        """
+        p_t ~ 1/n add a factor of n to algorithm i.e. 1/p_t so keep p_t constant
+        """
+        assert(N%2==0)
+        P = self.get_random_solution_population(N)
+        for p in P:
+            _R = self.data_handler.compute_reward(p.beta,p.A)
+            _L = self.data_handler.compute_loss(p.beta,p.A)
+            p.first_set_RL_NSGA(_R,_L)
+        P = non_dominated_sorting(P,True)
+        if logger is not None:
+            logger.log_EA_Population(0,P)
+        for gen in tqdm(range(G), desc="Generation of NSGA2"):
+            C = self.get_offspring_population(N, P, p_c, p_m,p_t,mutation_step_size,crossover_step_size, use_reg_for_crossover)
+            for c in C:
+                _R = self.data_handler.compute_reward(c.beta,c.A)
+                _L = self.data_handler.compute_loss(c.beta,c.A)
+                c.first_set_RL_NSGA(_R,_L)
+            F_list = non_dominated_sorting(P+C)
+            _P = []
+            n_gen = len(F_list)
+            i = 0
+            while i < n_gen and len(_P)+len(F_list[i]) < N:
+                _P += F_list[i]
+                i += 1
+            if len(_P) < N and i < n_gen:
+                F_list[i] = compute_crowding_distance(F_list[i],is_nondominant=True,serialize=False,to_sort=True)
+                _P += F_list[i][-(N-len(_P)):]
+            if logger is not None:
+                logger.log_EA_Population(gen+1,_P)
+            P = _P
+        return P
+    
+    def get_string(self, N, G, p_c, p_m, p_t, mutation_step_size,crossover_step_size, use_reg_for_crossover):
+        return f"NSGAII[{1*use_reg_for_crossover},{N},{G},{int(1000*p_c)},{int(1000*p_m)},{int(1000*p_t)},{int(1000*mutation_step_size)},{int(1000*crossover_step_size)}]"

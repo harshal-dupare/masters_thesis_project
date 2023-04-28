@@ -13,11 +13,14 @@ class Baseline_Method:
         self.data_handler = data_handler
         pass
 
+    def get_string(self):
+        return "baseline"
+        
     def run(self, iter_max=100, logger:Logger=None):
         beta_opt = None
         A_opt = None
         R_opt = -float('inf')
-        R_opt = float('inf')
+        L_opt = float('inf')
         for iter in tqdm(range(iter_max), desc='Baseline Method'):
             M = random_matrix((self.d, self.k))
             A = gram_schmidt_algorithm(M)
@@ -25,7 +28,7 @@ class Baseline_Method:
             R = self.data_handler.compute_reward(beta, A)
             L = self.data_handler.compute_loss(beta, A)
             if logger is not None:
-              logger.log_RL(R,L)
+                logger.log_RLO(R,L,self.data_handler.compute_orthogonal_condition_normF(A))
             if R > R_opt:
                 beta_opt = beta
                 A_opt = A

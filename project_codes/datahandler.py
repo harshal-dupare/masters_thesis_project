@@ -47,6 +47,9 @@ class Data_Handler:
         self._compute_optimizers()
         pass
 
+    def get_string(self):
+        return f"{self.n}-{self.k}-{self.d}-{self.T}-{self.S}"
+
     def _compute_optimizers(self):
         self.sum_RtdTRtd_dT_altD = np.zeros((self.d, self.d))  # d x d
         self.sum_RtdTRt_dT_altN = np.zeros((self.d, 1))  # d x 1

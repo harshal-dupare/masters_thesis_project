@@ -1,8 +1,6 @@
 import numpy as np
 from tqdm import tqdm
 from datahandler import *
-from logger import *
-
 
 class U_A_Method:
     def __init__(self):
@@ -23,6 +21,8 @@ class U_A_Method_1(U_A_Method):
         O_grad_A = self.data_handler.compute_orthogonal_condition_normF_gradient_A(A)
         delta = self.weight_R*R_grad_A-self.weight_L*L_grad_A-self.weight_O*O_grad_A
         return self.learning_rate*delta
+    def get_string(self):
+        return f"U_A[{self.itter},{int(10000*self.learning_rate)},{int(10000*self.weight_R)},{int(10000*self.weight_L)},{int(10000*self.weight_O)}]"
 
 
 class U_beta_Method:
@@ -42,6 +42,8 @@ class U_beta_Method_1(U_beta_Method):
         L_grad_beta = self.data_handler.compute_loss_gradient_beta(beta, A)
         delta = self.weight_R*R_grad_beta-self.weight_L*L_grad_beta
         return self.learning_rate*delta
+    def get_string(self):
+        return f"U_beta[{self.itter},{int(10000*self.learning_rate)},{int(10000*self.weight_R)},{int(10000*self.weight_L)}]"
 class U_beta_Method_2(U_beta_Method):
     def __init__(self, phi, data_handler:Data_Handler):
         super().__init__()
@@ -61,7 +63,8 @@ class U_beta_Method_2(U_beta_Method):
         delta = (1-self.weight_reg)*self.learning_rate*delta
         delta += self.weight_reg*(beta_reg-2*beta) 
         return delta
-
+    def get_string(self):
+        return f"U_beta[{self.itter},{int(10000*self.learning_rate)},{int(10000*self.weight_R)},{int(10000*self.weight_L)},{int(10000*self.weight_reg)}]"
 
 class U_O_Method:
     def __init__(self):
@@ -98,3 +101,5 @@ class U_O_Method_1(U_O_Method):
                 beta_opt = beta_i
                 R_opt = R_i
         return beta_opt, A_opt
+    def get_string(self):
+        return f"U_O[{self.iter_max},{int(10000*self.learning_rate_A)},{int(10000*self.learning_rate_beta)},{int(10000*self.weight_reg)}]"
