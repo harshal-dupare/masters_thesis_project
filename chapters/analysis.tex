@@ -120,7 +120,7 @@ Following is the pseudocode for the method:
 \State $\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \emptyset, \emptyset, -\infty $
 \For{$i \gets 1 ... N$}
     \State $M_i \gets random(\mathbb{R}^{d\times k})$
-    \State $A_i \gets gram\_schmidt\_algorithm(M_i)$\Comment{orthonormalize $M_i$ to $A_i$}
+    \State $A_i \gets \text{gram\_schmidt\_algorithm}(M_i)$\Comment{orthonormalize $M_i$ to $A_i$}
     \State Compute $\{F^{n\times k}_{t, i}\}$ for $A_i$ over $t\in [d,T]$
     \State $\beta_i \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t, i}\}, t\in [d,T])$
     \If{$\mathcal{R}_{\beta_i, A_i} > \mathcal{R}_{optimal}$}  \Comment{update the optimal if better solution found}
@@ -128,10 +128,10 @@ Following is the pseudocode for the method:
     \EndIf 
 \EndFor
 \State \Return  $\beta_{optimal}, A_{optimal}$
-\State \textbf{complexity: } $O(N(dk+dk^2+ndS+d^2k)) = 
- O(Nd(dk+nS))$
+\State \textbf{complexity: } $O(N(dk+d^2k+ndS+k^3)) = 
+ O(N(k^3+ndS))$
 \end{algorithmic}
-\end{algorithm} In an alternate implementation of this algorithms we can even do grid search over the entries of $A$, but because $A\in \mathbb{R}^{d\times k}$, which is a very large space we restrict this method over randomized search. Note that the step $5,6$ together only take $O(d^2k)$ time with one time overhead of $O(Tndk)$ as we can compute $\mathbf{D}, \mathbf{N}$ as in \ref{regg_D}, \ref{regg_N}, then $A$ compute $\beta$ with just 4 matrix multiplications and 1 matrix inversion taking $O(d^2k)$ operations.
+\end{algorithm} In an alternate implementation of this algorithms we can even do grid search over the entries of $A$, but because $A\in \mathbb{R}^{d\times k}$, which is a very large space we restrict this method over randomized search. Note that the step $5,6$ together only take $O(k^3+d^2k)$ time with one time overhead of $O(Tndk)$ as we can compute $\mathbf{D}, \mathbf{N}$ as in \ref{regg_D}, \ref{regg_N}, then $A$ compute $\beta$ with just 4 matrix multiplications and 1 matrix inversion taking $O(k^3)$ operations.
 \level{3}{Gradient Based Methods}
 To compute the partial derivatives of the loss function $\mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}$ with respect to $A^{d\times k}$ and $\beta^{k \times 1}$, we will use the chain rule and the derivative of the matrix multiplication.\newline \newline first, let's compute the derivative of $\mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}$ with respect to $\beta^{k \times 1}$. Lets Define $\Delta_t = R^{n\times 1}_t-R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}$
 \begin{equation}
@@ -284,8 +284,8 @@ using which we can write
 \caption{$\mathcal{A}_{1}[N,\mathcal{U_{A}},\mathcal{U_{\beta}}]$ : Orthogonal Property Iterative Scheme (OPI Scheme)}\label{lfm_orthogonal_property_iterative_scheme}
 \begin{algorithmic}[1]
 \State $A_{0} \gets random(\mathbb{R}^{d\times k}) $
-\State $A_{0} \gets gram\_schmidt\_algorithm(A_0)$\Comment{orthonormalize $A_0$, as $A_0 \in \mathcal{O}_d^k $}
-\State $\beta_0 \gets \mathcal{U_{\beta}}[\vec{\phi}](\mathcal{R}_{\beta, A},\mathcal{L}_{\beta, A},\Vec{0},\Vec{0},A_{0})$
+\State $A_{0} \gets \text{gram\_schmidt\_algorithm}(A_0)$\Comment{orthonormalize $A_0$, as $A_0 \in \mathcal{O}_d^k $}
+\State $\beta_0 \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t}[A_0]\}, t\in [d,T])$
 \For{$i \gets 0$ to $N-1$}
     \State $ \Delta A_i \gets \mathcal{U_{A}}[\vec{\alpha}](\mathcal{R}_{\beta, A},\mathcal{L}_{\beta, A},\beta_i,A_i)-A_i$
     \State $2T_i \gets \Delta A_i^\top A_i- A_i^\top \Delta A_i$
@@ -294,14 +294,14 @@ using which we can write
     \State $\beta_{i+1} \gets \mathcal{U_{\beta}}[\vec{\phi}](\mathcal{R}_{\beta, A},\mathcal{L}_{\beta, A},\beta_{i}, A_{i}, A_{i+1})$
 \EndFor
 \State \Return $\beta_{N},A_{N}$
-\State \textbf{complexity: } $O(N(dk^2+|\mathcal{U_{A}}[\vec{\alpha}]|+|\mathcal{U_{\beta}}[\vec{\phi}]|))$
+\State \textbf{complexity: } $O(N(|\mathcal{U_{A}}[\vec{\alpha}]|+k^2d+k^3+k^2d+|\mathcal{U_{\beta}}[\vec{\phi}]|)) =O(N(|\mathcal{U_{A}}[\vec{\alpha}]|+k^3+|\mathcal{U_{\beta}}[\vec{\phi}]|)) $
 \end{algorithmic}
 \end{algorithm} for the second case were we relax the Condition on $A \in \mathcal{O}_d^k$ to $A \in \mathbb{R}^{d\times k}$ we can write a general iterative scheme as follows
 \begin{algorithm}[H]
 \caption{$\mathcal{A}_{2}[N,\mathcal{U_{A}},\mathcal{U_{\beta}}, \mathcal{U_{O}}]$ : Delayed Orthogonalization Iterative Scheme (DOI Scheme)}\label{lfm_orthogonal_property_iterative_scheme}
 \begin{algorithmic}[1]
 \State $A_{0} \gets random(\mathbb{R}^{d\times k}) $
-\State $\beta_0 \gets \mathcal{U_{\vec{\beta}}}[\vec{\phi}](\mathcal{R}_{\beta, A},\mathcal{L}_{\beta, A},\Vec{0},\Vec{0},A_{0})$
+\State $\beta_0 \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t}[A_0]\}, t\in [d,T])$
 \For{$i \gets 0$ to $N-1$}
     \State $A_{i+1} \gets  \mathcal{U_{A}}[\vec{\alpha}](\mathcal{R}_{\beta, A},\mathcal{L}_{\beta, A},\beta_i,A_i)$
     \State $\beta_{i+1} \gets \mathcal{U_{\beta}}[\vec{\phi}](\mathcal{R}_{\beta, A},\mathcal{L}_{\beta, A},\beta_{i}, A_{i}, A_{i+1})$
@@ -354,22 +354,21 @@ using which we can write
 \end{aligned}
 \end{equation}
 \hspace{2mm} \newline \textbf{For $\mathcal{U_{O}}[\vec{\lambda}](\mathcal{R}_{\beta, A},\mathcal{L}_{\beta, A},\beta^{*},A^{*})$}
-\newline Here $\vec{\lambda} = (\lambda_0,\lambda_1,\lambda_2)$ where $\lambda_0$ is the number of iterations, $\lambda_1$ is the step size for update in $A$, $\lambda_2$ is the step size for update in $\beta$ and set $N = \lambda_0$ .
+\newline Here $\vec{\lambda} = (\lambda_0,\lambda_1,\lambda_2, \lambda_3)$ where $\lambda_0$ is the number of iterations, $\lambda_1$ is the step size for update in $A$, $\lambda_2$ is the step size for update in $\beta$, $\lambda_3$ is the weight of regression change, and let $N = \lambda_0$ .
 \begin{algorithm}[H]
 \caption{$\mathcal{U}^{1}_{O}[\vec{\lambda}](\mathcal{R}_{\beta, A},\mathcal{L}_{\beta, A},\beta^{*},A^{*})$ : Iterative Closing Method}\label{lfm_baseline_method}
 \begin{algorithmic}[1]
 \State $A \gets random(\mathbb{R}^{d\times k})$
-\State $A \gets gram\_schmidt\_algorithm(A)$\Comment{orthonormalize $A$}
-\State Compute $\{F^{n\times k}_{t}\}$ for $A$ over $t\in [d,T]$
-\State $\beta \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t}\}, t\in [d,T])$
+\State $A \gets \text{gram\_schmidt\_algorithm}(A)$\Comment{orthonormalize $A$}
+\State $\beta \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t}[A]\}, t\in [d,T])$
 \State $\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \beta, A, \mathcal{R}_{\beta, A}$
 \For{$i \gets 1$ to $N$}
     \State $\Delta A \gets A^{*} - A$
-    \State $Q \gets \text{cayley\_transformation}(\frac{\lambda_1}{2} \Delta A)$ \Comment{Where $\vec{\lambda} = (\lambda_1)$}
+    \State $Q \gets \text{ortho\_cayley\_transformation}(\frac{\lambda_1}{2} \Delta A)$
     \State $A \gets AQ$
-    \State Compute $\{F^{n\times k}_{t}\}$ for $A$ over $t\in [d,T]$
-    \State $\beta \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t}\}, t\in [d,T])$
-    \State $\beta \gets \beta + \lambda_2 \frac{\partial \mathcal{R}_{\beta_i, A_{i}}}{\partial \beta} $
+    \State $\beta_{reg} \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t}[A]\}, t\in [d,T])$
+    \State $\Delta \beta \gets (1-\lambda_3)\frac{\partial \mathcal{R}_{\beta, A}}{\partial \beta} + \lambda_3 (\beta_{reg}-beta)$
+    \State $\beta \gets \beta + \lambda_2 \Delta \beta$
     \If{$\mathcal{R}_{\beta, A} > \mathcal{R}_{optimal}$}  \Comment{update the optimal if better solution found}
         \State $\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \beta, A, \mathcal{R}_{\beta, A} $
     \EndIf 
@@ -485,10 +484,12 @@ We need to define the 2 sub-procedure namely non\_dominated\_sorting$(P)$ and th
 \begin{algorithmic}[1]
 \Require{$A_1, A_2 \in \mathcal{O}^{k}_{d}$}
 \State $(\beta_1, A_1), (\beta_2, A_2)\gets S_1, S_2$
-\State $A^{'}_1, A^{'}_2\gets gram\_schmidt\_algorithm(\frac{A_1+A_2}{2}), gram\_schmidt\_algorithm(\frac{A_1-A_2}{2})$
-\State $\beta^{'}_1, \beta^{'}_2 \gets \frac{\beta_1+\beta_2}{2}, \frac{\beta_1-\beta_2}{2}$
+\State $\Delta A_1, \Delta A_2 \gets (A_2-A_1), (A_1-A_2)$
+\State $Q_1, Q_2 \gets \text{ortho\_cayley\_transformation}(\frac{\lambda}{2} \Delta A_1), \text{ortho\_cayley\_transformation}(\frac{\lambda}{2} \Delta A_2)$
+\State $A^{'}_1, A^{'}_2\gets A_1Q_1, A_2Q_2$
+\State $\beta^{'}_1, \beta^{'}_2 \gets \beta_1 + \lambda(\beta_2-\beta_1), \beta_2 + \lambda(\beta_1-\beta_2)$
 \State \Return $(\beta^{'}_1,A^{'}_1),(\beta^{'}_2,A^{'}_2)$
-\State \textbf{complexity: } $O(dk^2)$
+\State \textbf{complexity: } $O(d^2k)$
 \end{algorithmic}
 \end{algorithm}
 \begin{algorithm}[H]
@@ -496,11 +497,11 @@ We need to define the 2 sub-procedure namely non\_dominated\_sorting$(P)$ and th
 \begin{algorithmic}[1]
 \Require{$A_1, A_2 \in \mathcal{O}^{k}_{d}$}
 \State $(\beta_1, A_1), (\beta_2, A_2)\gets S_1, S_2$
-\State $A^{'}_1, A^{'}_2\gets gram\_schmidt\_algorithm(\frac{A_1+A_2}{2}), gram\_schmidt\_algorithm(\frac{A_1-A_2}{2})$
-\State Compute $\{F^{n\times k}_{t, i}\}$ for $A^{'}_i$ over $t\in [d,T]$ for $i\in \{1,2\}$
-\State $\beta^{'}_i \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t, i}\}, t\in [d,T])$ for $i\in \{1,2\}$
+\State $Q_1, Q_2 \gets \text{ortho\_cayley\_transformation}(\frac{\lambda}{2} \Delta A_1), \text{ortho\_cayley\_transformation}(\frac{\lambda}{2} \Delta A_2)$
+\State $A^{'}_1, A^{'}_2\gets A_1Q_1, A_2Q_2$
+\State $\beta^{'}_i \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t}[A^{'}_i]\}, t\in [d,T])$ for $i\in \{1,2\}$
 \State \Return $(\beta^{'}_1,A^{'}_1),(\beta^{'}_2,A^{'}_2)$
-\State \textbf{complexity: } $O(dk^2+d^2k) = O(d^2k$
+\State \textbf{complexity: } $O(d^2k+k^3) = O(k^3)$
 \end{algorithmic}
 \end{algorithm}
 \begin{algorithm}[H]
@@ -509,7 +510,7 @@ We need to define the 2 sub-procedure namely non\_dominated\_sorting$(P)$ and th
 \Require{$A \in \mathcal{O}^{k}_{d}$, $\lambda \in \mathbb{R}^{+}$}
 \State $(\beta, A)\gets S$
 \State $\Delta A, \Delta \beta \gets Random(\mathbb{R}^{d\times k}),Random(\mathbb{R}^{k\times 1})$
-\State $Q \gets \text{cayley\_transformation}(\frac{\lambda}{2} \Delta A)$
+\State $Q \gets \text{ortho\_cayley\_transformation}(\frac{\lambda}{2} \Delta A)$
 \State \Return $(\beta + \lambda \Delta \beta, AQ)$
 \State \textbf{complexity: } $O()$
 \end{algorithmic}
@@ -535,7 +536,7 @@ Originally developed for solving single objective optimization problems, Particl
 \State $\{ \vec{d}(\vec{a}_i)\} \gets$ crowding\_distance$(A)$ \Comment{$d(\vec{a}_i)$ : average distance to $\vec{a}_i$'s neighbors in $A$}
 \For{$t \gets 1$ to $T_{\max}$}
 \For{$i \gets 1$ to $N$}
-\State $\vec{p_g} \gets \text{get\_global\_best}(A)$ \Comment{select the global best}
+\State $\vec{p_g} \gets \text{get\_global\_best}[\theta](A)$ \Comment{select the global best}
 \State $v_i \gets \text{update\_velocity}[\omega,c_1, c_2](\vec{x}_i,\vec{v}_i,\vec{p}_i,\vec{p}_g)$
 \State $\vec{x_i} \gets \text{update\_position}[\epsilon](\vec{x}_i,\vec{v}_i)$
 \If{\textbf{True} with probability $p_m$}
@@ -548,7 +549,7 @@ Originally developed for solving single objective optimization problems, Particl
 \EndFor 
 \State $A \gets \text{nondominated\_merge}(A, \{\vec{x}_i\})$ \Comment{Update the nondominated solutions }
 \State $\{ \vec{d}(\vec{a}_i)\} \gets\text{crowding\_distance}[\textbf{True}](A)$
-\State $\{ \vec{d}(\vec{x}_i)\} \gets\text{crowding\_distance}[\textbf{True}](\{\vec{x}_i\})$
+\State $\{ \vec{d}(\vec{x}_i)\} \gets\text{crowding\_distance}[\textbf{False}](\{\vec{x}_i\})$
 \State $\{\vec{p}_i\}, \{\vec{f}(p_i)\} \gets$ \text{update\_personal\_best}$(\{\vec{p}_i\}, \{\vec{f}(p_i)\},\{\vec{x}_i\}, \{\vec{f}(x_i)\}, \{\vec{d}(x_i)\})$
 \EndFor
 \State \Return $A$
@@ -587,7 +588,7 @@ Originally developed for solving single objective optimization problems, Particl
 \begin{algorithmic}[1]
 \State $(\beta_i,A_i) \gets x_i$
 \State $(\Delta \beta_i,\Delta A_i) \gets v_i$
-\State $Q_i \gets \text{cayley\_transformation}(\frac{\epsilon}{2}\Delta A_i)$
+\State $Q_i \gets \text{ortho\_cayley\_transformation}(\frac{\epsilon}{2}\Delta A_i)$
 \State \Return $(\beta+\epsilon \Delta \beta_i,A_iQ_i)$
 \State \textbf{complexity: } $O()$
 \end{algorithmic}
@@ -600,15 +601,11 @@ Originally developed for solving single objective optimization problems, Particl
 \State $F \gets \text{nondominated}(\{\vec{x}_i\})$
 \State $F_1,F_2,...F_t \gets \text{non\_dominated\_sorting}(F\cup A)$
 \State $A , i \gets \emptyset, 1 $
-\While{$|A|+|F_i| \le M$}
-\State Calculate crowding distance for each solution in $F_i$
-\State $A \gets A \cup F_i$
-\State $i \gets i+1$
-\EndWhile
-\If{$|A| < M$}
-\State Sort $F_i$ in descending order of crowding distance
-\State $A \gets A \cup F_i[1:M-|A|]$ 
-\EndIf 
+\If{$|F_1| > M$}
+\State Sort $F_1$ in descending order of crowding distance
+\State $F_1 \gets F_1[1:M]$ 
+\EndIf
+\State \Return $F_1$
 \State \textbf{complexity: } $O()$
 \end{algorithmic}
 \end{algorithm}
@@ -620,7 +617,7 @@ Originally developed for solving single objective optimization problems, Particl
 \Require{$A_i \in \mathcal{O}^{k}_{d}$}
 \State $(\beta_i, A_i)\gets \vec{x}_i$
 \State $\Delta A_i, \Delta \beta_i \gets Random(\mathbb{R}^{d\times k}),Random(\mathbb{R}^{k\times 1})$
-\State $Q_i \gets \text{cayley\_transformation}(\frac{\lambda_1}{2} \Delta A_i)$
+\State $Q_i \gets \text{ortho\_cayley\_transformation}(\frac{\lambda_1}{2} \Delta A_i)$
 \State $\vec{x}^{'}_i\gets (\beta_i + \lambda_1 \Delta \beta_i, A_iQ_i)$
 \State $\vec{v}^{'}_i \gets (\vec{v}_i.\beta_i + \lambda_2 Random(\mathbb{R}^{k\times 1}), \vec{v}_i.A_i + \lambda_2 Random(\mathbb{R}^{d\times k}))$
 \State \Return $\vec{x}^{'}_i, \vec{v}^{'}_i$
@@ -648,18 +645,19 @@ Originally developed for solving single objective optimization problems, Particl
         \For{$k\gets 2$ to $n_i-1$ } \Comment{$F_i$ has $n_i$ solutions in it}
             \State $d(F_i[k]) \gets d(F_i[k]) + (F_i[k+1][j] - F_i[k-1][j])$
         \EndFor
+        \State $d(F_i[1]), d(F_i[n_i])  \gets \text{Max distance among all points in } F_i $
     \EndFor
-    \State $d(F_i[1]), d(F_i[n_i])  \gets \text{Max distance among all points in } F_i $
 \EndFor
 \State \textbf{complexity: } $O()$
 \end{algorithmic}
 \end{algorithm}
 
 \begin{algorithm}[H]
-\caption{$\text{get\_global\_best}(A)$}
+\caption{$\text{get\_global\_best}[\theta](A)$}
 \label{mopso:get_global_best}
 \begin{algorithmic}[1]
-\State $g \in A$, where $g$ has the highest crowding distance in $A$
+\State with probability $theta$, $ g \in A$, where $g$ has the highest crowding distance in $A$
+\State with probability $1-theta$, $ g $ is any random solution in $A$ 
 \State \Return g
 \State \textbf{complexity: } $O()$
 \end{algorithmic}
@@ -672,15 +670,15 @@ Originally developed for solving single objective optimization problems, Particl
 \State $P, V \gets \emptyset, \emptyset$
 \For{$i \gets 1$ to $N$}
     \State $A_i \gets random(\mathbb{R}^{d\times k})$
-    \State Compute $\{F^{n\times k}_{t,i}\}$ for $A_i$ over $t\in [d,T]$
-    \State $\beta_i \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t,i}\}, t\in [d,T])$
+    \State $A_i \gets \text{gram\_schmidt\_algorithm}(A_i)$
+    \State $\beta_i \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t,i}[A_i]\}, t\in [d,T])$
     \State $(\Delta \beta_i,\Delta A_i) \gets (\frac{\partial \mathcal{R}_{\beta_i, A_{i}}}{\partial \beta},\frac{\partial \mathcal{R}_{\beta_i, A_{i}}}{\partial A})$
     \State $x_i, v_i\gets (\beta_i,A_i), (\Delta \beta_i,\Delta A_i)$
     \State $P\gets P \cup \{x_i\}$
     \State $V\gets V \cup \{v_i\}$
 \EndFor
 \State \Return $P, V$
-\State \textbf{complexity: } $O(N(dk+d^2k+computing\_grads))$
+\State \textbf{complexity: } $O(N(k^3+computing\_grads))$
 \end{algorithmic}
 \end{algorithm}
 
@@ -807,7 +805,7 @@ A_{i+1} &= A_{i} - \epsilon_A ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\par
 \begin{aligned}
 \Delta A_i &= - \epsilon_A ( -(1-\mathcal{R}_{\beta_i, A_i})\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A} + \mathcal{L}_{\beta_i, A_i} \frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial A})\\
 \beta_{i+1} &= \beta_i - \epsilon_{\beta} ( -(1-\mathcal{R}_{\beta_i, A_i})\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta} + \mathcal{L}_{\beta_i, A_i} \frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial \beta})\\
-Q_i &= \hspace{2mm} \text{cayley\_transformation}(\frac{1}{2} \Delta A_i)\\
+Q_i &= \hspace{2mm} \text{ortho\_cayley\_transformation}(\frac{1}{2} \Delta A_i)\\
 A_{i+1} &= \hspace{2mm} A_i Q_i \\
 \end{aligned}    
 \end{equation}
@@ -816,7 +814,7 @@ and similarly for \ref{LMOP_1:step_1} we can write
 \begin{aligned}
 \Delta A_{i} &= - \epsilon_A ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A} )\\
 \beta_{i+1} &= \beta_i - \epsilon_{\beta} ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta} )\\
-Q_i &= \text{cayley\_transformation}(\frac{1}{2} \Delta A_i)\\
+Q_i &= \text{ortho\_cayley\_transformation}(\frac{1}{2} \Delta A_i)\\
 A_{i+1} &= A_i Q_i
 \end{aligned}    
 \end{equation}
@@ -850,7 +848,7 @@ A_{i+1} &= A_{i} - \epsilon_A ( \frac{\partial || A_iA^\top_i -I||^2_F}{2\partia
 \begin{aligned}
 \Delta A_{i} &= - \epsilon_A ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A} + C \vec{dir}(A_i-\bar{A}) max(\epsilon,||\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A}||))\\
 \beta_{i+1} &= \beta_{i} - \epsilon_{\beta} ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta} + C \vec{dir}(\beta_i-\bar{\beta}) max(\epsilon,||\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta}||))\\
-Q_i &= \hspace{2mm} \text{cayley\_transformation}(\frac{1}{2} \Delta A_i)\\
+Q_i &= \hspace{2mm} \text{ortho\_cayley\_transformation}(\frac{1}{2} \Delta A_i)\\
 A_{i+1} &= \hspace{2mm} A_i Q_i \\
 \end{aligned}    
 \end{equation}
@@ -859,11 +857,54 @@ A_{i+1} &= \hspace{2mm} A_i Q_i \\
 \begin{aligned}
 \Delta A_{i} &= - \epsilon_A ( -\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial A} + C \vec{dir}(A_i-\bar{A}) max(\epsilon,||\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial A}||))\\
 \beta_{i+1} &= \beta_{i} - \epsilon_{\beta} ( -\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial \beta} + C \vec{dir}(\beta_i-\bar{\beta}) max(\epsilon,||\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial \beta}||))\\
-Q_i &= \hspace{2mm} \text{cayley\_transformation}(\frac{1}{2} \Delta A_i)\\
+Q_i &= \hspace{2mm} \text{ortho\_cayley\_transformation}(\frac{1}{2} \Delta A_i)\\
 A_{i+1} &= \hspace{2mm} A_i Q_i \\
 \end{aligned}    
 \end{equation}
-We note that other then \ref{NPMOP_1:objective} and \ref{NPMOP_2:objective} i.e. for all other methods, other than No Preference Method we need to use CGGD method, which relies on having $\bar{A}, \bar{\beta}$ which satisfy the corresponding constraints, and due to computational limitations as to compute them at each iteration is very expensive. Hence, we will compute the solution only for No Preference Method.
+We note that other then \ref{NPMOP_1:objective} and \ref{NPMOP_2:objective} i.e. for all other methods, other than No Preference Method we need to use CGGD method, which relies on having $\bar{A}, \bar{\beta}$ which satisfy the corresponding constraints, and due to computational limitations as to compute them at each iteration is very expensive. Hence, we will compute the solution only for No Preference Method. Below is the pseudocode for both the No Preference Methods where $\vec{\mu} = (\mu_0,\mu_1,\mu_2)$ where $\mu_0$ is the number of iterations, we can also denote it by $N=\mu_0$, $\mu_1$ is the learning rate for $\A$ and $\mu_2$ is the learning rate for $\beta$.
+
+\begin{algorithm}[H]
+\caption{$NPM_1[\vec{\mu}]$ : No Preference Method 1}\label{no_preference_method_1}
+\begin{algorithmic}[1]
+\State $A \gets random(\mathbb{R}^{d\times k})$
+\State $A \gets \text{gram\_schmidt\_algorithm}(A)$\Comment{orthonormalize $A$}
+\State $\beta \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t}[A]\}, t\in [d,T])$
+\State $\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \beta, A, \mathcal{R}_{\beta, A}$
+\For{$i \gets 1$ to $N$}
+    \State $\Delta A \gets (1-\mathcal{R}_{\beta, A})\frac{\partial \mathcal{R}_{\beta, A}}{\partial A} - \mathcal{L}_{\beta, A} \frac{\partial \mathcal{L}_{\beta, A}}{\partial A}- \frac{1}{2}\frac{\partial ||AA^\top -I||^2_F}{\partial A} $
+    \State $\Delta \beta \gets (1-\mathcal{R}_{\beta, A})\frac{\partial \mathcal{R}_{\beta, A}}{\partial \beta} - \mathcal{L}_{\beta, A} \frac{\partial \mathcal{L}_{\beta, A}}{\partial \beta} $
+    \State $Q \gets \text{ortho\_cayley\_transformation}(\frac{\mu_1}{2} \Delta A)$
+    \State $A \gets AQ$
+    \State $\beta \gets \beta + \mu_2 \Delta \beta$
+    \If{$\mathcal{R}_{\beta, A} > \mathcal{R}_{optimal}$}  \Comment{update the optimal if better solution found}
+        \State $\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \beta, A, \mathcal{R}_{\beta, A} $
+    \EndIf 
+\EndFor
+\State \Return  $\beta_{optimal}, A_{optimal}$
+\State \textbf{complexity: } $O()$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{$NPM_2[\vec{\mu}]$ : No Preference Method 2}\label{no_preference_method_2}
+\begin{algorithmic}[1]
+\State $A \gets random(\mathbb{R}^{d\times k})$
+\State $A \gets \text{gram\_schmidt\_algorithm}(A)$\Comment{orthonormalize $A$}
+\State $\beta \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t}[A]\}, t\in [d,T])$
+\State $\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \beta, A, \mathcal{R}_{\beta, A}$
+\For{$i \gets 1$ to $N$}
+    \State $\Delta A \gets (1-\mathcal{R}_{\beta, A})\frac{\partial \mathcal{R}_{\beta, A}}{\partial A} - \mathcal{L}_{\beta, A} \frac{\partial \mathcal{L}_{\beta, A}}{\partial A}- \frac{1}{2}\frac{\partial ||AA^\top -I||^2_F}{\partial A} $
+    \State $\Delta \beta \gets (1-\mathcal{R}_{\beta, A})\frac{\partial \mathcal{R}_{\beta, A}}{\partial \beta} - \mathcal{L}_{\beta, A} \frac{\partial \mathcal{L}_{\beta, A}}{\partial \beta} $
+    \State $A \gets A + \mu_1 \Delta A$
+    \State $\beta \gets \beta + \mu_2 \Delta \beta$
+    \If{$\mathcal{R}_{\beta, A} > \mathcal{R}_{optimal}$}  \Comment{update the optimal if better solution found}
+        \State $\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \beta, A, \mathcal{R}_{\beta, A} $
+    \EndIf 
+\EndFor
+\State \Return  $\beta_{optimal}, A_{optimal}$
+\State \textbf{complexity: } $O()$
+\end{algorithmic}
+\end{algorithm}
 
 % %% Condition number part
 % \level{3}{Condition Number Relaxation}
