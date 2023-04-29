@@ -161,8 +161,16 @@ class Data_Handler:
         O(d^2k+k^3) = O(k^3)
         """
         beta = np.matmul(np.matmul(A.T,self.sum_RtdTRtd_dT_altD),A)
-        beta = np.linalg.inv(beta)
-        beta = np.matmul(beta, np.matmul(A.T,self.sum_RtdTRt_dT_altN))
-        return beta
+        try:
+            beta = np.linalg.inv(beta)
+            beta = np.matmul(beta, np.matmul(A.T,self.sum_RtdTRt_dT_altN))
+            return beta
+        except:
+            print(f"faced error")
+            print(f"going for least squared method to solve it")
+            gamma = np.matmul(A.T,self.sum_RtdTRt_dT_altN)
+            beta = np.linalg.lstsq(beta,gamma)
+            return beta
+
 
 
