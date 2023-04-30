@@ -14,7 +14,7 @@ from ea_helpers import *
 class PlotSettings:
     def __init__(self, x_axis = 'R',y_axis = '-logO',z_axis = '-logL', alpha=0.5, s=100, ec='none', use_xyz_limits=False, lam=1.2, remove_outliers=False,
                  outlier_tail_lower=0.025, outlier_tail_upper=0.025, cmap='cool', plot_style='seaborn', dpi=300,
-                 x_scale='linear', y_scale='linear', duration=200, traj_font_size=20, plot_size=(20,16), 
+                 x_scale='linear', y_scale='linear', duration=200, traj_font_size=14, plot_size=(20,16), 
                  three_d_plot_elev=20, three_d_plot_azim=45, traj_color='blue', traj_arrow_size=1,
                  traj_arrow_length_ratio=0.1, traj_alpha=0.8, traj_linewidths=0.5, traj_edgecolors='k', 
                  traj_pivot='tip', traj_lines_linewidth=2, two_d_traj_scale=1, two_d_traj_width=0.005, use_quiver = True):
@@ -50,6 +50,13 @@ class PlotSettings:
         self._2d_traj_scale = two_d_traj_scale
         self._2d_traj_width = two_d_traj_width
         self._use_quiver = use_quiver 
+        tab20 = plt.get_cmap('tab20')
+        self.color_names = [tab20.colors[i] for i in range(tab20.N)]
+        self.swap_buffer = None
+
+    def store_in_buffer(self,var):
+        self.swap_buffer = var
+        return
 
 class Logger:
     def __init__(self, log_name: str, data_handler: Data_Handler, _img_save_folder=None):
@@ -178,9 +185,7 @@ class Logger:
                                          [val for val in list(df['L']) if str(val) != 'nan'],
                                          [val for val in list(df['O']) if str(val) != 'nan']]
         return
-    # RESULTS MAKING END
 
-    # STATS
     def compute_core_statistics(self, folder, last_from_list__=200, beyond_gen_iter=10):
         if len(self.list_L) > 0:
             df = pd.DataFrame()
@@ -293,6 +298,8 @@ class Logger:
             grouped_df.to_csv(fpath)
             print(f" {fname} : dumped change gen EAarchiveROL")
 
+    # RESULTS MAKING END
+    
     # PLOTTING
 
     # MAIN
@@ -305,7 +312,7 @@ class Logger:
             df = self.remove_duplicates_lossy(df)
 
             self.scatter_plot_2d_3d(df,plotsetting)
-            self.dist_plots(df,plotsetting)
+            self.dist_plot(df,plotsetting)
 
         if len(self.RLO_iter_logs) > 0:
             from_dict = self.RLO_iter_logs
@@ -443,9 +450,8 @@ class Logger:
         plt.show()
         pass
 
-    def dist_plots(self, df, plotsetting):
+    def dist_plot(self, df, plotsetting):
         pass
-
 
     def plot_trajectory_3d(self, df, ax, plotsetting):
         # Extract x, y, z coordinates from DataFrame
@@ -464,7 +470,7 @@ class Logger:
                         pivot=plotsetting._traj_pivot, linewidths=plotsetting._traj_linewidths, edgecolors=plotsetting._traj_edgecolors,
                         alpha=plotsetting._traj_alpha, length=plotsetting._traj_arrow_size)
 
-    def progress_line_plots_3d(self, df, grouping_type, plotsetting):
+    def progress_line_plots_3d(self, df, grouping_type, plotsetting:PlotSettings):
         def modify_ax(_ax,_title_name, _legend_list=[]):
             if plotsetting._use_xyz_limits:
                 limits = self.get_plotting_limits(df, plotsetting)
@@ -532,10 +538,15 @@ class Logger:
             fig = plt.figure(figsize=plotsetting._plot_size)
             ax = fig.add_subplot(111, projection='3d')
             legends_list = []
+            counter_i = 0
             for k, dfv in df_dict.items():
                 # need way too increment color # TODO
+                plotsetting.store_in_buffer(plotsetting._traj_color)
+                plotsetting._traj_color = plotsetting.color_names[counter_i%len(plotsetting.color_names)]
                 self.plot_trajectory_3d(dfv, ax, plotsetting)
+                plotsetting._traj_color = plotsetting.swap_buffer
                 legends_list += [f"attempt {k}"]
+                counter_i+=1
 
             # Set plot title and labels
             title_name = f"{self.log_name} trajectories"
@@ -647,10 +658,15 @@ class Logger:
                     fig = plt.figure(figsize=plotsetting._plot_size)
                     ax = fig.add_subplot(111)
                     legends_list = []
+                    counter_i = 0
                     for k, dfv in df_dict.items():
                         # need way too increment color # TODO
+                        plotsetting.store_in_buffer(plotsetting._traj_color)
+                        plotsetting._traj_color = plotsetting.color_names[counter_i%len(plotsetting.color_names)]
                         self.plot_trajectory_2d(dfv, ax, plotsetting)
+                        plotsetting._traj_color = plotsetting.swap_buffer
                         legends_list += [f"attempt {k}"]
+                        counter_i+=1
 
                     title_name =  f"{self.log_name} trajectories {plotsetting._x_axis} {plotsetting._y_axis}"
                     modify_ax(ax,title_name,legends_list)
@@ -707,35 +723,26 @@ class Logger:
         if plotsetting._use_xyz_limits:
             limits = self.get_plotting_limits(df, plotsetting)
 
-        @gif.frame
-        def plot(gen, x, y):
-            fig, ax = plt.subplots()
-            ax.scatter(x=x, y=y, color='red')
-            if plotsetting._use_xyz_limits:
-                ax.set_xlim((limits['low'][plotsetting._x_axis], limits['high'][plotsetting._x_axis]))
-                ax.set_ylim((limits['low'][plotsetting._y_axis], limits['high'][plotsetting._y_axis]))
-            ax.set_xlabel(plotsetting._x_axis)
-            ax.set_ylabel(plotsetting._y_axis)
-            ax.set_yscale(plotsetting._y_scale)
-            ax.set_xscale(plotsetting._x_scale)
-            title = f"{self.log_name} Generation : {gen}"
-            ax.set_title(title)
-
-        def save_plot(gen, x, y):
-            fig, ax = plt.subplots()
-            ax.scatter(x=x, y=y, color='red')
-            if plotsetting._use_xyz_limits:
-                ax.set_xlim((limits['low'][plotsetting._x_axis], limits['high'][plotsetting._x_axis]))
-                ax.set_ylim((limits['low'][plotsetting._y_axis], limits['high'][plotsetting._y_axis]))
-            ax.set_xlabel(plotsetting._x_axis)
-            ax.set_ylabel(plotsetting._y_axis)
-            ax.set_yscale(plotsetting._y_scale)
-            ax.set_xscale(plotsetting._x_scale)
-            title = f"{self.log_name} Generation : {gen}"
-            ax.set_title(title)
-            fname = title +f"-{plotsetting._x_axis}-{plotsetting._y_axis}"+ ".png"
+        def _save_plot(title):
+            fname = title + f"-{plotsetting._x_axis}-{plotsetting._y_axis}"+ ".png"
             fname = os.path.join(self.IMAGE_SAVE_FOLDER, fname)
             plt.savefig(fname, plotsetting._dpi)
+
+        @gif.frame
+        def plot(gen, x, y, to_save_plot = False):
+            fig, ax = plt.subplots()
+            ax.scatter(x=x, y=y, color='red')
+            if plotsetting._use_xyz_limits:
+                ax.set_xlim((limits['low'][plotsetting._x_axis], limits['high'][plotsetting._x_axis]))
+                ax.set_ylim((limits['low'][plotsetting._y_axis], limits['high'][plotsetting._y_axis]))
+            ax.set_xlabel(plotsetting._x_axis)
+            ax.set_ylabel(plotsetting._y_axis)
+            ax.set_yscale(plotsetting._y_scale)
+            ax.set_xscale(plotsetting._x_scale)
+            title = f"{self.log_name} Generation : {gen}"
+            ax.set_title(title)
+            if to_save_plot:
+                _save_plot(title)
 
         frames = []
         grp = df.groupby('gen')
@@ -744,7 +751,7 @@ class Logger:
             _x = df_grp_key[plotsetting._x_axis]
             _y = df_grp_key[plotsetting._y_axis]
             frames += [plot(grp_key, _x, _y)]
-            save_plot(grp_key, _x, _y)
+            plot(grp_key,_x,_y,to_save_plot=True)
 
         fname = f"{self.log_name}-{plotsetting._x_axis}-{plotsetting._y_axis}" + ".gif"
         fname = os.path.join(self.IMAGE_SAVE_FOLDER, fname)
@@ -770,8 +777,13 @@ class Logger:
             # give different color for each point
             color_of_point += ['red']
 
+        def _save_plot(title):
+            fname = title + f"-{plotsetting._x_axis}-{plotsetting._y_axis}"+ ".png"
+            fname = os.path.join(self.IMAGE_SAVE_FOLDER, fname)
+            plt.savefig(fname, plotsetting._dpi)
+
         @gif.frame
-        def plot(gen):
+        def plot(gen, to_save_plot = False):
             fig, ax = plt.subplots()
             list_point_xs = []
             list_point_ys = []
@@ -795,41 +807,15 @@ class Logger:
             ax.set_xscale(plotsetting._x_scale)
             title = f"{self.log_name} motion of solutions : {gen}"
             ax.set_title(title)
-
-        def save_plot(gen):
-            fig, ax = plt.subplots()
-            list_point_xs = []
-            list_point_ys = []
-            metric = []
-            for point in range(points_count):
-                list_point_xs += [[df_list[gg][plotsetting._x_axis][point]for gg in range(gen-1, gen+1)]]
-                list_point_ys += [[df_list[gg][plotsetting._y_axis][point] for gg in range(gen-1, gen+1)]]
-                metric += [((list_point_xs[-1][1]-list_point_xs[-1][0])**2+(list_point_ys[-1][1]-list_point_ys[-1][0])**2)**0.5]
-            q25q75 = pd.DataFrame(metric).quantile([0.25,0.75])
-            
-            for p in range(len(points_count)):
-                if metric[p] > 2.5*q25q75[1]-1.5*q25q75[0]:
-                    continue
-                ax.plot(list_point_xs[p], list_point_ys[p],color=color_of_point[p])
-                if plotsetting._use_xyz_limits:
-                    ax.set_xlim((limits['low'][plotsetting._x_axis],
-                                limits['high'][plotsetting._x_axis]))
-                    ax.set_ylim((limits['low'][plotsetting._y_axis],
-                                limits['high'][plotsetting._y_axis]))
-            ax.set_xlabel(plotsetting._x_axis)
-            ax.set_ylabel(plotsetting._y_axis)
-            ax.set_yscale(plotsetting._y_scale)
-            ax.set_xscale(plotsetting._x_scale)
-            title = f"{self.log_name} motion of solutions : {gen}"
-            ax.set_title(title)
-            fname = title + f"-{plotsetting._x_axis}-{plotsetting._y_axis}"+ ".png"
-            fname = os.path.join(self.IMAGE_SAVE_FOLDER, fname)
-            plt.savefig(fname, plotsetting._dpi)
+            if to_save_plot:
+                _save_plot(title)
 
         frames = []
         for gen_i in range(1, gen_max-1):
             frames += [plot(gen_i)]
-            save_plot(gen_i)
+        
+        for gen_i in range(1, gen_max-1):
+            plot(gen_i,to_save_plot=True)
 
         fname = f"{self.log_name}-{plotsetting._x_axis}-{plotsetting._y_axis}" + ".gif"
         fname = os.path.join(self.IMAGE_SAVE_FOLDER, fname)
@@ -848,7 +834,7 @@ class Logger:
             plt.savefig(file_name)
         plt.show()
 
-    def dist_plot(self, save=False, filename='distplot.png'):
+    def distribution_plot(self, save=False, filename='distplot.png'):
         fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(10, 4))
         sns.set_style('whitegrid')
         sns.distplot(self.list_R, label='Reward', ax=ax1)
