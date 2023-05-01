@@ -12,7 +12,7 @@ As we will see that lot of research has been done in solving MOOP and we have fa
 % Connect the dots with regularizations using scalarization//
 
 % In this chapter, we will review some of the related literature. Several datasets have been collected from various social media platforms such as Twitter, Facebook, Reddit ,etc for hate-speech detection. Largely the focus has been remained on identifying the hate-labeled post by identification of hate-keywords and then taking the necessary action against the user by either suspending his account or removing his posts.There has been some concern about this action because it could trigger an escalation of the discussion about what constitutes hate speech and what is not. Therefore we try to look at both the ends of the pipeline through reviewing the literature for detoxifying the online media through hate-detection systems and deploying generative models for counter-narratives generation.    
-\newpage
+
 \level{1}{Multi-Objective Optimization}
 \level{2}{Definitions}
 In MOOP since there are more than one objectives its unlikely that all of them achieve their optima at the same point, hence typically there is no single global solution. Which makes its necessary to rethink about the definition for an optimum and accordingly determine a set of points that can be deemed as the solutions. The most widely used concept concept in defining an optimal point is that of the \textit{Pareto optimality} \cite{pareto1971manual}, which is defined as follows:\newline 
@@ -45,23 +45,23 @@ Since no preference information is provided the general one the approaches follo
 \level{2}{A Priori Methods}
 Methods which come under this class can further divided into other smaller classes but all of them have a common feature that is,enough information is provided a priori to compare any candidate pareto optimal solutions.
 \newline Following are some of the Important methods under this class:
-\newline \newline \textbf{Utility Function Methods}: Here we have a utility function $U: \mathbb{R}^k \to \mathbb{R}$, and the goal is to solve the following SOOP
-\begin{equation}
-    \underset{x \in X}{min}\hspace{1mm} U(F(x))
-\end{equation}
-\newline notable methods which come under this utility model are
-\begin{equation} \label{lin_utility_model}
-    U(F(x)) = \mathlarger{\mathlarger{\sum}}_{\forall i\in [k]} w_i F_i(x)
-\end{equation}
-\newline known as the Linear scalarization method, if all $\forall i \in [k], w_i > 0$ is a sufficient condition for the solution of \ref{lin_utility_model} to be a pareto optima \cite{zadeh1963optimality}, but it is not a necessary condition \cite{zionts1989multiple}.
-\begin{equation} \label{eq11}
-    U(F(x)) = \mathlarger{\mathlarger{( \sum}}_{\forall i\in [k]} w_i (F_i(x)-F^{*}_i)^p \mathlarger{\mathlarger{) }}^{1/p}
-\end{equation}
-\newline \ref{eq11} for $p>0$,generally $p=1,2$ is another common extension of the formulation \cite{yu1976compromise}, for pareto optamility the conditions on $w_i$ are same as they are for \ref{lin_utility_model}, along with that if any of the $w_i$ is set to $0$ then it can result in weak pareto optimality.
-\begin{equation} \label{HypervolumeChebyshevScalarization}
-    U(F(x)) = \underset{i\in [k]}{max}\hspace{1mm} \frac{F_i(x)}{w_i}
-\end{equation}
-\newline \ref{HypervolumeChebyshevScalarization} is known as Hypervolume/Chebyshev Scalarization method \cite{zhang2020random}, and in this case if $\forall i \in [k] \hspace{1mm} w_i>0$, it is shown that the solution of \ref{HypervolumeChebyshevScalarization} converges to the Pareto front even for non-convex pareto fronts.
+% \newline \newline \textbf{Utility Function Methods}: Here we have a utility function $U: \mathbb{R}^k \to \mathbb{R}$, and the goal is to solve the following SOOP
+% \begin{equation}
+%     \underset{x \in X}{min}\hspace{1mm} U(F(x))
+% \end{equation}
+% \newline notable methods which come under this utility model are
+% \begin{equation} \label{lin_utility_model}
+%     U(F(x)) = \mathlarger{\mathlarger{\sum}}_{\forall i\in [k]} w_i F_i(x)
+% \end{equation}
+% \newline known as the Linear scalarization method, if all $\forall i \in [k], w_i > 0$ is a sufficient condition for the solution of \ref{lin_utility_model} to be a pareto optima \cite{zadeh1963optimality}, but it is not a necessary condition \cite{zionts1989multiple}.
+% \begin{equation} \label{eq11}
+%     U(F(x)) = \mathlarger{\mathlarger{( \sum}}_{\forall i\in [k]} w_i (F_i(x)-F^{*}_i)^p \mathlarger{\mathlarger{) }}^{1/p}
+% \end{equation}
+% \newline \ref{eq11} for $p>0$,generally $p=1,2$ is another common extension of the formulation \cite{yu1976compromise}, for pareto optamility the conditions on $w_i$ are same as they are for \ref{lin_utility_model}, along with that if any of the $w_i$ is set to $0$ then it can result in weak pareto optimality.
+% \begin{equation} \label{HypervolumeChebyshevScalarization}
+%     U(F(x)) = \underset{i\in [k]}{max}\hspace{1mm} \frac{F_i(x)}{w_i}
+% \end{equation}
+% \newline \ref{HypervolumeChebyshevScalarization} is known as Hypervolume/Chebyshev Scalarization method \cite{zhang2020random}, and in this case if $\forall i \in [k] \hspace{1mm} w_i>0$, it is shown that the solution of \ref{HypervolumeChebyshevScalarization} converges to the Pareto front even for non-convex pareto fronts.
 \newline \newline \textbf{$\epsilon$-Constraint Method}:
 In this method\cite{haimes1971bicriterion} we have a single most important objective function $F_s(x)$. and the remaining objective functions are used to form additional constraints $F_i(x) \le \epsilon_i,\forall i \in [k]/\{s\}$.
 
@@ -74,19 +74,19 @@ In this method\cite{haimes1971bicriterion} we have a single most important objec
 \end{equation}\newline
 It is proven that the by a systematic variation of $\epsilon_i$ one can generate a set of Pareto optimal solutions\cite{hwang1979methods}.
 If the solution of \ref{eps_const_obj},\ref{eps_const_con} exists then it is a weakly Pareto optimal solution \cite{miettinen2012nonlinear}, and if the solution is unique, then it is Pareto optimal \cite{miettinen2012nonlinear}.
-\newline \newline \textbf{Lexicographic Method}: As the name suggests, the Objective functions are ordered as per decreasing order of importance namely $F_i(x)$ is more important than $F_j(x)$ iff $i<j$. Then, the following optimization problems are solved starting from $i=1,2,...,k$.
-\begin{equation} \label{lex_obj}
-    \underset{x\in X}{min}\hspace{1mm} F_i(x)
-\end{equation}
-\newline subject to
-\begin{equation} \label{lex_constraints}
-    F_j(x) \le F_j(x^{*}_j), \forall j \in \{1,2,...i-1\}\hspace{2mm}
-\end{equation}
-\newline In \ref{lex_constraints} we can also have $=$ instead of $\le$, \cite{stadler1988multicriteria}. Here $x^{*}_j$ is the solution obtained at the $j$'th iteration, initially for $i=j=1$ there are no constrains and $F_i(x)$ is minimized over $x\in X$. 
-\newline \newline \textbf{Goal Programming Methods}: Goal Programming method was developed by \cite{charnes1955optimal}\cite{ijiri1965management}\cite{charnes1967effective}. In this method we have been given goals $g_j$ which are expected by the \textit{DM} for the objective $F_j(x)$ respectively. To measure the deviations from the goal the sum of the absolute deviation is minimized. 
-\begin{equation}
-    \underset{x\in X}{min} \hspace{1mm}\mathlarger{\mathlarger{\sum}}_{\forall i\in [k]} |g_i - F_i(x)|
-\end{equation}
+% \newline \newline \textbf{Lexicographic Method}: As the name suggests, the Objective functions are ordered as per decreasing order of importance namely $F_i(x)$ is more important than $F_j(x)$ iff $i<j$. Then, the following optimization problems are solved starting from $i=1,2,...,k$.
+% \begin{equation} \label{lex_obj}
+%     \underset{x\in X}{min}\hspace{1mm} F_i(x)
+% \end{equation}
+% \newline subject to
+% \begin{equation} \label{lex_constraints}
+%     F_j(x) \le F_j(x^{*}_j), \forall j \in \{1,2,...i-1\}\hspace{2mm}
+% \end{equation}
+% \newline In \ref{lex_constraints} we can also have $=$ instead of $\le$. Here $x^{*}_j$ is the solution obtained at the $j$'th iteration, initially for $i=j=1$ there are no constrains and $F_i(x)$ is minimized over $x\in X$. 
+% \newline \newline \textbf{Goal Programming Methods}: Goal Programming method was developed by \cite{charnes1955optimal}\cite{ijiri1965management}\cite{charnes1967effective}. In this method we have been given goals $g_j$ which are expected by the \textit{DM} for the objective $F_j(x)$ respectively. To measure the deviations from the goal the sum of the absolute deviation is minimized. 
+% \begin{equation}
+%     \underset{x\in X}{min} \hspace{1mm}\mathlarger{\mathlarger{\sum}}_{\forall i\in [k]} |g_i - F_i(x)|
+% \end{equation}
 \level{2}{A Posteriori Methods} \label{a_posteriori_method}
 As the name suggest that the \textit{DM} is involved a posteriori of finding solution, these apprpaches are also known as generate-first-choose-later approaches \cite{messac2002generating}. The goal is to produce a good enough representative subset of solutions which are Pareto optimal. In general they are classified into 2 classes.
 
@@ -95,27 +95,27 @@ As the name suggest that the \textit{DM} is involved a posteriori of finding sol
     \item \textbf{Evolutionary algorithms}, which produce a set of Pareto optimal solutions per iteration/run of the algorithm.
 \end{enumerate}
 
-\level{3}{Mathematical Programming Methods}
-Few of the well known methods in this class are:
-\begin{enumerate}
-    \item Normal Boundary Intersection Method
-    \item Modified Normal Boundary Intersection Method
-    \item Normal Constraint Method
-\end{enumerate} 
-\textbf{Normal Boundary Intersection Method (NBI)}: \label{nbi_method_def}
-As discussed the section \label{lin_utility_model} the weighted sum method does provide a pareto optimal solution but its is very difficult to find evenly spread solution by varying the weights, to address these and other computational drawbacks Das and Dennis in their paper \cite{das1998normal} presented the NBI method, whichis formulated as follows:
-\begin{equation} \label{nbi_obj}
-    \underset{x\in X, t}{min} \hspace{1mm} t
-\end{equation}
-\begin{equation}
-    \Phi w + t \mu = F(x) - F^{*}
-\end{equation}
-Where $\Phi \in \mathbb{R}^{k\times k}$ is the pay-off matrix whose $\Phi_{ij}$ entry measures the difference in the optimal value for $j$'th objective considering only the $i$'th objective to be minimized and that of the utopia point \ref{ideal_point_def}, i.e. $\Phi_{ij} = F_j(\underset{x\in X}{argmin}\hspace{1mm} F_i(x))-F^{*}_j$ . Also $\mu = - \Phi e$, $\mu$ is known as the quasi-normal vector and $e^{\top}w=\sum_{i\in [k]} w_i = 1$ which is provided by the user. NBI method doesn't provide sufficient condition for finding pareto optimal solutions hence it is possible that the solutions obtained via this method are not pareto optimal and neither does this provide a necessary condition for pareto optimal solutions since for $k>2$ for some problems it overlooks some of the pareto optimal solutions.
-\newline\newline \textbf{Modified Normal Boundary Intersection Method (NBIm)}: \label{nbim_method_def} As stated in \ref{nbi_method_def} the NBI method suffers from not even being a necessary condition for pareto optimal solutions, Das \cite{das1999improved} and R de S Motta \cite{de2012modified} proposed modified methods to cover these drawbacks
-\newline\newline \textbf{Normal Constraint Method (NC)}: \label{nc_method_def} Messac et al. \cite{messac2003normalized}\cite{messac2004normal} proposed the NC method as an alternative to the NBI method, which provided some improvements. It uses the utopia point \ref{ideal_point_def} to normalize the objective vector $F(x)$ to $\hat{F}(x)$ along with a pareto filter which removes the non-dominant solutions to keep only the dominant solutions.Also it always produces pareto optimal solutions along with it's performance being independent of design objective scales. 
+% \level{3}{Mathematical Programming Methods}
+% Few of the well known methods in this class are:
+% \begin{enumerate}
+%     \item Normal Boundary Intersection Method
+%     \item Modified Normal Boundary Intersection Method
+%     \item Normal Constraint Method
+% \end{enumerate} 
+% \textbf{Normal Boundary Intersection Method (NBI)}: \label{nbi_method_def}
+% As discussed the section \label{lin_utility_model} the weighted sum method does provide a pareto optimal solution but its is very difficult to find evenly spread solution by varying the weights, to address these and other computational drawbacks Das and Dennis in their paper \cite{das1998normal} presented the NBI method, whichis formulated as follows:
+% \begin{equation} \label{nbi_obj}
+%     \underset{x\in X, t}{min} \hspace{1mm} t
+% \end{equation}
+% \begin{equation}
+%     \Phi w + t \mu = F(x) - F^{*}
+% \end{equation}
+% Where $\Phi \in \mathbb{R}^{k\times k}$ is the pay-off matrix whose $\Phi_{ij}$ entry measures the difference in the optimal value for $j$'th objective considering only the $i$'th objective to be minimized and that of the utopia point \ref{ideal_point_def}, i.e. $\Phi_{ij} = F_j(\underset{x\in X}{argmin}\hspace{1mm} F_i(x))-F^{*}_j$ . Also $\mu = - \Phi e$, $\mu$ is known as the quasi-normal vector and $e^{\top}w=\sum_{i\in [k]} w_i = 1$ which is provided by the user. NBI method doesn't provide sufficient condition for finding pareto optimal solutions hence it is possible that the solutions obtained via this method are not pareto optimal and neither does this provide a necessary condition for pareto optimal solutions since for $k>2$ for some problems it overlooks some of the pareto optimal solutions.
+% \newline\newline \textbf{Modified Normal Boundary Intersection Method (NBIm)}: \label{nbim_method_def} As stated in \ref{nbi_method_def} the NBI method suffers from not even being a necessary condition for pareto optimal solutions, Das \cite{das1999improved} and R de S Motta \cite{de2012modified} proposed modified methods to cover these drawbacks
+% \newline\newline \textbf{Normal Constraint Method (NC)}: \label{nc_method_def} Messac et al. \cite{messac2003normalized}\cite{messac2004normal} proposed the NC method as an alternative to the NBI method, which provided some improvements. It uses the utopia point \ref{ideal_point_def} to normalize the objective vector $F(x)$ to $\hat{F}(x)$ along with a pareto filter which removes the non-dominant solutions to keep only the dominant solutions.Also it always produces pareto optimal solutions along with it's performance being independent of design objective scales. 
 
 \level{3}{Evolutionary Algorithms (EA)}
-Evolutionary algorithms are one of the very actively researched methods \cite{vikhar2016evolutionary} for solving MOOP and finding pareto optimal solutions. EA are subset of the paradigm which is inspired by nature and evolution in designing algorithms for various purposes including solving optimization problems. The general procedure that and EA follows is described below:
+Evolutionary algorithms are one of the very actively researched methods for solving MOOP and finding pareto optimal solutions. EA are subset of the paradigm which is inspired by nature and evolution in designing algorithms for various purposes including solving optimization problems. The general procedure that and EA follows is described below:
 \begin{algorithm}
 \caption{Generic EA}\label{algo_generic_ea}
 \begin{algorithmic}
@@ -130,35 +130,32 @@ Evolutionary algorithms are one of the very actively researched methods \cite{vi
 \end{algorithm}\newline Some of the notable methods in EA which are commonly used are:
 \begin{enumerate}
     \item Non-dominated Sorting Genetic Algorithm-II (NSGA-II)
-    \item Ant Colony Optimization (ACO)
     \item Particle swarm optimization (PSO)
 \end{enumerate} 
 \textbf{Non-dominated Sorting Genetic Algorithm-II (NSGA-II)}: \label{nsga_2} Proposed by K. Deb et al. in the paper \cite{deb2002fast}, NSGA-II is based on elitist principle meaning only the elites of the populations survive to the next generation based on a partial-order sorting of the population, to decide the elites.
-\newline\newline \textbf{Ant Colony Optimization (ACO)}: \label{ant_colony_opt} it is based on idea of ant pheromone which ants use to communicate to form paths and explore more of the promising regions \cite{slowik2017nature}.
 \newline\newline \textbf{Particle Swarm Optimization (PSO)}: \label{partical_swarm_opt} PSO is based on the flocking behaviour of the birds where each particle has a position (the solution) and a velocity (change in the solution) where the velocity is influenced by some neighbourhood of the particle \cite{poli2007particle}.
 \newline\newline The advantage the EA provides is that it can quickly provide a sets of solutions which even though are not guaranteed to be pareto optimal, but are non-dominant set and serve as good approximation to the entirety of the Pareto front. The disadvantages being that these algorithms are relatively slow and pareto optimality cant be guaranteed.
 
-\level{2}{Interactive methods}
-Interactive methods require the \textit{DM} to actively take part in pruning the candidates solutions suggested by the method, and based on the input of the \textit{DM} the method adopts and suggest new solutions which are then again evaluated by the \textit{DM} and the process is repeated to improve and adopt the solutions as per the needs of \textit{DM}.
-\newline\newline The generic structure of the Interactive methods is as follows \cite{miettinen2008introduction}:
-\begin{algorithm}[H]
-\caption{Generic Interactive Method} \label{algo_generic_interactive_method}
-\begin{algorithmic}[1]
-\State $\mathcal{P} \gets initialize(\mathcal{M})$ \Comment{pareto optimal solution set: $\mathcal{P}$; no-preference method: $\mathcal{M}$}
-\Do
-    \State $\mathcal{R} \gets getPreference(\mathcal{P},DM)$\Comment{preference information: $\mathcal{R}$, decision maker: $DM$ }
-    \State $\mathcal{P} \gets newSolutionSet(\mathcal{P},\mathcal{R},\mathcal{M})$\Comment{update solution set based on $\mathcal{R}$}
-\doWhile{$converges(\mathcal{P},DM) \lor terminate(\mathcal{P},DM)$}\Comment{till convergence or termination}
-\end{algorithmic}
-\end{algorithm} The above method can be classified based on the which method is used as $\mathcal{M}$ and what type of preference information $\mathcal{R}$ is available/provided by the \textit{DM}.
-\newline \newline $\mathcal{M}$ can be chosen from the various options available in a posteriori methods/no preference method \ref{a_posteriori_method} based on the problem type.
-\newline \newline Generally the choices of $\mathcal{R}$ are classified into 3 classes \cite{miettinen2008introduction}.
-\begin{enumerate}
-    \item \textbf{Trade-off Between Objectives}: Here the \textit{DM} is shown various trade-off scenarios and asked their preference in regards to those trade-off, and based on that the next solution set is generated \cite{zionts1976interactive}.
-    \item \textbf{Reference Point}: Here the \textit{DM} for a get set of $\mathcal{P}$ pareto optimal solutions needs to provide a reference point w.r.t. which the next iteration will generate the updated solution set  $\mathcal{P}$ \cite{wierzbicki1986completeness}\cite{wierzbicki2000modern}.
-    \item \textbf{Classification of Objectives}: Here for a given $\mathcal{P}$ the \textit{DM} classifies different objectives of the solutions such as to get more preferred solutions, and based on the classification the updates solution set $\mathcal{P}$ is generated.
-\end{enumerate}
-\newpage
+% \level{2}{Interactive methods}
+% Interactive methods require the \textit{DM} to actively take part in pruning the candidates solutions suggested by the method, and based on the input of the \textit{DM} the method adopts and suggest new solutions which are then again evaluated by the \textit{DM} and the process is repeated to improve and adopt the solutions as per the needs of \textit{DM}.
+% \newline\newline The generic structure of the Interactive methods is as follows \cite{miettinen2008introduction}:
+% \begin{algorithm}[H]
+% \caption{Generic Interactive Method} \label{algo_generic_interactive_method}
+% \begin{algorithmic}[1]
+% \State $\mathcal{P} \gets initialize(\mathcal{M})$ \Comment{pareto optimal solution set: $\mathcal{P}$; no-preference method: $\mathcal{M}$}
+% \Do
+%     \State $\mathcal{R} \gets getPreference(\mathcal{P},DM)$\Comment{preference information: $\mathcal{R}$, decision maker: $DM$ }
+%     \State $\mathcal{P} \gets newSolutionSet(\mathcal{P},\mathcal{R},\mathcal{M})$\Comment{update solution set based on $\mathcal{R}$}
+% \doWhile{$converges(\mathcal{P},DM) \lor terminate(\mathcal{P},DM)$}\Comment{till convergence or termination}
+% \end{algorithmic}
+% \end{algorithm} The above method can be classified based on the which method is used as $\mathcal{M}$ and what type of preference information $\mathcal{R}$ is available/provided by the \textit{DM}.
+% \newline \newline $\mathcal{M}$ can be chosen from the various options available in a posteriori methods/no preference method \ref{a_posteriori_method} based on the problem type.
+% \newline \newline Generally the choices of $\mathcal{R}$ are classified into 3 classes \cite{miettinen2008introduction}.
+% \begin{enumerate}
+%     \item \textbf{Trade-off Between Objectives}: Here the \textit{DM} is shown various trade-off scenarios and asked their preference in regards to those trade-off, and based on that the next solution set is generated \cite{zionts1976interactive}.
+%     \item \textbf{Reference Point}: Here the \textit{DM} for a get set of $\mathcal{P}$ pareto optimal solutions needs to provide a reference point w.r.t. which the next iteration will generate the updated solution set  $\mathcal{P}$ \cite{wierzbicki1986completeness}\cite{wierzbicki2000modern}.
+%     \item \textbf{Classification of Objectives}: Here for a given $\mathcal{P}$ the \textit{DM} classifies different objectives of the solutions such as to get more preferred solutions, and based on the classification the updates solution set $\mathcal{P}$ is generated.
+% \end{enumerate}
 \level{1}{Condition Number}
 The term \textbf{\textit{Condition Number}} was first coined by Alan Turing in 1947 in his paper on Rounding-Off Errors in Matrix Processes \cite{turing1948rounding}. He defined the condition number for matrices, further in 1966, John Rice in his paper \textit{A Theory of Condition} \cite{rice1966theory} showed how to formulate the definition of condition number other classes of problems.
 \newline\newline In our problem formulation may we not only require to compute the condition number of the function $f$ to check if its bounded or not \ref{cond_abs},\ref{cond_rel}; but also to minimize the maximum over a set $X_3$ \ref{cond_abs_min},\ref{cond_rel_min}.
@@ -180,16 +177,16 @@ There are several papers which have proved various important properties of matri
 \begin{equation}
     \underset{A}{min}\hspace{1mm} \lambda_1(A) - \kappa_2 (\Bar{A}) \lambda_n(A)
 \end{equation}
-where $\Bar{A}$ is the optimal solution with minimum condition number, if such a solution's value of $\kappa_2 (\Bar{A})$ is not known, then one can use a desirable value of $\kappa_2 (\Bar{A})$ in its place. Here $\lambda_i(A)$ are the eigenvalues of the matrix $A$ in decreasing order of their magnitude form $i=1,2,...,n$. They also proved that that the problem of minimizing the condition number is non-smooth and non-convex optimization problem \cite{marechal2009optimizing}, which further increases the difficulty of the problem. In their paper \cite{beltran2010convexity}, C Beltrán et al. have studied the convexity properties of the condition number over norm over frobenius inner product. Further Xiaojun Chen et al. in their paper \cite{chen2011minimizing} analysed the same for $A$ being a gram matrix of functions of a scalar $x$, namely $A(x) = V(x)^{\top}V(x)$ and derived formulas for generalized gradient of $\kappa_2(A(x))$, and using exponential smoothing function they also develop a globally convergent smoothing method to solve the \ref{min_cond_matrix} problem.
-\newline \newline G.Piazza and T.Politi in their paper \cite{piazza2002upper} proved an upper bound for $\kappa_2 (A)$ i.e. the condition number w.r.t. $||\cdot||_2$ (the spectral norm) for $1\le k \le n$. 
-\begin{equation} \label{cond_matx_ub_1}
-    \kappa_2 (A) \le \frac{2^k}{\mathlarger{\prod_{i=2}^{k}} \sigma_i}\frac{1}{|det(A)|}\mathlarger{\mathlarger{\mathlarger{\mathlarger{(}}}} \frac{||A||_F}{\sqrt{n+k-1}}\mathlarger{\mathlarger{\mathlarger{\mathlarger{)}}}} ^{n+k-1}
-\end{equation}
-for $k=1$ it reduces to as proved in \cite{guggenheimer1995simple}.
-\begin{equation} \label{cond_matx_ub_1.1}
-    \kappa_2 (A) \le \frac{2}{|det(A)|}\mathlarger{\mathlarger{\mathlarger{\mathlarger{(}}}} \frac{||A||_F}{\sqrt{n}}\mathlarger{\mathlarger{\mathlarger{\mathlarger{) }}}} ^{n}
-\end{equation}
-where $||\cdot||_F$ is Frobenius norm and $\sigma_i, i\in [n]$ are the singular value of $A$ in decreasing order of their magnitude.
+% where $\Bar{A}$ is the optimal solution with minimum condition number, if such a solution's value of $\kappa_2 (\Bar{A})$ is not known, then one can use a desirable value of $\kappa_2 (\Bar{A})$ in its place. Here $\lambda_i(A)$ are the eigenvalues of the matrix $A$ in decreasing order of their magnitude form $i=1,2,...,n$. They also proved that that the problem of minimizing the condition number is non-smooth and non-convex optimization problem \cite{marechal2009optimizing}, which further increases the difficulty of the problem. In their paper \cite{beltran2010convexity}, C Beltrán et al. have studied the convexity properties of the condition number over norm over frobenius inner product. Further Xiaojun Chen et al. in their paper \cite{chen2011minimizing} analysed the same for $A$ being a gram matrix of functions of a scalar $x$, namely $A(x) = V(x)^{\top}V(x)$ and derived formulas for generalized gradient of $\kappa_2(A(x))$, and using exponential smoothing function they also develop a globally convergent smoothing method to solve the \ref{min_cond_matrix} problem.
+% \newline \newline G.Piazza and T.Politi in their paper \cite{piazza2002upper} proved an upper bound for $\kappa_2 (A)$ i.e. the condition number w.r.t. $||\cdot||_2$ (the spectral norm) for $1\le k \le n$. 
+% \begin{equation} \label{cond_matx_ub_1}
+%     \kappa_2 (A) \le \frac{2^k}{\mathlarger{\prod_{i=2}^{k}} \sigma_i}\frac{1}{|det(A)|}\mathlarger{\mathlarger{\mathlarger{\mathlarger{(}}}} \frac{||A||_F}{\sqrt{n+k-1}}\mathlarger{\mathlarger{\mathlarger{\mathlarger{)}}}} ^{n+k-1}
+% \end{equation}
+% for $k=1$ it reduces to as proved in \cite{guggenheimer1995simple}.
+% \begin{equation} \label{cond_matx_ub_1.1}
+%     \kappa_2 (A) \le \frac{2}{|det(A)|}\mathlarger{\mathlarger{\mathlarger{\mathlarger{(}}}} \frac{||A||_F}{\sqrt{n}}\mathlarger{\mathlarger{\mathlarger{\mathlarger{) }}}} ^{n}
+% \end{equation}
+$||\cdot||_F$ is Frobenius norm and $\sigma_i, i\in [n]$ are the singular value of $A$ in decreasing order of their magnitude.
 \begin{equation} \label{frobenius_norm}
     ||A||_F = \sqrt{ \mathlarger{\sum_{i \in [n]} \sum_{j \in [m]}} A^{2}_{ij}} 
 \end{equation}
@@ -197,15 +194,15 @@ another interesting relation between $\kappa_2(A)$ and that of $\kappa_F(A)$ i.e
 \begin{equation} \label{cond_2_rel_cond_forb}
     \frac{\kappa_F(A)}{n} \le \kappa_2(A) \le \kappa_F(A)
 \end{equation}
-Hongyi Li et al. in their paper \cite{li2011note} have proved the following lower bounds on $\kappa_F(A)$ for $A$ being positive definite matrix and $\beta \in \mathbb{R}$ and $tr(A)$ is the trace of matrix $A$.
-\begin{equation} \label{cond_f_low_bound_1}
-    \kappa_F(A) \ge 2n\frac{tr(A^{1+\beta})}{tr(A^{2\beta})det(A)^{\frac{1-\beta}{n}}} -n
-\end{equation}
-\begin{equation} \label{cond_f_low_bound_2}
-    \kappa_F(A) \ge 2\frac{tr(A^{\beta+1})tr(A^{\beta-1})}{tr(A^{2\beta})} -n
-\end{equation}
-note that \ref{cond_f_low_bound_2} follows from \ref{cond_f_low_bound_1} using AM-GM inequality. Further Nicholas J. Higham in their paper \cite{higham1987survey} have presented survey for computing condition number of triangular matrices
-\newpage
+% Hongyi Li et al. in their paper \cite{li2011note} have proved the following lower bounds on $\kappa_F(A)$ for $A$ being positive definite matrix and $\beta \in \mathbb{R}$ and $tr(A)$ is the trace of matrix $A$.
+% \begin{equation} \label{cond_f_low_bound_1}
+%     \kappa_F(A) \ge 2n\frac{tr(A^{1+\beta})}{tr(A^{2\beta})det(A)^{\frac{1-\beta}{n}}} -n
+% \end{equation}
+% \begin{equation} \label{cond_f_low_bound_2}
+%     \kappa_F(A) \ge 2\frac{tr(A^{\beta+1})tr(A^{\beta-1})}{tr(A^{2\beta})} -n
+% \end{equation}
+% note that \ref{cond_f_low_bound_2} follows from \ref{cond_f_low_bound_1} using AM-GM inequality. Further Nicholas J. Higham in their paper \cite{higham1987survey} have presented survey for computing condition number of triangular matrices
+
 \level{2}{Condition Number of Functions}
 Edvin Deadman and Samuel D. Relton in their paper \cite{deadman2016taylor} extended the taylor's theorem for a complex function of matrices where $f:\mathbb{C}\to \mathbb{C}$ extended over matrices over $\mathbb{C}^{n\times n}$ i.e. $f:\mathbb{C}^{n\times n}\to \mathbb{C}$. For $f$ satisfying some conditions they proved the bound on the absolute condition number of $f$ at $A$ for $\epsilon>0$.
 \begin{equation}

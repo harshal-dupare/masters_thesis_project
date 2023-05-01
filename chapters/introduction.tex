@@ -6,15 +6,9 @@ In general, there can be more than one objective and constraint in the formulati
 
 Generally when we have a function, we want it to have some good properties like being correct, easy to compute, easy to store, behave nicely over the input set, or any other desirable properties based on the context. One such very important property for most of such functions of interest is being \textit{Well-Conditioned}, meaning small changes in the input should not result in too big changes in the output. We focus on this problem namely the problem to find function solutions of fMOOP which are well-conditioned lets call this class of problem as cond-fMOOP.
 
-Goal of this study is to analyze one such problem of interest belonging to cond-fMOOP, and study how the existing methodologies perform on such problem and device new methodologies for finding solution to this problem belonging to cond-fMOOP.
+Goal of this study is to analyze one such problem of interest belonging to cond-fMOOP, and study how the existing methodologies perform on such problems and device new methodologies for finding solution to this problem belonging to cond-fMOOP.
 
-% * How important are optimization methods and their vaste applications\\
-% * Highlight importance of subsections of optimization methods where we are looking for functions belonging to certain family, and give eg\\
-% * Then highlight how important it is for those functions to be stable for small changes in input, i.e. locality of these problems, and show if thats not maintained then how it can lead to bad functions and how they can be exploited \\
-% * Hence its impostant to model this problem wrt MOOP and study it\\
 \level{1}{Preliminaries}
-\level{2}{Definitions}
-
 \textbf{\textit{Aggregation Scheme:}} Given a value function $value(\cdot)$ over $x$, for $x \in X$, a method to aggregate those values to one value. Denoted as follows:
 \begin{equation}
 \underset{\forall x\in X}{Agg}\hspace{1mm} value(x)
@@ -46,7 +40,9 @@ cond_{rel}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsil
    ||T^{m\times k}|| = \underset{X \in \mathbb{R}^{n\times m}/\{\Bar{0}\}}{sup} \frac{||X\times T^{m\times k}||}{||X||}
 \end{equation}
 \textit{Note}: Whenever the dimensions of the matrix in the context are already defined or are obvious from the context we will omit the superscript denoting its dimension.
-\level{2}{Problem} \label{prob_def}
+\newpage 
+
+\level{1}{Problem Definition} \label{prob_def}
 \textbf{Given:}
 \newline Domain $X_1\cup X_2 \subseteq X$ and their associated Ranges $Y_1\cup Y_2 \subseteq Y$, where $X_i\equiv Y_i$ such that for each $x \in X_i$ we have a corresponding $y \in Y_i$ i.e. $y\equiv x$.
 \newline Aggregation schemes $\underset{\forall x\in X_1}{Agg_1}$ defined over $\mathcal{L}: Y \times Y \to \mathbb{R}$ call $\mathcal{L}(\cdot,\cdot)$ the \textit{Loss} function and $\underset{\forall x\in X_2}{Agg_2}$ defined over $\mathcal{R}: Y \times Y \to \mathbb{R}$ call $\mathcal{R}(\cdot,\cdot)$  the \textit{Reward} function.\newline
@@ -76,8 +72,6 @@ or is subject to at least one of the \ref{cond_abs}, \ref{cond_rel} as constrain
 \newline It is very important to mention that the above problem formulation highly depends on the nature of the mapping $f$ and the family $\mathcal{F}$ that it belongs to. For example if $f$ models a function for which we expect smooth change in its value w.r.t. its domain then its a reasonable formulation, and if there are no reasons to believe that it should be smooth over its domain then its not a reasonable formulation. Similarly for a chosen family $\mathcal{F}$ to model $f$, if $\mathcal{F}$ doesn't have smooth functions belonging to it then its not a reasonable formulations irrespective of the nature of the function that $f$ is modeling.
 \newline\newline
 \textbf{\textit{Note}}: What we mean by minimizing over a functions $f \in \mathcal{F}$ of a family of functions $\mathcal{F}$ is that we minimize over the parameters of that family of function $\mathcal{F}$.
-
-% \newpage 
 \level{1}{Motivation and Applications}
 
 \level{2}{Linear Factor Model} \label{problem_linear_factor_model}
@@ -133,44 +127,43 @@ subject to
 \begin{equation} \label{lfm_cond}
 \underset{R^{n\times d}_{t\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{rel}(f,R^{n\times d}_{t\times d}) \le \alpha
 \end{equation}
-\newline
-\level{2}{Principle Time Series}
-Another task related to time series is to represent a set of $n$ time series by less number of time series $k<n$. Which is some way is an application of the Linear Factor Models.\newline
-\textit{Given}:\newline The definition of $R^{n\times 1}_t$ and  $R^{n\times d}_{t\times d}$ are same as before, but here we need to design latent time series denote them by $F^{k\times 1}_t \in \mathbb{R}^{k\times 1}$ as a function of $R^{n\times d}_{t+1\times d}$, i.e. $F^{k\times 1}_t = f(R^{n\times d}_{t+1\times d})$ which reduces the $n$ time series observed from time $t-d$ to time $t$ to set of $k$ time series at time $t$ such that its possible to sufficiently recover the $n$ time series at time $t$ by another function $ g(F^{k\times 1}_t) = P^{n \times 1}_{t}$ such that $P^{n \times 1}_{t} \approx R^{n \times 1}_{t}$ which we can measure by \textit{Average} aggregation scheme over the loss function $\mathcal{L}(y,\hat{y}) = ||y-\hat{y}||_2$, which we need to minimize.
+% \newline
+% \level{2}{Principle Time Series}
+% Another task related to time series is to represent a set of $n$ time series by less number of time series $k<n$. Which is some way is an application of the Linear Factor Models.\newline
+% \textit{Given}:\newline The definition of $R^{n\times 1}_t$ and  $R^{n\times d}_{t\times d}$ are same as before, but here we need to design latent time series denote them by $F^{k\times 1}_t \in \mathbb{R}^{k\times 1}$ as a function of $R^{n\times d}_{t+1\times d}$, i.e. $F^{k\times 1}_t = f(R^{n\times d}_{t+1\times d})$ which reduces the $n$ time series observed from time $t-d$ to time $t$ to set of $k$ time series at time $t$ such that its possible to sufficiently recover the $n$ time series at time $t$ by another function $ g(F^{k\times 1}_t) = P^{n \times 1}_{t}$ such that $P^{n \times 1}_{t} \approx R^{n \times 1}_{t}$ which we can measure by \textit{Average} aggregation scheme over the loss function $\mathcal{L}(y,\hat{y}) = ||y-\hat{y}||_2$, which we need to minimize.
 
-\begin{equation} \label{pts_diagram}
-\begin{tikzcd}
-R^{n\times d}_{t+1 \times d} \arrow[rr, "f" description] \arrow[r, no head]& {}& F^{k\times 1}_{t} \arrow[d, "g" description] \\
-R^{n\times 1}_t \arrow[rr, "\mathcal{L}" description, Rightarrow, no head] \arrow[rd, dashed] && P^{n \times 1}_{t} \arrow[ld, dashed]\\
-& \mathcal{R} &
-\end{tikzcd}
-\end{equation}\newline 
-further we can restrict the functions $f(\cdot)$ and $g(\cdot)$ to be linear w.r.t. their argument. In that case it can be written as
+% \begin{equation} \label{pts_diagram}
+% \begin{tikzcd}
+% R^{n\times d}_{t+1 \times d} \arrow[rr, "f" description] \arrow[r, no head]& {}& F^{k\times 1}_{t} \arrow[d, "g" description] \\
+% R^{n\times 1}_t \arrow[rr, "\mathcal{L}" description, Rightarrow, no head] \arrow[rd, dashed] && P^{n \times 1}_{t} \arrow[ld, dashed]\\
+% & \mathcal{R} &
+% \end{tikzcd}
+% \end{equation}\newline 
+% further we can restrict the functions $f(\cdot)$ and $g(\cdot)$ to be linear w.r.t. their argument. In that case it can be written as
 
-\begin{equation} \label{f_for_pts}
-F^{k\times 1}_t = f(R^{n\times d}_{t+1\times d}) = A^{k\times n}\times R^{n\times d}_{t+1\times d}\times B^{d\times 1}
-\end{equation}
+% \begin{equation} \label{f_for_pts}
+% F^{k\times 1}_t = f(R^{n\times d}_{t+1\times d}) = A^{k\times n}\times R^{n\times d}_{t+1\times d}\times B^{d\times 1}
+% \end{equation}
 
-\begin{equation} \label{g_for_pts}
-P^{n \times 1}_{t} = g(F^{k\times 1}_t) = C^{n \times k} \times F^{k\times 1}_t
-\end{equation}
-\newline
-For small changes in our time series data $\delta R^{n\times d}_{t+1\times d}$ we expect that there is small changes in the latent time series $\delta F^{k\times 1}_t$, which we can model by bounding the absolute condition number by a scalar $\alpha$.
+% \begin{equation} \label{g_for_pts}
+% P^{n \times 1}_{t} = g(F^{k\times 1}_t) = C^{n \times k} \times F^{k\times 1}_t
+% \end{equation}
+% \newline
+% For small changes in our time series data $\delta R^{n\times d}_{t+1\times d}$ we expect that there is small changes in the latent time series $\delta F^{k\times 1}_t$, which we can model by bounding the absolute condition number by a scalar $\alpha$.
 
-\begin{equation}
-    \underset{R^{n\times d}_{t+1\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{abs}(f,R^{n\times d}_{t+1\times d}) = \underset{\epsilon \to 0}{lim}\underset{||\delta R^{n\times d}_{t+1\times d}||\le \epsilon}{sup} \frac{||A^{k\times n}\times \delta R^{n\times d}_{t+1\times d}\times B^{d\times 1}||}{||\delta R^{n\times d}_{t+1\times d}||}
-\end{equation}\newline
-combining all of that together gives us the \textbf{cond-fMOOP} formulation of this problem as
-\begin{equation} \label{pts_loss}
-\underset{A\in \mathbb{R}^{k\times n}, B \in \mathbb{R}^{d\times 1}, C \in \mathbb{R}^{n\times k}}{min}\hspace{1mm} \frac{1}{T-d+1} \mathlarger{\mathlarger{\sum}}_{\forall t\in [d,T]} \hspace{1mm} ||R^{n\times 1}_t-C^{n \times k} \times A^{k\times n}\times R^{n\times d}_{t+1\times d}\times B^{d\times 1}||_2^2
-\end{equation}\newline
-subject to
-\begin{equation} \label{lfm_cond}
-\underset{R^{n\times d}_{t+1\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{abs}(f,R^{n\times d}_{t+1\times d}) \le \alpha
-\end{equation}
-\newline
+% \begin{equation}
+%     \underset{R^{n\times d}_{t+1\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{abs}(f,R^{n\times d}_{t+1\times d}) = \underset{\epsilon \to 0}{lim}\underset{||\delta R^{n\times d}_{t+1\times d}||\le \epsilon}{sup} \frac{||A^{k\times n}\times \delta R^{n\times d}_{t+1\times d}\times B^{d\times 1}||}{||\delta R^{n\times d}_{t+1\times d}||}
+% \end{equation}\newline
+% combining all of that together gives us the \textbf{cond-fMOOP} formulation of this problem as
+% \begin{equation} \label{pts_loss}
+% \underset{A\in \mathbb{R}^{k\times n}, B \in \mathbb{R}^{d\times 1}, C \in \mathbb{R}^{n\times k}}{min}\hspace{1mm} \frac{1}{T-d+1} \mathlarger{\mathlarger{\sum}}_{\forall t\in [d,T]} \hspace{1mm} ||R^{n\times 1}_t-C^{n \times k} \times A^{k\times n}\times R^{n\times d}_{t+1\times d}\times B^{d\times 1}||_2^2
+% \end{equation}\newline
+% subject to
+% \begin{equation} \label{lfm_cond}
+% \underset{R^{n\times d}_{t+1\times d} \in \mathbb{R}^{n\times d}}{max}\hspace{1mm} cond_{abs}(f,R^{n\times d}_{t+1\times d}) \le \alpha
+% \end{equation}
+% \newline
 
-\newpage
 \level{2}{Defense Against Adversarial Attacks on Neural Networks} \label{problem_defense_adv_nn_attack}
 
 Say we are given a trained neural network $\mathcal{N}: X \to Y$ which has learnt a mapping from $X$, the input set to $Y$, the output set. If the underlining mapping that $\mathcal{N}$ was modeled to learn was smooth w.r.t. its input then we expect that for a well trained network $\mathcal{N}$ for any input $x\in X$ and for small enough $\delta x \in X$  $\delta x$ the output of the network wont change much, lets say that it won't change more than a constant $\alpha > 0$ times the norm of $x$ i.e. $||\mathcal{N}(x+\delta x) - \mathcal{N}(x)|| = ||\delta \mathcal{N}(x)||\le \alpha ||\delta x||$. Which we can reformulate as follows

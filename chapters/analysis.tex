@@ -5,26 +5,25 @@ We will focus on the problem that motivated this formulation - finding a well-co
     \item For a solvable $\mathcal{P} \in \text{fMOOP}$ and $\mathcal{P}^{'} \in \text{cond-fMOOP, derived from } \mathcal{P}$. Is $\mathcal{P}^{'}$ solvable?
     \item For $\mathcal{P} \in \text{cond-fMOOP}$ over $X$ and subsets $X_5,X_6 \subseteq X$. How to determine minimum value of $\alpha$ for which $\mathcal{P}$ is solvable?
     \item For a $\mathcal{P} \in \text{cond-fMOOP}$, if we transform the condition number restriction using bounds, call the new problem $\mathcal{P}^{'}$. How close are the solutions of $\mathcal{P}^{'}$ and $\mathcal{P}$? \label{question_transformed_problems_behaviour}
-\end{enumerate} \textbf{Question (1)} is essential because not all fMOOP problems have solutions with bounded condition numbers. Therefore, having a method to identify such problems will enable us to focus on problems that do have solutions with bounded condition numbers and develop methods to solve them accordingly. \textbf{Question (2)} is crucial because even if a problem has solutions with bounded condition numbers, it may not have solutions with arbitrary small condition numbers. Thus, having a method to find the minimum value of $\alpha$ can determine the optimality of developed methods and how close they are to the optimal value. \textbf{Question (3)} is also significant because computing the condition number is a costly task. However, we have many easy-to-compute bounds for the condition number. Thus, it is essential to know how close the solutions of $\mathcal{P}^{'}$ and $\mathcal{P}$ are to judge the degree of approximation produced by using the bounds, which resolve the computational problem.
+\end{enumerate} \textbf{Question (1)} is essential because not all fMOOP problems have solutions with bounded condition numbers. Having a method to identify such problems will enable us to focus on the right problems and develop methods to solve them accordingly.\newline \textbf{Question (2)} is crucial because even if a problem has solutions with bounded condition numbers, it may not have solutions with arbitrary small condition numbers. Thus, having a method to find the minimum value of $\alpha$ can determine the optimality of developed methods and how close they are to the optimal value.\newline \textbf{Question (3)} is also significant because computing the condition number is a costly task. However, we have many easy-to-compute bounds for the condition number. Thus, it is essential to know how close the solutions of $\mathcal{P}^{'}$ and $\mathcal{P}$ are to judge the degree of approximation produced by using the bounds, which resolve the computational problem.
 \newpage 
 \level{1}{Theoretical Results}
-\level{2}{Relation between Absolute \& Relative Condition Number}
-Given a function $f:X\to Y$ its absolute and relative condition number are given by
-\begin{equation}
-    cond_{abs}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta f(x)||}{||\delta x||}
-\end{equation}
-\begin{equation}
-    cond_{rel}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta f(x)||/||f(x)||}{||\delta x||/||x||}
-\end{equation}
-we can write
-\begin{equation}
-    cond_{rel}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta f(x)||}{||\delta x||}\frac{||x||}{||f(x)||}
-\end{equation}
-$\implies$
-\begin{equation} \label{cond_abs_rel_relation}
-    cond_{rel}(f,x) = cond_{abs}(f,x)\frac{||x||}{||f(x)||}
-\end{equation}
-
+% \level{2}{Relation between Absolute \& Relative Condition Number}
+% Given a function $f:X\to Y$ its absolute and relative condition number are given by
+% \begin{equation}
+%     cond_{abs}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta f(x)||}{||\delta x||}
+% \end{equation}
+% \begin{equation}
+%     cond_{rel}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta f(x)||/||f(x)||}{||\delta x||/||x||}
+% \end{equation}
+% we can write
+% \begin{equation}
+%     cond_{rel}(f,x) = \underset{\epsilon \to 0}{lim}\underset{||\delta x||\le \epsilon}{sup} \frac{||\delta f(x)||}{||\delta x||}\frac{||x||}{||f(x)||}
+% \end{equation}
+% $\implies$
+% \begin{equation} \label{cond_abs_rel_relation}
+%     cond_{rel}(f,x) = cond_{abs}(f,x)\frac{||x||}{||f(x)||}
+% \end{equation}
 \level{2}{Condition Number over Composition of Function}
 Say we have a function $f=g(h(x)) = g \circ h(x)$ where $f:X\to Y$, $h:X\to Z$, and $g:Z\to Y$ then we can write
 \begin{equation}
@@ -75,45 +74,42 @@ note that for this case $||\cdot||_F$ is equivalent to $||\cdot||_2$, and the ab
     \underset{A \in \mathbb{R}^{1\times d}}{min}\hspace{1mm} (||A||_2, \frac{1}{n}\mathlarger{\sum}_{i\in [n]} ||AX_i-Y_i||_2)
 \end{equation}
 which when scalarized with squaring the norm restriction gives us the standard $L_2$ regularization.
-\newpage 
 \level{1}{Experimental Results}
-\level{2}{Problem} \label{results_problem_1}
-This is the same problem as defined in the section \ref{problem_linear_factor_model}.
-\newline A data of returns for $n$ time series $R^{n\times 1}_t \in \mathbb{R}^{n\times 1}$, for $t\in [T]$ and denote $R^{n\times d}_{t\times d} = [R^{n\times 1}_{t-1},R^{n\times 1}_{t-2},...,R^{n\times 1}_{t-d}] \in \mathbb{R}^{n\times d}$ is given.
-\newline \newline We need to design $A^{d\times k} \in  \mathbb{R}^{d\times k}$ and $\beta^{k\times 1} \in \mathbb{R}^{k\times 1}$, such that $F^{n\times k}_t = R^{n\times d}_{t\times d}\times A^{d\times k}$ and $P^{n \times 1}_{t} = F^{n\times k}_t \times \beta^{k \times 1}$ and $P^{n \times 1}_{t} \approx R^{n \times 1}_{t}$. And the performance  which is measured by \textit{Average} aggregation scheme over the loss function $\mathcal{L}(y,\hat{y}) = ||y-\hat{y}||_2$ which we need to minimize and another \textit{Average} aggregation scheme over the return function $\mathcal{R}(y,\hat{y}) = \frac{\langle y,\hat{y}\rangle}{||y||_2||\hat{y}||_2}$ defined over the testing period of $t \in [T,T+S]= \{T,T+1,...,T+S-1\}$ which we need to maximize.
 
-\begin{equation} \label{results_problem_lfm_diagram}
-\begin{tikzcd}
-R^{n\times d}_{t \times d} \arrow[rr, "\times A^{d\times k}" description] \arrow[r, no head]& {}& F^{n\times k}_{t} \arrow[d, "\times \beta^{k\times 1}" description] \\
-R^{n\times 1}_t \arrow[rr, "\mathcal{L}" description, Rightarrow, no head] \arrow[rd, dashed] && P^{n \times 1}_{t} \arrow[ld, dashed]\\
-& \mathcal{R} &
-\end{tikzcd}
-\end{equation}
-\newline
-and the orthonormal condition
-\begin{equation} \label{results_problem_orthonormal_eq}
- A^{d\times k}(A^{d\times k})^{\top} = I^{d\times d}
-\end{equation}
-from the \ref{results_problem_orthonormal_eq} we can infer that $(A^{d\times k})^\top$ belongs to the set of right inverses of $A^{d\times k}$. 
-\newline with the two objectives as:
-\begin{equation} \label{problem_lfm_loss}
-\underset{\beta^{k \times 1}\in \mathbb{R}^{k\times 1}, A^{d\times k} \in \mathbb{R}^{d\times k}}{min}\hspace{1mm} \mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}
-\end{equation}
-where $\mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}$ is defined as follows
-\begin{equation} \label{problem_lfm_loss_exprr}
-\mathcal{L}_{\beta^{k \times 1}, A^{d\times k}} = \frac{1}{2(T-d+1)} \mathlarger{\mathlarger{\sum}}_{\forall t\in [d,T]} \hspace{1mm} ||R^{n\times 1}_t-R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}||_2^2
-\end{equation}
-and 
-\begin{equation} \label{problem_lfm_reward}
-\underset{\beta^{k \times 1}\in \mathbb{R}^{k\times 1}, A^{d\times k} \in \mathbb{R}^{d\times k}}{max}\hspace{1mm} \mathcal{R}_{\beta^{k \times 1}, A^{d\times k}}
-\end{equation}
-where $\mathcal{R}_{\beta^{k \times 1}, A^{d\times k}}$ is defined as follows
-\begin{equation} \label{problem_lfm_reward_exprr}
-\mathcal{R}_{\beta^{k \times 1}, A^{d\times k}} = \frac{1}{S} \mathlarger{\mathlarger{\sum}}_{\forall t\in [T,T+S]} \hspace{1mm} \frac{\langle R^{n\times 1}_t,R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}\rangle}{||R^{n\times 1}_t||_2||R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}||_2}
-\end{equation}
+% \newline A data of returns for $n$ time series $R^{n\times 1}_t \in \mathbb{R}^{n\times 1}$, for $t\in [T]$ and denote $R^{n\times d}_{t\times d} = [R^{n\times 1}_{t-1},R^{n\times 1}_{t-2},...,R^{n\times 1}_{t-d}] \in \mathbb{R}^{n\times d}$ is given.
+% \newline \newline We need to design $A^{d\times k} \in  \mathbb{R}^{d\times k}$ and $\beta^{k\times 1} \in \mathbb{R}^{k\times 1}$, such that $F^{n\times k}_t = R^{n\times d}_{t\times d}\times A^{d\times k}$ and $P^{n \times 1}_{t} = F^{n\times k}_t \times \beta^{k \times 1}$ and $P^{n \times 1}_{t} \approx R^{n \times 1}_{t}$. And the performance  which is measured by \textit{Average} aggregation scheme over the loss function $\mathcal{L}(y,\hat{y}) = ||y-\hat{y}||_2$ which we need to minimize and another \textit{Average} aggregation scheme over the return function $\mathcal{R}(y,\hat{y}) = \frac{\langle y,\hat{y}\rangle}{||y||_2||\hat{y}||_2}$ defined over the testing period of $t \in [T,T+S]= \{T,T+1,...,T+S-1\}$ which we need to maximize.
+% \begin{equation} \label{results_problem_lfm_diagram}
+% \begin{tikzcd}
+% R^{n\times d}_{t \times d} \arrow[rr, "\times A^{d\times k}" description] \arrow[r, no head]& {}& F^{n\times k}_{t} \arrow[d, "\times \beta^{k\times 1}" description] \\
+% R^{n\times 1}_t \arrow[rr, "\mathcal{L}" description, Rightarrow, no head] \arrow[rd, dashed] && P^{n \times 1}_{t} \arrow[ld, dashed]\\
+% & \mathcal{R} &
+% \end{tikzcd}
+% \end{equation}
+% \newline
+% and the orthonormal condition
+% \begin{equation} \label{results_problem_orthonormal_eq}
+%  A^{d\times k}(A^{d\times k})^{\top} = I^{d\times d}
+% \end{equation}
+% from the \ref{results_problem_orthonormal_eq} we can infer that $(A^{d\times k})^\top$ belongs to the set of right inverses of $A^{d\times k}$. 
+% \newline with the two objectives as:
+% \begin{equation} \label{problem_lfm_loss}
+% \underset{\beta^{k \times 1}\in \mathbb{R}^{k\times 1}, A^{d\times k} \in \mathbb{R}^{d\times k}}{min}\hspace{1mm} \mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}
+% \end{equation}
+% where $\mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}$ is defined as follows
+% \begin{equation} \label{problem_lfm_loss_exprr}
+% \mathcal{L}_{\beta^{k \times 1}, A^{d\times k}} = \frac{1}{2(T-d+1)} \mathlarger{\mathlarger{\sum}}_{\forall t\in [d,T]} \hspace{1mm} ||R^{n\times 1}_t-R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}||_2^2
+% \end{equation}
+% and 
+% \begin{equation} \label{problem_lfm_reward}
+% \underset{\beta^{k \times 1}\in \mathbb{R}^{k\times 1}, A^{d\times k} \in \mathbb{R}^{d\times k}}{max}\hspace{1mm} \mathcal{R}_{\beta^{k \times 1}, A^{d\times k}}
+% \end{equation}
+% where $\mathcal{R}_{\beta^{k \times 1}, A^{d\times k}}$ is defined as follows
+% \begin{equation} \label{problem_lfm_reward_exprr}
+% \mathcal{R}_{\beta^{k \times 1}, A^{d\times k}} = \frac{1}{S} \mathlarger{\mathlarger{\sum}}_{\forall t\in [T,T+S]} \hspace{1mm} \frac{\langle R^{n\times 1}_t,R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}\rangle}{||R^{n\times 1}_t||_2||R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}||_2}
+% \end{equation}
 \level{2}{ Methodologies }
-\level{3}{Baseline Method} The following method is based on randomized sampling method, which involves generating the matrix $M$ randomly and is orthonormalized to get $A$ then using linear regression we get the value for $\beta$. This process is repeated multiple times, and the best result is selected from the attempts.
-Following is the pseudocode for the method:
+In the following section we will describe the methodologies we developed to solve Linear Factor Model problem with the condition $AA^\top =I$ \ref{problem_linear_factor_model}.
+\level{3}{Baseline Method} The following method is based on randomized sampling method, which involves generating the matrix $M$ randomly and is orthonormalized to get $A$ then using linear regression we get the value for $\beta$. This process is repeated multiple times, and the best result is selected from the attempts. In an alternate implementation of this algorithms we can even do grid search over the entries of $A$, but because $A\in \mathbb{R}^{d\times k}$, which is a very large space we restrict this method over randomized search. Note that the step $5,6$ together only take $O(k^3+d^2k)$ time with one time overhead of $O(Tndk)$ as we can compute $\mathbf{D}, \mathbf{N}$ as in \ref{regg_D}, \ref{regg_N}, then $A$ compute $\beta$ with just 4 matrix multiplications and 1 matrix inversion taking $O(k^3)$ operations. Following is the pseudocode for the method:
 \begin{algorithm}[H]
 \caption{$\mathcal{A}_{0}[N]$ : Baseline Method}\label{lfm_baseline_method}
 \begin{algorithmic}[1]
@@ -131,7 +127,7 @@ Following is the pseudocode for the method:
 \State \textbf{complexity: } $O(N(dk+d^2k+ndS+k^3)) = 
  O(N(k^3+ndS))$
 \end{algorithmic}
-\end{algorithm} In an alternate implementation of this algorithms we can even do grid search over the entries of $A$, but because $A\in \mathbb{R}^{d\times k}$, which is a very large space we restrict this method over randomized search. Note that the step $5,6$ together only take $O(k^3+d^2k)$ time with one time overhead of $O(Tndk)$ as we can compute $\mathbf{D}, \mathbf{N}$ as in \ref{regg_D}, \ref{regg_N}, then $A$ compute $\beta$ with just 4 matrix multiplications and 1 matrix inversion taking $O(k^3)$ operations.
+\end{algorithm}
 \level{3}{Gradient Based Methods}
 To compute the partial derivatives of the loss function $\mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}$ with respect to $A^{d\times k}$ and $\beta^{k \times 1}$, we will use the chain rule and the derivative of the matrix multiplication.\newline \newline first, let's compute the derivative of $\mathcal{L}_{\beta^{k \times 1}, A^{d\times k}}$ with respect to $\beta^{k \times 1}$. Lets Define $\Delta_t = R^{n\times 1}_t-R^{n\times d}_{t\times d}\times A^{d\times k} \times \beta^{k \times 1}$
 \begin{equation}
@@ -374,7 +370,7 @@ using which we can write
     \EndIf 
 \EndFor
 \State \Return  $\beta_{optimal}, A_{optimal}$
-\State \textbf{complexity: } $O()$
+\State \textbf{complexity: } $O(k^3+N(k^3+ndS))=O(N(k^3+ndS))$
 \end{algorithmic}
 \end{algorithm} \newline \textbf{Observation:} For a given $A$ and for $\{F^{n\times k}_{t}\}$ computed w.r.t. $A$ over $t\in [d,T]$ and $\beta \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t}\}, t\in [d,T])$. Here we are using $L_2$ norm for regression which gives us the formula for $\beta$, as we know that $\beta$ is the solution of the equation \ref{Loss_diff_wrt_beta} and using the fact that $F^{n\times k}_{t} = R^{n\times d}_{t}A$, we can write a formula for $\beta$ as follows
 \begin{equation}\label{expaned_bets_diff_loss}
@@ -424,13 +420,234 @@ we can write $(F^{n\times k}_t)^\top F^{n\times k}_t = A^\top(R^{n\times d}_{t})
 \end{equation}
 Hence, if $\bar{A} = AQ$ then if $\beta, \bar{\beta}$ solve regression problem generated by $A, \bar{A}$ respectively then we get $\bar{\beta} = Q^\top\beta$. 
 
-\newpage
+\level{3}{No Preference Method}
+Under MOOP methods we decided to use No Preference method, because of its no dependence on of use defined parameters and easy to formulate and compute.
+
+First we compute the \textbf{utopia point} as defined in \ref{ideal_point_def} for this problem, here we have 2 dimensions for the objective to minimize namely $-\mathcal{R}_{\beta, A}$ and $\mathcal{L}_{\beta, A}$ and the utopia point values denoted by $-\mathcal{R}_{\beta, A}^* = min -\mathcal{R}_{\beta, A}  = - max\hspace{2mm} \mathcal{R}_{\beta, A} =  - 1 $ as its inner-product between vectors divided by the norms induced by that inner-product in and $\mathcal{L}_{\beta, A}^* =min \hspace{2mm} \mathcal{L}_{\beta, A} = 0$. And finally we have the condition that $AA^\top = I$, which either we can view as constraint or consider $I$ as the utopia point value of $AA^\top$. Finally we can consider one of the 2 optimization problem framed under \textit{No preference method}
+\newline \textbf{No Preference Method Optimization Problem 1}
+\begin{equation} \label{NPMOP_1:objective}
+\begin{aligned}
+    \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathcal{O}^{k}_{d}}{min} || [\mathcal{L}_{\beta, A}-\mathcal{L}_{\beta, A}^*,-\mathcal{R}_{\beta, A}+\mathcal{R}_{\beta, A}^*]||
+\end{aligned}
+\end{equation}
+in this case we can use any norm $||\cdot ||$ defiend on $\mathbb{R}^2$ for example euclidean norm.
+\hspace{2mm}
+\newline \textbf{No Preference Method Optimization Problem 2}
+\begin{equation} \label{NPMOP_2:objective}
+\begin{aligned}
+    \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathbb{R}^{d\times k}}{min} || [\mathcal{L}_{\beta, A}-\mathcal{L}_{\beta, A}^*,-\mathcal{R}_{\beta, A}+\mathcal{R}_{\beta, A}^*, AA^\top - I]||
+\end{aligned}
+\end{equation}
+in this case we can use any norm $||\cdot ||$ defiend on $\mathbb{R}^{2+d^2}$ as $AA^\top -I$ is a $d\times d$ matrix which can vectorize to get a $d\times d$ vector for the purposes of computing the norm.
+% \level{4}{$\epsilon$-Constraint Method}
+% To apply $\epsilon$-Constraint Method to this problem we need to first define the most important single objective, in our case that is $\mathcal{R}_{\beta, A}$ and we can relax the other objective to an constraint namely $\mathcal{L}_{\beta, A} \le \epsilon$ so now the problem that we need to solve reduces to one of the 2 cases depending on how we handle the condition $AA^\top = I$.
+% \newline \textbf{$\epsilon$-Constraint Method Optimization Problem 1}
+% \begin{equation} \label{ECMOP_1}
+% \begin{aligned}
+%     \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathcal{O}^{k}_{d}}{max}& \hspace{3mm} \mathcal{R}_{\beta, A}\\
+%     \text{st.  }& \mathcal{L}_{\beta, A} \le \epsilon
+% \end{aligned}
+% \end{equation}
+% \newline \textbf{$\epsilon$-Constraint Method Optimization Problem 2}
+% \begin{equation} \label{ECMOP_2}
+% \begin{aligned}
+%     \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathbb{R}^{d\times k}}{max}& \hspace{3mm} \mathcal{R}_{\beta, A}\\
+%     \text{st.  }& \mathcal{L}_{\beta, A} \le \epsilon\\
+%      & ||AA^\top - I|| \le \epsilon_1
+% \end{aligned}
+% \end{equation}
+% \level{4}{Lexicographic Method}
+% To reduce the problem for this method we need the order of important of the objectives, which in our case $\mathcal{R}_{\beta, A}$ being more important than $\mathcal{L}_{\beta, A}$. And similarly as before based on how we handle the condition $AA^\top = I$ we can get 2 optimization problems.
+% \newline \textbf{Lexicographic Method Optimization Problem 1}
+% \newline \textbf{Step 1}
+% \begin{equation} \label{LMOP_1:step_1}
+% \begin{aligned}
+%     \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathcal{O}^{k}_{d}}{max}& \hspace{3mm} \mathcal{R}_{\beta, A}\\
+% \end{aligned}
+% \end{equation}
+% let $\beta^{*}, A^{*}$ be the solution of \textbf{Step 1}, then \textbf{Step 2} can be formulated as follows
+% \newline \textbf{Step 2}
+% \begin{equation}\label{LMOP_1:step_2}
+% \begin{aligned}
+%     \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathcal{O}^{k}_{d}}{min}& \hspace{3mm} \mathcal{L}_{\beta, A}\\
+%     \text{st.  }& \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}
+% \end{aligned}
+% \end{equation}
+% \newline \textbf{Lexicographic Method Optimization Problem 2}
+% \newline note that when we relax $A \in \mathcal{O}_d^k$ to $A \in \mathbb{R}^{d\times k}$ we get one more objective namely 
+% \begin{equation}
+% \begin{aligned}
+% \underset{A\in \mathbb{R}^{d\times k}}{min} \hspace{3mm} || AA^\top -I|| 
+% \end{aligned}
+% \end{equation}
+% which gives us the new added step \textbf{Step 3} for the problem 3 along with the \textbf{Step 1, 2} 
+% \newline \textbf{Step 1}
+% \begin{equation} \label{LMOP_2:step_1}
+% \begin{aligned}
+%     \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathbb{R}^{d\times k}}{max}& \hspace{3mm} \mathcal{R}_{\beta, A}\\
+% \end{aligned}
+% \end{equation}
+% let $\beta^{*}, A^{*}$ be the solution of \textbf{Step 1}, then \textbf{Step 2} can be formulated as follows
+% \newline \textbf{Step 2}
+% \begin{equation} \label{LMOP_2:step_2}
+% \begin{aligned}
+%     \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathbb{R}^{d\times k}}{min}& \hspace{3mm} \mathcal{L}_{\beta, A}\\
+%     \text{st.  }& \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}
+% \end{aligned}
+% \end{equation}
+% let $\beta^{**}, A^{**}$ be the solution of \textbf{Step 2}, then \textbf{Step 3} can be formulated as follows
+% \newline \textbf{Step 3}
+% \begin{equation} \label{LMOP_2:step_3}
+% \begin{aligned}
+% \underset{A\in \mathbb{R}^{d\times k}}{min}& \hspace{3mm} || AA^\top -I|| \\ 
+% \text{st.  }& \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}\\
+% \text{st.  }& \mathcal{L}_{\beta, A} \le \mathcal{L}_{\beta^{**}, A^{**}}\\
+% \end{aligned}
+% \end{equation}
+% \newline \newline Note that all the problems \ref{NPMOP_1:objective}, \ref{NPMOP_2:objective}, \ref{ECMOP_1}, \ref{ECMOP_2}, \ref{LMOP_1:step_1}, \ref{LMOP_1:step_2}, \ref{LMOP_2:step_1}, \ref{LMOP_2:step_2} and \ref{LMOP_2:step_3} are \textbf{Single Objective Optimization Problem} and we can use various methods to solve them. As all the objectives are differentiable we can use Gradient Descent (GD) algorithm and its variants to get an optimal solution. For problems \ref{NPMOP_2:objective} and \ref{LMOP_2:step_1} we can directly apply GD, but  for other problems we need to address the condition and modify GD accordingly. The problems where $A \in \mathcal{O}_d^k$ are \ref{NPMOP_1:objective} and \ref{LMOP_1:step_1} to solve them we need to modify the GD accordingly. For the problems \ref{ECMOP_2}, \ref{LMOP_2:step_2} and \ref{LMOP_2:step_3} we have inequality constraints for which we can use \textbf{Constraint Guided Gradient Descent (CGGD)} algorithm \cite{karsmakers2022constraint} to get the solution. For the remaining problems, namely \ref{ECMOP_1} and \ref{LMOP_1:step_2} we need to modify \textbf{CGGD} algorithm to account for the condition $A \in \mathcal{O}_d^k$ and get the solution.
+% \newline \textbf{Constraint Guided Gradient Descent (CGGD) Algorithm}
+% \newline Constraint Guided Gradient Descent (CGGD) is a type of optimization algorithm that is used to solve constrained optimization problems. For the problem defined  below 
+% \begin{equation}
+% \begin{aligned}
+%     \underset{\vec{x} \in \mathbb{R}^n}{min} \hspace{2mm} & f(\vec{x})\\
+%     \forall i \in \{1...k\} \hspace{2mm} & g_i(\vec{x}) \le 0\\
+% \end{aligned}
+% \end{equation}
+% then CGGD algorithm at step $i$ updates the value of $\vec{x}_i$ to $\vec{x}_{i+1}$ with the learning rate being $\eta_i$ and $\epsilon$ is the lower bound for relative weight of constraint delta compared to that of the gradient, and a constant $C\ge 1$, usually $C = 1.5$.
+% \begin{equation}
+% \begin{aligned}
+%     \vec{x}_{i+1} =& \vec{x}_i - \eta_i(\nabla f(\vec{x}_i) + C \vec{dir}(\vec{x}_i-\vec{x}^{*}) max(\epsilon,||\nabla f(\vec{x}_i)||))\\
+% \end{aligned}
+% \end{equation}
+% where $x^{*}$ is belongs to the set of points for which $\forall i \in \{1...k\} \hspace{2mm}  g_i(\vec{x}) \le 0$ is satisfied and $\vec{dir}(\vec{x}_i-\vec{x}^{*})$ represents the direction vector from $\vec{x}^{*}$ to $\vec{x}_i$. Even though with any $x^{*}$ eventually the solution will converge, but choice of the $x^{*}$ at each iteration has a huge impact on the convergence speed. 
+% \newline \newline \textbf{Case $A \in \mathbb{R}^{d \times k}$ and No Inequality Condition}
+% \newline Here we have the problems \ref{NPMOP_2:objective} and \ref{LMOP_2:step_1}, so for \ref{NPMOP_2:objective} we directly apply GD method to get the solution. Following is the update rule for the norm defined as follows $||x,y,A|| = \sqrt{x^2+y^2+||A||^2_F}$ after we minimize the $\frac{1}{2}||\cdot||^2$ using GD method with learning rate of $\epsilon_A,\epsilon_{\beta}$
+% \begin{equation}
+% \begin{aligned}
+% A_{i+1} &= A_{i} - \epsilon_A ( -(1-\mathcal{R}_{\beta_i, A_i})\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A} + \mathcal{L}_{\beta_i, A_i} \frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial A}+ \frac{1}{2}\frac{\partial ||A_iA^\top_i -I||^2_F}{\partial A} )\\
+% \beta_{i+1} &= \beta_{i} - \epsilon_{\beta} ( -(1-\mathcal{R}_{\beta_i, A_i})\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta} + \mathcal{L}_{\beta_i, A_i} \frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial \beta} )\\
+% \end{aligned}    
+% \end{equation}
+% and similarly for \ref{LMOP_2:step_1} we can write
+% \begin{equation}
+% \begin{aligned}
+% A_{i+1} &= A_{i} - \epsilon_A ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A} )\\
+% \beta_{i+1} &= \beta_{i} - \epsilon_{\beta} ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta} )
+% \end{aligned}    
+% \end{equation}
+% \newline \textbf{Case $A \in \mathcal{O}_d^k$ and No Inequality Condition}
+% \newline Here we have the problems \ref{NPMOP_1:objective} and \ref{LMOP_1:step_1}, we directly apply GD method to get the $\Delta A_i$ which we will use to get a $Q_i$. Following is the update rule for the norm defined as follows $||x,y,A|| = \sqrt{x^2+y^2+||A||^2_F}$ after we minimize the $\frac{1}{2}||\cdot||^2$ using GD method with learning rate of $\epsilon_A,\epsilon_{\beta}$
+% \begin{equation}
+% \begin{aligned}
+% \Delta A_i &= - \epsilon_A ( -(1-\mathcal{R}_{\beta_i, A_i})\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A} + \mathcal{L}_{\beta_i, A_i} \frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial A})\\
+% \beta_{i+1} &= \beta_i - \epsilon_{\beta} ( -(1-\mathcal{R}_{\beta_i, A_i})\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta} + \mathcal{L}_{\beta_i, A_i} \frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial \beta})\\
+% Q_i &= \hspace{2mm} \text{ortho\_cayley\_transformation}(\frac{1}{2} \Delta A_i)\\
+% A_{i+1} &= \hspace{2mm} A_i Q_i \\
+% \end{aligned}    
+% \end{equation}
+% and similarly for \ref{LMOP_1:step_1} we can write
+% \begin{equation}
+% \begin{aligned}
+% \Delta A_{i} &= - \epsilon_A ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A} )\\
+% \beta_{i+1} &= \beta_i - \epsilon_{\beta} ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta} )\\
+% Q_i &= \text{ortho\_cayley\_transformation}(\frac{1}{2} \Delta A_i)\\
+% A_{i+1} &= A_i Q_i
+% \end{aligned}    
+% \end{equation}
+% \newline \textbf{Case $A \in \mathbb{R}^{d \times k}$ and With Inequality Condition}
+% \newline Here we have the problems \ref{ECMOP_2}, \ref{LMOP_2:step_2} and \ref{LMOP_2:step_3}
+% \newline For \ref{ECMOP_2}, let $X = \{(\beta, A) | \mathcal{L}_{\beta, A} \le \epsilon, ||AA^\top - I|| \le \epsilon_1\}$ and let $\bar{x} = (\bar{\beta},\bar{A}) \in X$ then we can write the update equation as follows for learning rates $\epsilon_A,\epsilon_{\beta}$ and constant $C=1.5$ and $\epsilon$ the lower bound for relative weight of constraint delta compared to that of the gradient.
+% \begin{equation}
+% \begin{aligned}
+% A_{i+1} &= A_{i} - \epsilon_A ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A} + C \vec{dir}(A_i-\bar{A}) max(\epsilon,||\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A}||))\\
+% \beta_{i+1} &= \beta_{i} - \epsilon_{\beta} ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta} + C \vec{dir}(\beta_i-\bar{\beta}) max(\epsilon,||\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta}||))
+% \end{aligned}    
+% \end{equation}
+% \newline for \ref{LMOP_2:step_2}, let $X = \{(\beta, A) | \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}\}$, $\bar{x} = (\bar{\beta},\bar{A}), \epsilon_A, \epsilon_{\beta}, C, \epsilon$ follow similar definition as before and we can write
+% \begin{equation}
+% \begin{aligned}
+% A_{i+1} &= A_{i} - \epsilon_A ( \frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial A} + C \vec{dir}(A_i-\bar{A}) max(\epsilon,||\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial A}||))\\
+% \beta_{i+1} &= \beta_{i} - \epsilon_{\beta} ( \frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial \beta} + C \vec{dir}(\beta_i-\bar{\beta}) max(\epsilon,||\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial \beta}||))
+% \end{aligned}    
+% \end{equation}
+% \newline for \ref{LMOP_2:step_3}, let $X = \{(\beta, A) | \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}, \mathcal{L}_{\beta, A} \le \mathcal{L}_{\beta^{**}, A^{**}}\}$, $\bar{x} = (\bar{\beta},\bar{A}), \epsilon_A, \epsilon_{\beta}, C, \epsilon$ follow similar definition as before and $|| AA^\top -I|| = || AA^\top -I||_F$ and we will minimize the $\frac{1}{2}||\cdot||^2_F$
+% \begin{equation}
+% \begin{aligned}
+% A_{i+1} &= A_{i} - \epsilon_A ( \frac{\partial || A_iA^\top_i -I||^2_F}{2\partial A} + C \vec{dir}(A_i-\bar{A}) max(\epsilon,||\frac{\partial || A_iA^\top_i -I||^2_F}{2\partial A}||_F))\\
+% \beta_{i+1} &= \beta_{i} - \epsilon_{\beta} ( C \vec{dir}(\beta_i-\bar{\beta}) max(\epsilon,0))
+% \end{aligned}    
+% \end{equation}
+% \newline \textbf{Case $A \in \mathcal{O}_d^k$ and With Inequality Condition}
+% \newline Here we have the problems \ref{ECMOP_1} and \ref{LMOP_1:step_2} 
+% \newline for \ref{ECMOP_1}, let $X = \{(\beta, A) |  \mathcal{L}_{\beta, A} \le \epsilon \}$, $\bar{x} = (\bar{\beta},\bar{A}), \epsilon_A, \epsilon_{\beta}, C, \epsilon$ follow similar definition as before and we can write the update rule as follows
+% \begin{equation}
+% \begin{aligned}
+% \Delta A_{i} &= - \epsilon_A ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A} + C \vec{dir}(A_i-\bar{A}) max(\epsilon,||\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A}||))\\
+% \beta_{i+1} &= \beta_{i} - \epsilon_{\beta} ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta} + C \vec{dir}(\beta_i-\bar{\beta}) max(\epsilon,||\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta}||))\\
+% Q_i &= \hspace{2mm} \text{ortho\_cayley\_transformation}(\frac{1}{2} \Delta A_i)\\
+% A_{i+1} &= \hspace{2mm} A_i Q_i \\
+% \end{aligned}    
+% \end{equation}
+% \newline for \ref{LMOP_1:step_2}, let $X = \{(\beta, A) | \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}\}$, $\bar{x} = (\bar{\beta},\bar{A}), \epsilon_A, \epsilon_{\beta}, C, \epsilon$ follow similar definition as before and we can write the update rule as follows
+% \begin{equation}
+% \begin{aligned}
+% \Delta A_{i} &= - \epsilon_A ( -\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial A} + C \vec{dir}(A_i-\bar{A}) max(\epsilon,||\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial A}||))\\
+% \beta_{i+1} &= \beta_{i} - \epsilon_{\beta} ( -\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial \beta} + C \vec{dir}(\beta_i-\bar{\beta}) max(\epsilon,||\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial \beta}||))\\
+% Q_i &= \hspace{2mm} \text{ortho\_cayley\_transformation}(\frac{1}{2} \Delta A_i)\\
+% A_{i+1} &= \hspace{2mm} A_i Q_i \\
+% \end{aligned}    
+% \end{equation}
+% We note that other then \ref{NPMOP_1:objective} and \ref{NPMOP_2:objective} i.e. for all other methods, other than No Preference Method we need to use CGGD method, which relies on having $\bar{A}, \bar{\beta}$ which satisfy the corresponding constraints, and due to computational limitations as to compute them at each iteration is very expensive. Hence, we will compute the solution only for No Preference Method. Below is the pseudocode for both the No Preference Methods where $\vec{\mu} = (\mu_0,\mu_1,\mu_2)$ where $\mu_0$ is the number of iterations, we can also denote it by $N=\mu_0$, $\mu_1$ is the learning rate for $\A$ and $\mu_2$ is the learning rate for $\beta$.
+
+\begin{algorithm}[H]
+\caption{$NPM_1[\vec{\mu}]$ : No Preference Method 1}\label{no_preference_method_1}
+\begin{algorithmic}[1]
+\State $A \gets random(\mathbb{R}^{d\times k})$
+\State $A \gets \text{gram\_schmidt\_algorithm}(A)$\Comment{orthonormalize $A$}
+\State $\beta \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t}[A]\}, t\in [d,T])$
+\State $\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \beta, A, \mathcal{R}_{\beta, A}$
+\For{$i \gets 1$ to $N$}
+    \State $\Delta A \gets (1-\mathcal{R}_{\beta, A})\frac{\partial \mathcal{R}_{\beta, A}}{\partial A} - \mathcal{L}_{\beta, A} \frac{\partial \mathcal{L}_{\beta, A}}{\partial A}- \frac{1}{2}\frac{\partial ||AA^\top -I||^2_F}{\partial A} $
+    \State $\Delta \beta \gets (1-\mathcal{R}_{\beta, A})\frac{\partial \mathcal{R}_{\beta, A}}{\partial \beta} - \mathcal{L}_{\beta, A} \frac{\partial \mathcal{L}_{\beta, A}}{\partial \beta} $
+    \State $Q \gets \text{ortho\_cayley\_transformation}(\frac{\mu_1}{2} \Delta A)$
+    \State $A \gets AQ$
+    \State $\beta \gets \beta + \mu_2 \Delta \beta$
+    \If{$\mathcal{R}_{\beta, A} > \mathcal{R}_{optimal}$}  \Comment{update the optimal if better solution found}
+        \State $\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \beta, A, \mathcal{R}_{\beta, A} $
+    \EndIf 
+\EndFor
+\State \Return  $\beta_{optimal}, A_{optimal}$
+\State \textbf{complexity: } $O(N(ndS+k^3))$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{$NPM_2[\vec{\mu}]$ : No Preference Method 2}\label{no_preference_method_2}
+\begin{algorithmic}[1]
+\State $A \gets random(\mathbb{R}^{d\times k})$
+\State $A \gets \text{gram\_schmidt\_algorithm}(A)$\Comment{orthonormalize $A$}
+\State $\beta \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t}[A]\}, t\in [d,T])$
+\State $\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \beta, A, \mathcal{R}_{\beta, A}$
+\For{$i \gets 1$ to $N$}
+    \State $\Delta A \gets (1-\mathcal{R}_{\beta, A})\frac{\partial \mathcal{R}_{\beta, A}}{\partial A} - \mathcal{L}_{\beta, A} \frac{\partial \mathcal{L}_{\beta, A}}{\partial A}- \frac{1}{2}\frac{\partial ||AA^\top -I||^2_F}{\partial A} $
+    \State $\Delta \beta \gets (1-\mathcal{R}_{\beta, A})\frac{\partial \mathcal{R}_{\beta, A}}{\partial \beta} - \mathcal{L}_{\beta, A} \frac{\partial \mathcal{L}_{\beta, A}}{\partial \beta} $
+    \State $A \gets A + \mu_1 \Delta A$
+    \State $\beta \gets \beta + \mu_2 \Delta \beta$
+    \If{$\mathcal{R}_{\beta, A} > \mathcal{R}_{optimal}$}  \Comment{update the optimal if better solution found}
+        \State $\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \beta, A, \mathcal{R}_{\beta, A} $
+    \EndIf 
+\EndFor
+\State \Return  $\beta_{optimal}, A_{optimal}$
+\State \textbf{complexity: } $O(N(ndS+k^2))$
+\end{algorithmic}
+\end{algorithm}
+
+
 \level{3}{Evolutionary Algorithms}
 The main problem with applying Evolutionary Algorithms for this problem is that we need to search for $A,\beta$ but $A \in \mathcal{O}^{k}_{d}$ which is not closed under addition of any random matrix in $\mathbb{R}^{d\times k}$ so instead for perturbing $A$ for purposes of mutation and crossover we will use the Cayley Transformation \ref{cayley-transformation} over the perturbation to get the $Q$, which will be used to multiplicatively perturb $A$.
 
 \level{4}{NSGA-II}
-NSGA-II (Non-dominated Sorting Genetic Algorithm II) is a multi-objective optimization algorithm that uses genetic algorithms to search for Pareto-optimal solutions. Pareto-optimal solutions are solutions that cannot be improved in one objective without sacrificing another objective. NSGA-II was proposed by Kalyanmoy Deb in 2002 \cite{deb2002fast}, and it has become a popular algorithm for solving multi-objective optimization problems.
-\newline \newline Below is the pseudocode for NSGA-II for Population size $N$, maximum number of generations $G$, crossover probability $p_c$ and mutation probability $p_m$, crossover function $\mathcal{C}$, mutation function $\mathcal{M}$
+ Below is the pseudocode for NSGA-II for Population size $N$, maximum number of generations $G$, crossover probability $p_c$ and mutation probability $p_m$, crossover function $\mathcal{C}$, mutation function $\mathcal{M}$
 
 \begin{algorithm}[H] \label{nsga2_psoudocode}
 \caption{NSGA-II($N,G,p_c,p_m,\mathcal{C},\mathcal{M}$)}
@@ -452,13 +669,31 @@ NSGA-II (Non-dominated Sorting Genetic Algorithm II) is a multi-objective optimi
 \EndIf 
 \EndFor 
 \State \Return $P$
-\State \textbf{complexity: } $O()$
+% \State \textbf{complexity: } $O()$
 \end{algorithmic}
 \end{algorithm}
-We need to define the 2 sub-procedure namely non\_dominated\_sorting$(P)$ and the calculation of crowding distance and the corresponding crowded-comparator operator 
 \newline non\_dominated\_sorting$(P)$ : Sorts the population $P$ into different non-dominated fronts $F_1,F_2,...$ based on the Pareto-dominance relationship i.e. we say $x \preceq y$ or $x$ dominates $y$ if $x$ is no worst when compared to $y$ in all the objectives but is better at at least some of the objective. The first front $F_1$ contains the non-dominated solutions, the subset of $P$ which contains all the solutions which are not dominated by any other solution in $P$. For $i>1$, the $i$'th front $F_i$ contains the solutions that are only dominated by the solutions in the first $i-1$ sets namely $F_1,F_2...F_{i-1}$, for more details and algorithm to compute the $F_i$'s refer \cite{deb2002fast}.
 \newline \newline  Crowding distance and crowding comparator: The crowding distance is a measure of crowdedness around a solution in its a front $F_i$. Larger the value of crowding distances implies that there aren't many closeby solution in the front, hence solutions with larger crowding distances are preferred, as they give more diversity to the population. For exact definition of the Crowding distance refer \cite{deb2002fast}.
 \newline Since $S = (\beta,A)$ and $A \in \mathcal{O}^{k}_{d}$, we need to use $crossover[\mathcal{C}](S_1,S_2)$ and $mutate[\mathcal{M}](S_1,S_2)$ which are  customized for our problem to ensure that new updated solution after crossover and mutation have $A's \in \mathcal{O}^{k}_{d}$ and also need to modify $random\_candidate\_solutions(N)$ so that the initial solutions have $A's \in \mathcal{O}^{k}_{d}$. For initial population we can simply orthonormalize $A$'s in the initial population.
+
+\begin{algorithm}[H]
+\caption{$\mathcal{C}[Case]$ : crossover($S_1,S_2$)}\label{nsga2:crossover_1}
+\begin{algorithmic}[1]
+\Require{$A_1, A_2 \in \mathcal{O}^{k}_{d}$}
+\State $(\beta_1, A_1), (\beta_2, A_2)\gets S_1, S_2$
+\State $\Delta A_1, \Delta A_2 \gets (A_2-A_1), (A_1-A_2)$
+\State $Q_1, Q_2 \gets \text{ortho\_cayley\_transformation}(\frac{\lambda}{2} \Delta A_1), \text{ortho\_cayley\_transformation}(\frac{\lambda}{2} \Delta A_2)$
+\State $A^{'}_1, A^{'}_2\gets A_1Q_1, A_2Q_2$
+\If{$Case$ is Use Regression}
+\State $\beta^{'}_i \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t}[A^{'}_i]\}, t\in [d,T])$ for $i\in \{1,2\}$
+\Else{}
+\State $\beta^{'}_1, \beta^{'}_2 \gets \beta_1 + \lambda(\beta_2-\beta_1), \beta_2 + \lambda(\beta_1-\beta_2)$
+\EndIf
+\State \Return $(\beta^{'}_1,A^{'}_1),(\beta^{'}_2,A^{'}_2)$
+\State \textbf{complexity: } $O(k^3)$
+\end{algorithmic}
+\end{algorithm}
+
 \begin{algorithm}[H]
 \caption{get\_offspring\_population($P,N,\mathcal{C},\mathcal{M}$)}\label{nsga2:generate_offspring_population}
 \begin{algorithmic}[1]
@@ -476,51 +711,79 @@ We need to define the 2 sub-procedure namely non\_dominated\_sorting$(P)$ and th
 \State $Q \gets Q \cup \{S_1, S_2\}$
 \EndFor
 \State \Return $Q$
-\State \textbf{complexity: } $O()$
+% \State \textbf{complexity: } $O()$
 \end{algorithmic}
 \end{algorithm}
+
 \begin{algorithm}[H]
-\caption{$\mathcal{C}_1$ : crossover($S_1,S_2$)}\label{nsga2:crossover_1}
-\begin{algorithmic}[1]
-\Require{$A_1, A_2 \in \mathcal{O}^{k}_{d}$}
-\State $(\beta_1, A_1), (\beta_2, A_2)\gets S_1, S_2$
-\State $\Delta A_1, \Delta A_2 \gets (A_2-A_1), (A_1-A_2)$
-\State $Q_1, Q_2 \gets \text{ortho\_cayley\_transformation}(\frac{\lambda}{2} \Delta A_1), \text{ortho\_cayley\_transformation}(\frac{\lambda}{2} \Delta A_2)$
-\State $A^{'}_1, A^{'}_2\gets A_1Q_1, A_2Q_2$
-\State $\beta^{'}_1, \beta^{'}_2 \gets \beta_1 + \lambda(\beta_2-\beta_1), \beta_2 + \lambda(\beta_1-\beta_2)$
-\State \Return $(\beta^{'}_1,A^{'}_1),(\beta^{'}_2,A^{'}_2)$
-\State \textbf{complexity: } $O(d^2k)$
-\end{algorithmic}
-\end{algorithm}
-\begin{algorithm}[H]
-\caption{$\mathcal{C}_2$ : crossover($S_1,S_2$)}\label{nsga2:crossover_1}
-\begin{algorithmic}[1]
-\Require{$A_1, A_2 \in \mathcal{O}^{k}_{d}$}
-\State $(\beta_1, A_1), (\beta_2, A_2)\gets S_1, S_2$
-\State $Q_1, Q_2 \gets \text{ortho\_cayley\_transformation}(\frac{\lambda}{2} \Delta A_1), \text{ortho\_cayley\_transformation}(\frac{\lambda}{2} \Delta A_2)$
-\State $A^{'}_1, A^{'}_2\gets A_1Q_1, A_2Q_2$
-\State $\beta^{'}_i \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t}[A^{'}_i]\}, t\in [d,T])$ for $i\in \{1,2\}$
-\State \Return $(\beta^{'}_1,A^{'}_1),(\beta^{'}_2,A^{'}_2)$
-\State \textbf{complexity: } $O(d^2k+k^3) = O(k^3)$
-\end{algorithmic}
-\end{algorithm}
-\begin{algorithm}[H]
-\caption{$\mathcal{M}_1$ : mutate($S$)}\label{nsga2:mutate_1}
+\caption{$\mathcal{M}$ : mutate($S$)}\label{nsga2:mutate_1}
 \begin{algorithmic}[1]
 \Require{$A \in \mathcal{O}^{k}_{d}$, $\lambda \in \mathbb{R}^{+}$}
 \State $(\beta, A)\gets S$
 \State $\Delta A, \Delta \beta \gets Random(\mathbb{R}^{d\times k}),Random(\mathbb{R}^{k\times 1})$
 \State $Q \gets \text{ortho\_cayley\_transformation}(\frac{\lambda}{2} \Delta A)$
 \State \Return $(\beta + \lambda \Delta \beta, AQ)$
-\State \textbf{complexity: } $O()$
+\State \textbf{complexity: } $O(k^3)$
 \end{algorithmic}
 \end{algorithm}
 
-\newpage
 \level{4}{Multi-Objective  Particle Swarm Optimization}
-Originally developed for solving single objective optimization problems, Particle Swarm Optimization (PSO) \cite{shi2004particle} is an algorithm inspired by the social behavior of bird flocking. It initializes a population of particles with random solutions and updates their velocity, the best solution a particle has achieved so far, and follows the best solution achieved among the population of solutions in each generation, leading to the global Pareto front. Several multiobjective optimization algorithms are based on PSO, including Multiobjective Particle Swarm Optimization (MOPSO) \cite{coello2004handling}, Nondominated Sorting Particle Swarm Optimization (NSPSO) \cite{li2003non} and others. In this method we will be using the varient described in the paper 'An Effective Use of Crowding Distance in Multiobjective Particle Swarm Optimization' \cite{raquel2005effective} \newline The pseudocode for the described method is as follows:
+ Several multiobjective optimization algorithms are based on PSO, including Multiobjective Particle Swarm Optimization (MOPSO) \cite{coello2004handling}, Nondominated Sorting Particle Swarm Optimization (NSPSO) \cite{li2003non} and others. In this method we will be using the varient described in the paper 'An Effective Use of Crowding Distance in Multiobjective Particle Swarm Optimization' \cite{raquel2005effective} \newline The pseudocode for the described method is as follows:
+ % \begin{algorithm}[H]
+% \caption{update\_personal\_best$(\{\vec{p}_i\}, \{\vec{f}(p_i)\},\{\vec{x}_i\}, \{\vec{f}(x_i)\}, \{\vec{d}(x_i)\})$}
+% \label{alg:mopso}
+% \begin{algorithmic}[1]
+% \For{$i \gets 1$ to $N$}
+% \If{$\vec{f}(\vec{x}_i) \preceq \vec{f}(\vec{p}_i)$ or $(\neg (\vec{f}(\vec{p}_i) \preceq \vec{f}(\vec{x}_i))$ and $d(\vec{x}_i) > d(\vec{p}_i)$)}
+% \State $\vec{p_i} \gets \vec{x_i}, \vec{f}(\vec{p}_i) \gets \vec{f}(\vec{x}_i)$
+% \EndIf
+% \EndFor
+% \State \Return $\{\vec{p}_i\}, \{\vec{f}(p_i)\} $
+% \State \textbf{complexity: } $O()$
+% \end{algorithmic}
+% \end{algorithm}
+
+ \begin{algorithm}[H]
+\caption{$\text{update\_position}[\epsilon](\vec{x}_i,\vec{v}_i)$}
+\label{update_pos}
+\begin{algorithmic}[1]
+\State $(\beta_i,A_i) \gets x_i$
+\State $(\Delta \beta_i,\Delta A_i) \gets v_i$
+\State $Q_i \gets \text{ortho\_cayley\_transformation}(\frac{\epsilon}{2}\Delta A_i)$
+\State \Return $(\beta+\epsilon \Delta \beta_i,A_iQ_i)$
+% \State \textbf{complexity: } $O()$
+\end{algorithmic}
+\end{algorithm}
+
 \begin{algorithm}[H]
-\caption{Multi-Objective Particle Swarm Optimization (MOPSO)}
+\caption{$\text{nondominated\_merge}[M](A, \{\vec{x}_i\})$}
+\label{mopso_non_dominated_merge}
+\begin{algorithmic}[1]
+\State $F \gets \text{nondominated}(\{\vec{x}_i\})$
+\State $F_1,F_2,...F_t \gets \text{non\_dominated\_sorting}(F\cup A)$
+\State $A , i \gets \emptyset, 1 $
+\If{$|F_1| > M$}
+\State Sort $F_1$ in descending order of crowding distance
+\State $F_1 \gets F_1[1:M]$ 
+\EndIf
+\State \Return $F_1$
+% \State \textbf{complexity: } $O()$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{update\_velocity$[\omega,c_1, c_2](\vec{x}_i,\vec{v}_i,\vec{p}_i,\vec{p}_g)$}
+\label{alg:update_vel}
+\begin{algorithmic}[1]
+\State $r_1, r_2 \sim U(0,1)$
+\State $v_i \gets \omega v_i + c_1 r_1 (\vec{p_i} - \vec{x_i}) + c_2 r_2 (\vec{p_g} - \vec{x_i})$
+\State \Return $v_i$
+% \State \textbf{complexity: } $O()$
+\end{algorithmic}
+\end{algorithm}
+ 
+\begin{algorithm}[H]
+\caption{ MOPSO$(N,T_{max},\theta,\omega,c_1,c_2,p_m,\epsilon)$ Multi-Objective Particle Swarm Optimization}
 \label{alg:mopso}
 \begin{algorithmic}[1]
 % \Require Fitness function $f(x)$, where $x$ is a vector of decision variables.
@@ -536,7 +799,7 @@ Originally developed for solving single objective optimization problems, Particl
 \State $\{ \vec{d}(\vec{a}_i)\} \gets$ crowding\_distance$(A)$ \Comment{$d(\vec{a}_i)$ : average distance to $\vec{a}_i$'s neighbors in $A$}
 \For{$t \gets 1$ to $T_{\max}$}
 \For{$i \gets 1$ to $N$}
-\State $\vec{p_g} \gets \text{get\_global\_best}[\theta](A)$ \Comment{select the global best}
+\State $\vec{p_g} \gets \text{get\_global\_best}[\theta](A)$ \Comment{global best w.p. $theta$ else random point from $A$}
 \State $v_i \gets \text{update\_velocity}[\omega,c_1, c_2](\vec{x}_i,\vec{v}_i,\vec{p}_i,\vec{p}_g)$
 \State $\vec{x_i} \gets \text{update\_position}[\epsilon](\vec{x}_i,\vec{v}_i)$
 \If{\textbf{True} with probability $p_m$}
@@ -553,60 +816,26 @@ Originally developed for solving single objective optimization problems, Particl
 \State $\{\vec{p}_i\}, \{\vec{f}(p_i)\} \gets$ \text{update\_personal\_best}$(\{\vec{p}_i\}, \{\vec{f}(p_i)\},\{\vec{x}_i\}, \{\vec{f}(x_i)\}, \{\vec{d}(x_i)\})$
 \EndFor
 \State \Return $A$
-\State \textbf{complexity: } $O()$
+% \State \textbf{complexity: } $O()$
 \end{algorithmic}
 \end{algorithm}
 
 \begin{algorithm}[H]
-\caption{update\_personal\_best$(\{\vec{p}_i\}, \{\vec{f}(p_i)\},\{\vec{x}_i\}, \{\vec{f}(x_i)\}, \{\vec{d}(x_i)\})$}
-\label{alg:mopso}
+\caption{$\text{initialize\_position\_and\_velocity}(N)$}
+\label{mopso:initilize_position_and_velocity}
 \begin{algorithmic}[1]
+\State $P, V \gets \emptyset, \emptyset$
 \For{$i \gets 1$ to $N$}
-\If{$\vec{f}(\vec{x}_i) \preceq \vec{f}(\vec{p}_i)$ or $(\neg (\vec{f}(\vec{p}_i) \preceq \vec{f}(\vec{x}_i))$ and $d(\vec{x}_i) > d(\vec{p}_i)$)}
-\State $\vec{p_i} \gets \vec{x_i}, \vec{f}(\vec{p}_i) \gets \vec{f}(\vec{x}_i)$
-\EndIf
+    \State $A_i \gets random(\mathbb{R}^{d\times k})$
+    \State $A_i \gets \text{gram\_schmidt\_algorithm}(A_i)$
+    \State $\beta_i \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t,i}[A_i]\}, t\in [d,T])$
+    \State $(\Delta \beta_i,\Delta A_i) \gets (\frac{\partial \mathcal{R}_{\beta_i, A_{i}}}{\partial \beta},\frac{\partial \mathcal{R}_{\beta_i, A_{i}}}{\partial A})$
+    \State $x_i, v_i\gets (\beta_i,A_i), (\Delta \beta_i,\Delta A_i)$
+    \State $P\gets P \cup \{x_i\}$
+    \State $V\gets V \cup \{v_i\}$
 \EndFor
-\State \Return $\{\vec{p}_i\}, \{\vec{f}(p_i)\} $
-\State \textbf{complexity: } $O()$
-\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-\caption{update\_velocity$[\omega,c_1, c_2](\vec{x}_i,\vec{v}_i,\vec{p}_i,\vec{p}_g)$}
-\label{alg:update_vel}
-\begin{algorithmic}[1]
-\State $r_1, r_2 \sim U(0,1)$
-\State $v_i \gets \omega v_i + c_1 r_1 (\vec{p_i} - \vec{x_i}) + c_2 r_2 (\vec{p_g} - \vec{x_i})$
-\State \Return $v_i$
-\State \textbf{complexity: } $O()$
-\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-\caption{$\text{update\_position}[\epsilon](\vec{x}_i,\vec{v}_i)$}
-\label{update_pos}
-\begin{algorithmic}[1]
-\State $(\beta_i,A_i) \gets x_i$
-\State $(\Delta \beta_i,\Delta A_i) \gets v_i$
-\State $Q_i \gets \text{ortho\_cayley\_transformation}(\frac{\epsilon}{2}\Delta A_i)$
-\State \Return $(\beta+\epsilon \Delta \beta_i,A_iQ_i)$
-\State \textbf{complexity: } $O()$
-\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-\caption{$\text{nondominated\_merge}[M](A, \{\vec{x}_i\})$}
-\label{mopso_non_dominated_merge}
-\begin{algorithmic}[1]
-\State $F \gets \text{nondominated}(\{\vec{x}_i\})$
-\State $F_1,F_2,...F_t \gets \text{non\_dominated\_sorting}(F\cup A)$
-\State $A , i \gets \emptyset, 1 $
-\If{$|F_1| > M$}
-\State Sort $F_1$ in descending order of crowding distance
-\State $F_1 \gets F_1[1:M]$ 
-\EndIf
-\State \Return $F_1$
-\State \textbf{complexity: } $O()$
+\State \Return $P, V$
+% \State \textbf{complexity: } $O(N(k^3+computing\_grads))$
 \end{algorithmic}
 \end{algorithm}
 
@@ -621,7 +850,7 @@ Originally developed for solving single objective optimization problems, Particl
 \State $\vec{x}^{'}_i\gets (\beta_i + \lambda_1 \Delta \beta_i, A_iQ_i)$
 \State $\vec{v}^{'}_i \gets (\vec{v}_i.\beta_i + \lambda_2 Random(\mathbb{R}^{k\times 1}), \vec{v}_i.A_i + \lambda_2 Random(\mathbb{R}^{d\times k}))$
 \State \Return $\vec{x}^{'}_i, \vec{v}^{'}_i$
-\State \textbf{complexity: } $O(dk^2)$
+% \State \textbf{complexity: } $O(dk^2)$
 \end{algorithmic}
 \end{algorithm}
 
@@ -648,263 +877,22 @@ Originally developed for solving single objective optimization problems, Particl
         \State $d(F_i[1]), d(F_i[n_i])  \gets \text{Max distance among all points in } F_i $
     \EndFor
 \EndFor
-\State \textbf{complexity: } $O()$
+\State \Return $d$
+% \State \textbf{complexity: } $O()$
 \end{algorithmic}
 \end{algorithm}
 
-\begin{algorithm}[H]
-\caption{$\text{get\_global\_best}[\theta](A)$}
-\label{mopso:get_global_best}
-\begin{algorithmic}[1]
-\State with probability $theta$, $ g \in A$, where $g$ has the highest crowding distance in $A$
-\State with probability $1-theta$, $ g $ is any random solution in $A$ 
-\State \Return g
-\State \textbf{complexity: } $O()$
-\end{algorithmic}
-\end{algorithm}
+% \begin{algorithm}[H]
+% \caption{$\text{get\_global\_best}[\theta](A)$}
+% \label{mopso:get_global_best}
+% \begin{algorithmic}[1]
+% \State with probability $theta$, $ g \in A$, where $g$ has the highest crowding distance in $A$
+% \State with probability $1-theta$, $ g $ is any random solution in $A$ 
+% \State \Return g
+% \State \textbf{complexity: } $O()$
+% \end{algorithmic}
+% \end{algorithm}
 
-\begin{algorithm}[H]
-\caption{$\text{initialize\_position\_and\_velocity}(N)$}
-\label{mopso:initilize_position_and_velocity}
-\begin{algorithmic}[1]
-\State $P, V \gets \emptyset, \emptyset$
-\For{$i \gets 1$ to $N$}
-    \State $A_i \gets random(\mathbb{R}^{d\times k})$
-    \State $A_i \gets \text{gram\_schmidt\_algorithm}(A_i)$
-    \State $\beta_i \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t,i}[A_i]\}, t\in [d,T])$
-    \State $(\Delta \beta_i,\Delta A_i) \gets (\frac{\partial \mathcal{R}_{\beta_i, A_{i}}}{\partial \beta},\frac{\partial \mathcal{R}_{\beta_i, A_{i}}}{\partial A})$
-    \State $x_i, v_i\gets (\beta_i,A_i), (\Delta \beta_i,\Delta A_i)$
-    \State $P\gets P \cup \{x_i\}$
-    \State $V\gets V \cup \{v_i\}$
-\EndFor
-\State \Return $P, V$
-\State \textbf{complexity: } $O(N(k^3+computing\_grads))$
-\end{algorithmic}
-\end{algorithm}
-
-\newpage
-\level{3}{MOOP Methods}
-\level{4}{No Preference Method}
-First we compute the \textbf{utopia point} as defined in \ref{ideal_point_def} for this problem, here we have 2 dimensions for the objective to minimize namely $-\mathcal{R}_{\beta, A}$ and $\mathcal{L}_{\beta, A}$ and the utopia point values denoted by $-\mathcal{R}_{\beta, A}^* = min -\mathcal{R}_{\beta, A}  = - max\hspace{2mm} \mathcal{R}_{\beta, A} =  - 1 $ as its inner-product between vectors divided by the norms induced by that inner-product in and $\mathcal{L}_{\beta, A}^* =min \hspace{2mm} \mathcal{L}_{\beta, A} = 0$. And finally we have the condition that $AA^\top = I$, which either we can view as constraint or consider $I$ as the utopia point value of $AA^\top$. Finally we can consider one of the 2 optimization problem framed under \textit{No preference method}
-\newline \textbf{No Preference Method Optimization Problem 1}
-\begin{equation} \label{NPMOP_1:objective}
-\begin{aligned}
-    \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathcal{O}^{k}_{d}}{min} || [\mathcal{L}_{\beta, A}-\mathcal{L}_{\beta, A}^*,-\mathcal{R}_{\beta, A}+\mathcal{R}_{\beta, A}^*]||
-\end{aligned}
-\end{equation}
-in this case we can use any norm $||\cdot ||$ defiend on $\mathbb{R}^2$ for example euclidean norm.
-\hspace{2mm}
-\newline \textbf{No Preference Method Optimization Problem 2}
-\begin{equation} \label{NPMOP_2:objective}
-\begin{aligned}
-    \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathbb{R}^{d\times k}}{min} || [\mathcal{L}_{\beta, A}-\mathcal{L}_{\beta, A}^*,-\mathcal{R}_{\beta, A}+\mathcal{R}_{\beta, A}^*, AA^\top - I]||
-\end{aligned}
-\end{equation}
-in this case we can use any norm $||\cdot ||$ defiend on $\mathbb{R}^{2+d^2}$ as $AA^\top -I$ is a $d\times d$ matrix which can vectorize to get a $d\times d$ vector for the purposes of computing the norm.
-
-\level{4}{$\epsilon$-Constraint Method}
-To apply $\epsilon$-Constraint Method to this problem we need to first define the most important single objective, in our case that is $\mathcal{R}_{\beta, A}$ and we can relax the other objective to an constraint namely $\mathcal{L}_{\beta, A} \le \epsilon$ so now the problem that we need to solve reduces to one of the 2 cases depending on how we handle the condition $AA^\top = I$.
-\newline \textbf{$\epsilon$-Constraint Method Optimization Problem 1}
-\begin{equation} \label{ECMOP_1}
-\begin{aligned}
-    \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathcal{O}^{k}_{d}}{max}& \hspace{3mm} \mathcal{R}_{\beta, A}\\
-    \text{st.  }& \mathcal{L}_{\beta, A} \le \epsilon
-\end{aligned}
-\end{equation}
-\newline \textbf{$\epsilon$-Constraint Method Optimization Problem 2}
-\begin{equation} \label{ECMOP_2}
-\begin{aligned}
-    \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathbb{R}^{d\times k}}{max}& \hspace{3mm} \mathcal{R}_{\beta, A}\\
-    \text{st.  }& \mathcal{L}_{\beta, A} \le \epsilon\\
-     & ||AA^\top - I|| \le \epsilon_1
-\end{aligned}
-\end{equation}
-
-\level{4}{Lexicographic Method}
-To reduce the problem for this method we need the order of important of the objectives, which in our case $\mathcal{R}_{\beta, A}$ being more important than $\mathcal{L}_{\beta, A}$. And similarly as before based on how we handle the condition $AA^\top = I$ we can get 2 optimization problems.
-\newline \textbf{Lexicographic Method Optimization Problem 1}
-\newline \textbf{Step 1}
-\begin{equation} \label{LMOP_1:step_1}
-\begin{aligned}
-    \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathcal{O}^{k}_{d}}{max}& \hspace{3mm} \mathcal{R}_{\beta, A}\\
-\end{aligned}
-\end{equation}
-let $\beta^{*}, A^{*}$ be the solution of \textbf{Step 1}, then \textbf{Step 2} can be formulated as follows
-\newline \textbf{Step 2}
-\begin{equation}\label{LMOP_1:step_2}
-\begin{aligned}
-    \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathcal{O}^{k}_{d}}{min}& \hspace{3mm} \mathcal{L}_{\beta, A}\\
-    \text{st.  }& \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}
-\end{aligned}
-\end{equation}
-\newline \textbf{Lexicographic Method Optimization Problem 2}
-\newline note that when we relax $A \in \mathcal{O}_d^k$ to $A \in \mathbb{R}^{d\times k}$ we get one more objective namely 
-\begin{equation}
-\begin{aligned}
-\underset{A\in \mathbb{R}^{d\times k}}{min} \hspace{3mm} || AA^\top -I|| 
-\end{aligned}
-\end{equation}
-which gives us the new added step \textbf{Step 3} for the problem 3 along with the \textbf{Step 1, 2} 
-\newline \textbf{Step 1}
-\begin{equation} \label{LMOP_2:step_1}
-\begin{aligned}
-    \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathbb{R}^{d\times k}}{max}& \hspace{3mm} \mathcal{R}_{\beta, A}\\
-\end{aligned}
-\end{equation}
-let $\beta^{*}, A^{*}$ be the solution of \textbf{Step 1}, then \textbf{Step 2} can be formulated as follows
-\newline \textbf{Step 2}
-\begin{equation} \label{LMOP_2:step_2}
-\begin{aligned}
-    \underset{\beta\in \mathbb{R}^{k\times 1},A\in \mathbb{R}^{d\times k}}{min}& \hspace{3mm} \mathcal{L}_{\beta, A}\\
-    \text{st.  }& \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}
-\end{aligned}
-\end{equation}
-let $\beta^{**}, A^{**}$ be the solution of \textbf{Step 2}, then \textbf{Step 3} can be formulated as follows
-\newline \textbf{Step 3}
-\begin{equation} \label{LMOP_2:step_3}
-\begin{aligned}
-\underset{A\in \mathbb{R}^{d\times k}}{min}& \hspace{3mm} || AA^\top -I|| \\ 
-\text{st.  }& \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}\\
-\text{st.  }& \mathcal{L}_{\beta, A} \le \mathcal{L}_{\beta^{**}, A^{**}}\\
-\end{aligned}
-\end{equation}
-\newline \newline Note that all the problems \ref{NPMOP_1:objective}, \ref{NPMOP_2:objective}, \ref{ECMOP_1}, \ref{ECMOP_2}, \ref{LMOP_1:step_1}, \ref{LMOP_1:step_2}, \ref{LMOP_2:step_1}, \ref{LMOP_2:step_2} and \ref{LMOP_2:step_3} are \textbf{Single Objective Optimization Problem} and we can use various methods to solve them. As all the objectives are differentiable we can use Gradient Descent (GD) algorithm and its variants to get an optimal solution. For problems \ref{NPMOP_2:objective} and \ref{LMOP_2:step_1} we can directly apply GD, but  for other problems we need to address the condition and modify GD accordingly. The problems where $A \in \mathcal{O}_d^k$ are \ref{NPMOP_1:objective} and \ref{LMOP_1:step_1} to solve them we need to modify the GD accordingly. For the problems \ref{ECMOP_2}, \ref{LMOP_2:step_2} and \ref{LMOP_2:step_3} we have inequality constraints for which we can use \textbf{Constraint Guided Gradient Descent (CGGD)} algorithm \cite{karsmakers2022constraint} to get the solution. For the remaining problems, namely \ref{ECMOP_1} and \ref{LMOP_1:step_2} we need to modify \textbf{CGGD} algorithm to account for the condition $A \in \mathcal{O}_d^k$ and get the solution.
-\newline \textbf{Constraint Guided Gradient Descent (CGGD) Algorithm}
-\newline Constraint Guided Gradient Descent (CGGD) is a type of optimization algorithm that is used to solve constrained optimization problems. For the problem defined  below 
-\begin{equation}
-\begin{aligned}
-    \underset{\vec{x} \in \mathbb{R}^n}{min} \hspace{2mm} & f(\vec{x})\\
-    \forall i \in \{1...k\} \hspace{2mm} & g_i(\vec{x}) \le 0\\
-\end{aligned}
-\end{equation}
-then CGGD algorithm at step $i$ updates the value of $\vec{x}_i$ to $\vec{x}_{i+1}$ with the learning rate being $\eta_i$ and $\epsilon$ is the lower bound for relative weight of constraint delta compared to that of the gradient, and a constant $C\ge 1$, usually $C = 1.5$.
-\begin{equation}
-\begin{aligned}
-    \vec{x}_{i+1} =& \vec{x}_i - \eta_i(\nabla f(\vec{x}_i) + C \vec{dir}(\vec{x}_i-\vec{x}^{*}) max(\epsilon,||\nabla f(\vec{x}_i)||))\\
-\end{aligned}
-\end{equation}
-where $x^{*}$ is belongs to the set of points for which $\forall i \in \{1...k\} \hspace{2mm}  g_i(\vec{x}) \le 0$ is satisfied and $\vec{dir}(\vec{x}_i-\vec{x}^{*})$ represents the direction vector from $\vec{x}^{*}$ to $\vec{x}_i$. Even though with any $x^{*}$ eventually the solution will converge, but choice of the $x^{*}$ at each iteration has a huge impact on the convergence speed. 
-\newline \newline \textbf{Case $A \in \mathbb{R}^{d \times k}$ and No Inequality Condition}
-\newline Here we have the problems \ref{NPMOP_2:objective} and \ref{LMOP_2:step_1}, so for \ref{NPMOP_2:objective} we directly apply GD method to get the solution. Following is the update rule for the norm defined as follows $||x,y,A|| = \sqrt{x^2+y^2+||A||^2_F}$ after we minimize the $\frac{1}{2}||\cdot||^2$ using GD method with learning rate of $\epsilon_A,\epsilon_{\beta}$
-\begin{equation}
-\begin{aligned}
-A_{i+1} &= A_{i} - \epsilon_A ( -(1-\mathcal{R}_{\beta_i, A_i})\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A} + \mathcal{L}_{\beta_i, A_i} \frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial A}+ \frac{1}{2}\frac{\partial ||A_iA^\top_i -I||^2_F}{\partial A} )\\
-\beta_{i+1} &= \beta_{i} - \epsilon_{\beta} ( -(1-\mathcal{R}_{\beta_i, A_i})\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta} + \mathcal{L}_{\beta_i, A_i} \frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial \beta} )\\
-\end{aligned}    
-\end{equation}
-and similarly for \ref{LMOP_2:step_1} we can write
-\begin{equation}
-\begin{aligned}
-A_{i+1} &= A_{i} - \epsilon_A ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A} )\\
-\beta_{i+1} &= \beta_{i} - \epsilon_{\beta} ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta} )
-\end{aligned}    
-\end{equation}
-\newline \textbf{Case $A \in \mathcal{O}_d^k$ and No Inequality Condition}
-\newline Here we have the problems \ref{NPMOP_1:objective} and \ref{LMOP_1:step_1}, we directly apply GD method to get the $\Delta A_i$ which we will use to get a $Q_i$. Following is the update rule for the norm defined as follows $||x,y,A|| = \sqrt{x^2+y^2+||A||^2_F}$ after we minimize the $\frac{1}{2}||\cdot||^2$ using GD method with learning rate of $\epsilon_A,\epsilon_{\beta}$
-\begin{equation}
-\begin{aligned}
-\Delta A_i &= - \epsilon_A ( -(1-\mathcal{R}_{\beta_i, A_i})\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A} + \mathcal{L}_{\beta_i, A_i} \frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial A})\\
-\beta_{i+1} &= \beta_i - \epsilon_{\beta} ( -(1-\mathcal{R}_{\beta_i, A_i})\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta} + \mathcal{L}_{\beta_i, A_i} \frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial \beta})\\
-Q_i &= \hspace{2mm} \text{ortho\_cayley\_transformation}(\frac{1}{2} \Delta A_i)\\
-A_{i+1} &= \hspace{2mm} A_i Q_i \\
-\end{aligned}    
-\end{equation}
-and similarly for \ref{LMOP_1:step_1} we can write
-\begin{equation}
-\begin{aligned}
-\Delta A_{i} &= - \epsilon_A ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A} )\\
-\beta_{i+1} &= \beta_i - \epsilon_{\beta} ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta} )\\
-Q_i &= \text{ortho\_cayley\_transformation}(\frac{1}{2} \Delta A_i)\\
-A_{i+1} &= A_i Q_i
-\end{aligned}    
-\end{equation}
-\newline \textbf{Case $A \in \mathbb{R}^{d \times k}$ and With Inequality Condition}
-\newline Here we have the problems \ref{ECMOP_2}, \ref{LMOP_2:step_2} and \ref{LMOP_2:step_3}
-\newline For \ref{ECMOP_2}, let $X = \{(\beta, A) | \mathcal{L}_{\beta, A} \le \epsilon, ||AA^\top - I|| \le \epsilon_1\}$ and let $\bar{x} = (\bar{\beta},\bar{A}) \in X$ then we can write the update equation as follows for learning rates $\epsilon_A,\epsilon_{\beta}$ and constant $C=1.5$ and $\epsilon$ the lower bound for relative weight of constraint delta compared to that of the gradient.
-\begin{equation}
-\begin{aligned}
-A_{i+1} &= A_{i} - \epsilon_A ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A} + C \vec{dir}(A_i-\bar{A}) max(\epsilon,||\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A}||))\\
-\beta_{i+1} &= \beta_{i} - \epsilon_{\beta} ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta} + C \vec{dir}(\beta_i-\bar{\beta}) max(\epsilon,||\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta}||))
-\end{aligned}    
-\end{equation}
-\newline for \ref{LMOP_2:step_2}, let $X = \{(\beta, A) | \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}\}$, $\bar{x} = (\bar{\beta},\bar{A}), \epsilon_A, \epsilon_{\beta}, C, \epsilon$ follow similar definition as before and we can write
-\begin{equation}
-\begin{aligned}
-A_{i+1} &= A_{i} - \epsilon_A ( \frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial A} + C \vec{dir}(A_i-\bar{A}) max(\epsilon,||\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial A}||))\\
-\beta_{i+1} &= \beta_{i} - \epsilon_{\beta} ( \frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial \beta} + C \vec{dir}(\beta_i-\bar{\beta}) max(\epsilon,||\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial \beta}||))
-\end{aligned}    
-\end{equation}
-\newline for \ref{LMOP_2:step_3}, let $X = \{(\beta, A) | \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}, \mathcal{L}_{\beta, A} \le \mathcal{L}_{\beta^{**}, A^{**}}\}$, $\bar{x} = (\bar{\beta},\bar{A}), \epsilon_A, \epsilon_{\beta}, C, \epsilon$ follow similar definition as before and $|| AA^\top -I|| = || AA^\top -I||_F$ and we will minimize the $\frac{1}{2}||\cdot||^2_F$
-\begin{equation}
-\begin{aligned}
-A_{i+1} &= A_{i} - \epsilon_A ( \frac{\partial || A_iA^\top_i -I||^2_F}{2\partial A} + C \vec{dir}(A_i-\bar{A}) max(\epsilon,||\frac{\partial || A_iA^\top_i -I||^2_F}{2\partial A}||_F))\\
-\beta_{i+1} &= \beta_{i} - \epsilon_{\beta} ( C \vec{dir}(\beta_i-\bar{\beta}) max(\epsilon,0))
-\end{aligned}    
-\end{equation}
-\newline \textbf{Case $A \in \mathcal{O}_d^k$ and With Inequality Condition}
-\newline Here we have the problems \ref{ECMOP_1} and \ref{LMOP_1:step_2} 
-\newline for \ref{ECMOP_1}, let $X = \{(\beta, A) |  \mathcal{L}_{\beta, A} \le \epsilon \}$, $\bar{x} = (\bar{\beta},\bar{A}), \epsilon_A, \epsilon_{\beta}, C, \epsilon$ follow similar definition as before and we can write the update rule as follows
-\begin{equation}
-\begin{aligned}
-\Delta A_{i} &= - \epsilon_A ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A} + C \vec{dir}(A_i-\bar{A}) max(\epsilon,||\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial A}||))\\
-\beta_{i+1} &= \beta_{i} - \epsilon_{\beta} ( -\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta} + C \vec{dir}(\beta_i-\bar{\beta}) max(\epsilon,||\frac{\partial \mathcal{R}_{\beta_i, A_i}}{\partial \beta}||))\\
-Q_i &= \hspace{2mm} \text{ortho\_cayley\_transformation}(\frac{1}{2} \Delta A_i)\\
-A_{i+1} &= \hspace{2mm} A_i Q_i \\
-\end{aligned}    
-\end{equation}
-\newline for \ref{LMOP_1:step_2}, let $X = \{(\beta, A) | \mathcal{R}_{\beta, A} \ge \mathcal{R}_{\beta^{*}, A^{*}}\}$, $\bar{x} = (\bar{\beta},\bar{A}), \epsilon_A, \epsilon_{\beta}, C, \epsilon$ follow similar definition as before and we can write the update rule as follows
-\begin{equation}
-\begin{aligned}
-\Delta A_{i} &= - \epsilon_A ( -\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial A} + C \vec{dir}(A_i-\bar{A}) max(\epsilon,||\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial A}||))\\
-\beta_{i+1} &= \beta_{i} - \epsilon_{\beta} ( -\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial \beta} + C \vec{dir}(\beta_i-\bar{\beta}) max(\epsilon,||\frac{\partial \mathcal{L}_{\beta_i, A_i}}{\partial \beta}||))\\
-Q_i &= \hspace{2mm} \text{ortho\_cayley\_transformation}(\frac{1}{2} \Delta A_i)\\
-A_{i+1} &= \hspace{2mm} A_i Q_i \\
-\end{aligned}    
-\end{equation}
-We note that other then \ref{NPMOP_1:objective} and \ref{NPMOP_2:objective} i.e. for all other methods, other than No Preference Method we need to use CGGD method, which relies on having $\bar{A}, \bar{\beta}$ which satisfy the corresponding constraints, and due to computational limitations as to compute them at each iteration is very expensive. Hence, we will compute the solution only for No Preference Method. Below is the pseudocode for both the No Preference Methods where $\vec{\mu} = (\mu_0,\mu_1,\mu_2)$ where $\mu_0$ is the number of iterations, we can also denote it by $N=\mu_0$, $\mu_1$ is the learning rate for $\A$ and $\mu_2$ is the learning rate for $\beta$.
-
-\begin{algorithm}[H]
-\caption{$NPM_1[\vec{\mu}]$ : No Preference Method 1}\label{no_preference_method_1}
-\begin{algorithmic}[1]
-\State $A \gets random(\mathbb{R}^{d\times k})$
-\State $A \gets \text{gram\_schmidt\_algorithm}(A)$\Comment{orthonormalize $A$}
-\State $\beta \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t}[A]\}, t\in [d,T])$
-\State $\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \beta, A, \mathcal{R}_{\beta, A}$
-\For{$i \gets 1$ to $N$}
-    \State $\Delta A \gets (1-\mathcal{R}_{\beta, A})\frac{\partial \mathcal{R}_{\beta, A}}{\partial A} - \mathcal{L}_{\beta, A} \frac{\partial \mathcal{L}_{\beta, A}}{\partial A}- \frac{1}{2}\frac{\partial ||AA^\top -I||^2_F}{\partial A} $
-    \State $\Delta \beta \gets (1-\mathcal{R}_{\beta, A})\frac{\partial \mathcal{R}_{\beta, A}}{\partial \beta} - \mathcal{L}_{\beta, A} \frac{\partial \mathcal{L}_{\beta, A}}{\partial \beta} $
-    \State $Q \gets \text{ortho\_cayley\_transformation}(\frac{\mu_1}{2} \Delta A)$
-    \State $A \gets AQ$
-    \State $\beta \gets \beta + \mu_2 \Delta \beta$
-    \If{$\mathcal{R}_{\beta, A} > \mathcal{R}_{optimal}$}  \Comment{update the optimal if better solution found}
-        \State $\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \beta, A, \mathcal{R}_{\beta, A} $
-    \EndIf 
-\EndFor
-\State \Return  $\beta_{optimal}, A_{optimal}$
-\State \textbf{complexity: } $O()$
-\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-\caption{$NPM_2[\vec{\mu}]$ : No Preference Method 2}\label{no_preference_method_2}
-\begin{algorithmic}[1]
-\State $A \gets random(\mathbb{R}^{d\times k})$
-\State $A \gets \text{gram\_schmidt\_algorithm}(A)$\Comment{orthonormalize $A$}
-\State $\beta \gets regression(\{R^{n\times 1}_{t}\},\{F^{n\times k}_{t}[A]\}, t\in [d,T])$
-\State $\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \beta, A, \mathcal{R}_{\beta, A}$
-\For{$i \gets 1$ to $N$}
-    \State $\Delta A \gets (1-\mathcal{R}_{\beta, A})\frac{\partial \mathcal{R}_{\beta, A}}{\partial A} - \mathcal{L}_{\beta, A} \frac{\partial \mathcal{L}_{\beta, A}}{\partial A}- \frac{1}{2}\frac{\partial ||AA^\top -I||^2_F}{\partial A} $
-    \State $\Delta \beta \gets (1-\mathcal{R}_{\beta, A})\frac{\partial \mathcal{R}_{\beta, A}}{\partial \beta} - \mathcal{L}_{\beta, A} \frac{\partial \mathcal{L}_{\beta, A}}{\partial \beta} $
-    \State $A \gets A + \mu_1 \Delta A$
-    \State $\beta \gets \beta + \mu_2 \Delta \beta$
-    \If{$\mathcal{R}_{\beta, A} > \mathcal{R}_{optimal}$}  \Comment{update the optimal if better solution found}
-        \State $\beta_{optimal}, A_{optimal}, \mathcal{R}_{optimal} \gets \beta, A, \mathcal{R}_{\beta, A} $
-    \EndIf 
-\EndFor
-\State \Return  $\beta_{optimal}, A_{optimal}$
-\State \textbf{complexity: } $O()$
-\end{algorithmic}
-\end{algorithm}
 
 % %% Condition number part
 % \level{3}{Condition Number Relaxation}
@@ -915,7 +903,7 @@ We note that other then \ref{NPMOP_1:objective} and \ref{NPMOP_2:objective} i.e.
 % Here $f(X) = X\times A$.
 \newpage
 \level{2}{Data}
-We will be using the data provided by \textit{Qube Research and Technologies (QRT)} on the \textit{Challenge Data} site, under the challenge: \textit{Learning factors for stock market returns prediction} \cite{qrt_challenge}.\newline The data contains (cleaned) daily returns of 50 stocks over a time period of 754 days (three years). And in the original problem they have asked for solutions with $d=250$ and $k=10$.
+We will be using the data provided by \textit{Qube Research and Technologies (QRT)} on the \textit{Challenge Data} site, under the challenge: \textit{Learning factors for stock market returns prediction} \cite{qrt_challenge}.\newline The data contains (cleaned) daily returns of 50 stocks over a time period of 755 days. For our purposes of experiments on this data we will use values of $(n,k,d,T,S) = (50,21,20,600,155)$.
 % \begin{figure}[htbp]
 %     \centering
 %     \includegraphics[width=0.8\textwidth]{images/cumulative_returns_qrt_timeseries_data.png}
@@ -953,21 +941,287 @@ We will be using the data provided by \textit{Qube Research and Technologies (QR
   \label{fig:violin_plots}
 \end{figure}
 
-\level{3}{Preprocessing}
+\level{2}{Results}
 
-For statistical significance of results we will use multiple samples from the set of 50 timeseries for $n = 5,8,13,21,34,50$ being the sample sizes and $m=10,7,4,3,1$ being the number of such samples for each $n$.
+Since we have two objectives and one important condition, namely $R = \mathcal{R}_{\beta, A}$, $L = \mathcal{L}_{\beta, A}$, and $O = \frac{1}{2}||AA^\top -I||^2_F$, we will use their negative logarithms for the purpose of comparing the methods and deriving the statistics, as $L$ and $O$ are losses. Note that the higher the value of $R$, $-log(L)$, and $-log(O)$, the better the solution/method.
 
+\level{3}{Baseline Method}
+We implemented the baseline method and executed it for $N=10000$ (i.e., $\mathcal{A}_{0}[10000]$). For the plots below color of the point indicates it's $-log(L)$ value. We observe that all solutions have a high value of $-log(L)$, which appears to be bounded due to natural variation in the data. Additionally, the solutions are symmetrically distributed over $R$, but exhibit a skewed distribution over the values of $-log(O)$.
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/1-Baseline Method 3D scatter plot.png}
+        \captionsetup{font=tiny}
+        \caption{3D Scatter Plot : Baseline Method}
+        \label{fig:cumulative_returns}
+    \end{minipage}%
+    \begin{minipage}[t]{0.5511\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/1-Baseline Method scatter plot_R_vs_-logL.png}
+        \captionsetup{font=tiny}
+        \caption{2D $(R,-log(L))$ Scatter Plot : Baseline Method}
+        \label{fig:corr_matrix_ts_qrt_data}
+    \end{minipage}
+\end{figure}
+\level{3}{OPI Method : Type 1} 
+To get better statistical result we ran the method multiple times with value of $N$ set to  $1000$. $\mathcal{A}_{1}[1000,\mathcal{U}^{1}_{A},\mathcal{U}^{1}_{\beta}]$, we are using $\mathcal{U}^{1}_{A}[(100,0.01,0.3,0.3,0.3)]$ to update $A$ and $\mathcal{U}^{1}_{\beta}[(100,0.01,0.5,0.5)]$ to update $\beta$.  We observe that all solution attempts converge to the same point in $(R,-log(L))$, with initial updates being large but decreasing over time. Additionally, this method is able to overcome the problem of local minima in one dimension through the presence of better minima in another dimension.
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/OPI scheme 1 mean trajectory.png-.png}
+        \captionsetup{font=tiny}
+        \caption{3D Trajectory Line Plot : OPI Method Type 1}
+        \label{fig:cumulative_returns}
+    \end{minipage}%
+    \begin{minipage}[t]{0.5511\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/OPI scheme 1 trajectories R -logL.png}
+        \captionsetup{font=tiny}
+        \caption{2D $(R,-log(L))$ Trajectory Line Plot : OPI Method Type 1}
+        \label{fig:corr_matrix_ts_qrt_data}
+    \end{minipage}
+\end{figure}
+\level{3}{OPI Method : Type 2}
+To get better statistical result we ran the method multiple times with $N=1000$. This method uses $\mathcal{U}^{1}_{A}$ to update $A$ but $\mathcal{U}^{2}_{\beta}[(100,0.01,0.5,0.5,0.01)]$ to update $\beta$. We observe that this method updates the solutions non-smoothly, as it relies on regression to update $\beta$, which may result in the next update taking the value of $(R,-log(L),-log(O))$ to a distant point.
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/1-OPI scheme 2 mean trajectory.png}
+        \captionsetup{font=tiny}
+        \caption{3D Trajectory Line Plot : OPI Method Type 2}
+        \label{fig:cumulative_returns}
+    \end{minipage}%
+    \begin{minipage}[t]{0.5511\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/OPI scheme 2 trajectories R -logL.png}
+        \captionsetup{font=tiny}
+        \caption{2D $(R,-log(L))$ Trajectory Line Plot : OPI Method Type 2}
+        \label{fig:corr_matrix_ts_qrt_data}
+    \end{minipage}
+\end{figure}
+\level{3}{DOI Method : Type 1}
+Here we use same internal methods as of OPI Type 1, but since this method relaxes $A\in \mathcal{O}^{k}_{d}$ to $A\in \mathbb{R}^{d\times k}$ we use $\mathcal{U}^{1}_{O}[100,0.01,0.3,0.3,0.3]$ to bring it back in $\mathcal{O}^{k}_{d}$. Same as before to get better statistical result we ran the method multiple times with $N=1000$. This method converges to a point with decreasing update size, but the generated solutions do not consider the condition $A\in \mathcal{O}^{k}_{d}$, resulting in non-smooth updates.
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/1-DOI scheme 1 mean trajectory.png}
+        \captionsetup{font=tiny}
+        \caption{3D Trajectory Line Plot : DOI Method Type 1}
+        \label{fig:cumulative_returns}
+    \end{minipage}%
+    \begin{minipage}[t]{0.5511\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/DOI scheme 1 trajectories R -logL.png}
+        \captionsetup{font=tiny}
+        \caption{2D $(R,-log(L))$ Trajectory Line Plot : DOI Method Type 1}
+        \label{fig:corr_matrix_ts_qrt_data}
+    \end{minipage}
+\end{figure}
+\level{3}{DOI Method : Type 2}
+It is same as DOI Type 1, but uses OPI Type 2 in place of OPI Type 1 and here too to get better statistical result we ran the method multiple times with $N=1000$. This method has issues similar to DOI type 1 and OPI type 2, as it is not very smooth and the next update may not be nearby. But in $(R,-log(O))$ space, it is somewhat smooth, with little influence from regression to obtain $\beta$, which minimizes $L$.
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/1-DOI scheme 2 mean trajectory.png}
+        \captionsetup{font=tiny}
+        \caption{3D Trajectory Line Plot : DOI Method Type 2}
+        \label{fig:cumulative_returns}
+    \end{minipage}%
+    \begin{minipage}[t]{0.5511\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/DOI scheme 2 trajectories R -logO.png}
+        \captionsetup{font=tiny}
+        \caption{2D $(R,-log(O))$ Trajectory Line Plot : DOI Method Type 2}
+        \label{fig:corr_matrix_ts_qrt_data}
+    \end{minipage}
+\end{figure}
 
+\level{3}{No Preference Method (NPM) : Type 1}
+A learning rate of 0.01 is used for $A$ and $\beta$, with 1000 steps and NPM$_1[(0.01,0.01)]$. This method is observed to be very smooth, with all attempts converging to a point, and the update size decreasing over time.
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/1-NPM 1 mean trajectory.png}
+        \captionsetup{font=tiny}
+        \caption{3D Trajectory Line Plot : NPM Type 1}
+        \label{fig:cumulative_returns}
+    \end{minipage}%
+    \begin{minipage}[t]{0.5511\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/NPM 1 trajectories R -logL.png}
+        \captionsetup{font=tiny}
+        \caption{2D $(R,-log(L))$ Trajectory Line Plot : NPM Type 1}
+        \label{fig:corr_matrix_ts_qrt_data}
+    \end{minipage}
+\end{figure} 
+\level{3}{No Preference Method (NPM) : Type 2} 
+The method uses a learning rate of 0.01 for both $A$ and $\beta$, with 1000 steps and NPM$_2[(0.01,0.01)]$. However, it doesn't utilize the orthogonal property and Cayley transform to update $A$. As seen in the figures, the method is smooth and converges with decreasing update size. However, there is some variation in the convergence point.
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/1-NPM 2 mean trajectory.png}
+        \captionsetup{font=tiny}
+        \caption{3D Trajectory Line Plot : NPM Type 2}
+        \label{fig:cumulative_returns}
+    \end{minipage}%
+    \begin{minipage}[t]{0.5511\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/NPM 2 trajectories R -logO.png}
+        \captionsetup{font=tiny}
+        \caption{2D $(R,-log(O))$ Trajectory Line Plot :NPM Type 2}
+        \label{fig:corr_matrix_ts_qrt_data}
+    \end{minipage}
+\end{figure} 
+\level{3}{NSGA-II}
+\textbf{Type 1} : In this NSGA-II type we dont use regression for updating $\beta$ and the parameters of this are 
+NSGA-II$(100,500,1,0.2,\mathcal{C}[\text{No Regression},0.01],\mathcal{M}[0.01])$, that is with population size of 500 and number of generations 100. We observe that, except for the first generation, all the points lie on a non-dominant front and the performance appears to be improving steadily with each generation. \newline \textbf{Type 2}: This uses regression for updating $\beta$. We can see that there are multiple non-dominant fronts and as we reach convergence we have only 1 non-dominant front.
+\begin{figure}[H]
+  \centering
+  \begin{minipage}[b]{0.22\textwidth}
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=\textwidth]{images/1-NSGA-II 1 Generation _ 1.0-R - logL-point.png}
+  \end{figure}
+  \end{minipage}
+  \hspace{0.0cm}
+  \begin{minipage}[b]{0.22\textwidth}
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=\textwidth]{images/1-NSGA-II 1 Generation _ 10.0-R - logL-point.png}
+  \end{figure}
+  \end{minipage}
+  \hspace{0.0cm}
+  \begin{minipage}[b]{0.22\textwidth}
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=\textwidth]{images/1-NSGA-II 1 Generation _ 20.0-R - logL-point.png}
+  \end{figure}
+  \end{minipage}
+  \hspace{0.0cm}
+  \begin{minipage}[b]{0.22\textwidth}
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=\textwidth]{images/1-NSGA-II 1 Generation _ 40.0-R - logL-point.png}
+  \end{figure}
+  \end{minipage}
+  \caption{Solutions scatter plot of NSGA-II Type 1 for generations 1,10,20,40}
+  \label{fig:2x2group}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \begin{minipage}[b]{0.22\textwidth}
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=\textwidth]{images/1-NSGA-II 2 Generation _ 1.0-R - logL-point.png}
+  \end{figure}
+  \end{minipage}
+  \hspace{0.0cm}
+  \begin{minipage}[b]{0.22\textwidth}
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=\textwidth]{images/1-NSGA-II 2 Generation _ 10.0-R - logL-point.png}
+  \end{figure}
+  \end{minipage}
+  \hspace{0.0cm}
+  \begin{minipage}[b]{0.22\textwidth}
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=\textwidth]{images/1-NSGA-II 2 Generation _ 20.0-R - logL-point.png}
+  \end{figure}
+  \end{minipage}
+  \hspace{0.0cm}
+  \begin{minipage}[b]{0.22\textwidth}
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=\textwidth]{images/1-NSGA-II 2 Generation _ 40.0-R - logL-point.png}
+  \end{figure}
+  \end{minipage}
+  \caption{Solutions scatter plot of NSGA-II Type 2 for generations 1,10,20,40}
+  \label{fig:2x2group}
+\end{figure}
+\level{3}{MOPSO}
+We executed MOPSO$(500,100,0.95,0.9,0.5,0.2,0.1,0.006)$, population size of 500 and 100 time iterations. We can observe that the solutions has swarm behavior, with a drift towards higher values of $R$, as a tradeoff, their $-log(L)$ value decreases.
+\begin{figure}[H]
+  \centering
+  \begin{minipage}[b]{0.22\textwidth}
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=\textwidth]{images/1-fix_axisMOPSO motion of solutions _ 1-R - logL-gard.png}
+  \end{figure}
+  \end{minipage}
+  \hspace{0.0cm}
+  \begin{minipage}[b]{0.22\textwidth}
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=\textwidth]{images/1-fix_axisMOPSO motion of solutions _ 10-R - logL-gard.png}
+  \end{figure}
+  \end{minipage}
+  \hspace{0.0cm}
+  \begin{minipage}[b]{0.22\textwidth}
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=\textwidth]{images/1-fix_axisMOPSO motion of solutions _ 50-R - logL-gard.png}
+  \end{figure}
+  \end{minipage}
+  \hspace{0.0cm}
+  \begin{minipage}[b]{0.22\textwidth}
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=\textwidth]{images/1-fix_axisMOPSO motion of solutions _ 98-R - logL-gard.png}
+  \end{figure}
+  \end{minipage}
 
+  \caption{Solutions plot of MOPSO for time values of  1,10,50,98}
+  \label{fig:2x2group}
+\end{figure}
 
+\level{3}{Comparison Table}
 
+% \begin{sidewaystable}[htbp]
+% \centering
+% \begin{tabular}{|c|l|c|c|c|c|c|c|c|c|c|c|}
+% \hline
+% \multicolumn{1}{|c|}{Objective} & \multicolumn{1}{|c|}{Statistic} & \multicolumn{1}{|c|}{Baseline} & \multicolumn{2}{|c|}{OPI} & \multicolumn{2}{|c|}{DOI} & \multicolumn{2}{|c|}{NPM}& \multicolumn{2}{|c|}{NSGA-II} & \multicolumn{1}{|c|}{MOPSO} \\
+%  & &  & Type 1 & Type 2 & Type 1 & Type 2 & Type 1 & Type 2 & Type 1 & Type 2 & \\
+% \hline
+%             & mean (1e-2)  & \textcolor{red}{-0.272} &  7.53 &  7.43 & 7.53 &  7.43 & \textbf{7.55} & \textbf{7.55} &  1.90 &  2.63 &  0.00266 \\
+%             & std (1e-3)   &  2.36 &  3.43 &  4.48 & 1.85 &  3.23 & 1.42 & \textcolor{red}{1.41} &  9.38 &  7.60 &  \textbf{16.2} \\
+%       $R$   & min (1e-2)   & -3.74 & -0.31 & -2.22 & 3.11 & -0.40 & \textbf{3.73} & 3.55 & -2.35 & -1.55 & \textcolor{red}{-5.86} \\
+%             & 50\% (1e-2)  & -0.275 &  \textbf{7.56} &  7.47 & \textbf{7.56} &  7.47 & \textbf{7.56} & \textbf{7.56} &  1.62 &  2.91 & \textcolor{red}{-8.96} \\
+%             & max (1e-2)   &  \textcolor{red}{4.00} &  \textbf{7.56} & \textbf{ 7.56} & \textbf{7.56} &  \textbf{7.56} & \textbf{7.56} & \textbf{7.56} &  5.51 &  5.93 &  5.63 \\
+% \hline
+%             & mean         & \textbf{3.15} & \textbf{3.15} & 3.14 & \textbf{3.15} &  \textbf{3.15} & \textbf{3.15} & \textbf{3.15} &  3.12 &  3.03 &  \textcolor{red}{1.42} \\
+%             & std (1e-2)   & 2.51 & \textcolor{red}{0.00147} & 27.6 & 9.56 &  19 & 0.00155 & 0.00216 &  35.9 &  74.6 &  \textbf{146} \\
+% $-log(L)$   & min          & 1.70 & \textbf{3.15} & -6.45 & 2.60 & -6.37 & \textbf{3.15} & \textbf{3.15} & -4.66 & -4.96 & \textcolor{red}{-11.3} \\
+%             & 50\%         & \textbf{3.15} & \textbf{3.15} & \textbf{3.15} & \textbf{3.15} &  \textbf{3.15} & 3.1 & \textbf{3.15} &  \textbf{3.15} &  \textbf{3.15} &  \textcolor{red}{1.55} \\
+%             & max          & \textbf{3.15} & \textbf{3.15} & \textbf{3.15} & \textbf{3.15} &  \textbf{3.15} & \textbf{3.15} & \textbf{3.15} &  \textbf{3.15} &  \textbf{3.15} &  \textbf{3.15} \\
+% \hline
+%             & mean   & \textbf{64.46} & 58.34 & 61.80 & 13.82 &  \textcolor{red}{10.06} & 61.58 & 27.22 & 63.60 & 64.15 & 63.38 \\
+%             &  std   &  1.36 &  2.51 &  0.829 &  \textbf{9.54} &  5.98 &  0.75 &  4.19 &  0.52 &  \textcolor{red}{0.37} &  0.95 \\
+% $-log(O)$   & min    & 56.41 & 54.09 & 60.5 & -6.56 & \textcolor{red}{-6.65} & \textbf{60.06} & 12.43 & 56.32 & 58.47 & 59.65 \\
+%             & 50\% & \textbf{64.68} & 57.84 & 61.6 & 16.21 &  \textcolor{red}{14.4} & 61.46 & 29.01 & 63.54 & 64.09 & 63.42 \\
+%             & max    & \textbf{67.50} & 66.32 & 66.61 & 24.46 &  \textcolor{red}{14.96} & 66.42 & 29.74 & 66.98 & 66.88 & 67.29 \\
+% \hline
+% \end{tabular}
+% \caption{Statistics on solutions generated by various method}
+% \label{tab:stat_table}
+% \end{sidewaystable}
 
+\begin{figure}[H] \label{fig:results-table}
+\centering
+\includegraphics[width=1.0\textwidth]{images/results-table.png}
+\end{figure}
 
+\level{3}{Discussion}
 
-
-
-
-
+We note that the baseline method provides a basis for comparison with other methods. Methods that have high mean values and low variance values are considered good, as they converge more quickly towards the optimum. When considering the distribution of $-log(L)$, we observe that all methods, except for MOPSO, have a distribution that is very close to optimal. Additionally, we note that most of the standard deviation in the values of $-log(L)$ is found in the latter decimals of the values. As a result, there is no significant difference in the first two digits after the decimal point. However, we do observe that MOPSO performs particularly poorly, with a high standard deviation. Additionally, we note that both DOI types, OPI type 2, and both NSGA-II types have slightly higher standard deviations. Regarding $R$, we note that all methods except NSGA-II and MOPSO achieve the maximum value. However, among the methods that achieve the maximum value, OPI type 1, DOI type 1, and both NPM types achieve it more efficiently, as their 50\% value is the same. Moreover, the NPM methods have the lowest variation among them. Regarding $-log(O)$, we observe that the baseline method has the highest values. We also note that the methods that perform well with higher $R$ generally have lower values of $-log(O)$.
 
 
 

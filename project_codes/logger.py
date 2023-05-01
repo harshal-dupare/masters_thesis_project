@@ -13,15 +13,16 @@ from ea_helpers import *
 
 class PlotSettings:
     def __init__(self, x_axis = 'R',y_axis = '-logO',z_axis = '-logL', alpha=0.5, s=100, ec='none', use_xyz_limits=False, lam=1.2, remove_outliers=False,
-                 outlier_tail_lower=0.025, outlier_tail_upper=0.025, cmap='cool', plot_style='seaborn', dpi=300,
+                 outlier_tail_lower=0.025, outlier_tail_upper=0.025, cmap='cool', plot_style='seaborn-v0_8-whitegrid', dpi=300,
                  x_scale='linear', y_scale='linear', duration=200, traj_font_size=14, plot_size=(20,16), 
                  three_d_plot_elev=20, three_d_plot_azim=45, traj_color='blue', traj_arrow_size=1,
                  traj_arrow_length_ratio=0.1, traj_alpha=0.8, traj_linewidths=0.5, traj_edgecolors='k', 
-                 traj_pivot='tip', traj_lines_linewidth=2, two_d_traj_scale=1, two_d_traj_width=0.005, use_quiver = True):
+                 traj_pivot='tip', traj_lines_linewidth=2, two_d_traj_scale=1, two_d_traj_width=0.005, use_quiver = True,add_rud_at_start=''):
         self._x_axis = x_axis
         self._y_axis = y_axis
         self._z_axis = z_axis
         self._alpha = alpha
+        self._add_rud_at_start = add_rud_at_start
         self._s = s
         self._ec = ec
         self._use_xyz_limits = use_xyz_limits
@@ -52,14 +53,16 @@ class PlotSettings:
         self._use_quiver = use_quiver 
         tab20 = plt.get_cmap('tab20')
         self.color_names = [tab20.colors[i] for i in range(tab20.N)]
+        self.color_names_proper = ['g','b','r','c','m','y','k','w']
         self.swap_buffer = None
+        self.save_combined_data = False
 
     def store_in_buffer(self,var):
         self.swap_buffer = var
         return
 
 class Logger:
-    def __init__(self, log_name: str, data_handler: Data_Handler, _img_save_folder=None):
+    def __init__(self, log_name: str, data_handler: Data_Handler, _img_save_folder=None,_add_rud_at_start=''):
         self.log_name = log_name
         self.list_R = []
         self.list_L = []
@@ -67,6 +70,7 @@ class Logger:
         self.EA_RLO_logs = dict()
         self.EA_archive_RLO = dict()
         self.RLO_iter_logs = dict()
+        self._add_rud_at_start = _add_rud_at_start
 
         self.data_handler = data_handler
         self.IMAGE_SAVE_FOLDER = _img_save_folder
@@ -298,10 +302,8 @@ class Logger:
             grouped_df.to_csv(fpath)
             print(f" {fname} : dumped change gen EAarchiveROL")
 
-    # RESULTS MAKING END
-    
-    # PLOTTING
-
+    def get_save_name(self,fname):
+        return os.path.join(self.IMAGE_SAVE_FOLDER,self._add_rud_at_start+fname)
     # MAIN
     def plot_and_save_figures(self, plotsetting, beyond_gen_iter=10):
         if len(self.list_L) > 0:
@@ -329,6 +331,12 @@ class Logger:
                 df1["-logO"] = list(-np.log(v[2][beyond_gen_iter:]))
                 df1['index'] = len(v[0][beyond_gen_iter:])*[attempt_i]
                 df = pd.concat([df, df1], axis=0)
+            
+            
+            if plotsetting.save_combined_data:
+                self.progress_line_plots_3d(df, 'index', plotsetting)
+                exit()
+
             # for all the attempts it plots in 1 plot all the paths taken by the point
             self.progress_line_plots_3d(df, 'index', plotsetting)
             self.progress_line_plots_2d(df, 'index', plotsetting)
@@ -351,6 +359,10 @@ class Logger:
                 df1["-logO"] = list(-np.log(v[2]))
                 df1['gen'] = len(v[0])*[k]
                 df = pd.concat([df, df1], axis=0)
+
+            if plotsetting.save_combined_data:
+                self.progress_line_plots_3d(df, 'gen', plotsetting)
+                exit()
 
             # including tragectroy/gradient plot and gif
             self.population_gif_and_plots(df,plotsetting)
@@ -375,6 +387,11 @@ class Logger:
                 df1["-logO"] = list(-np.log(v[2]))
                 df1['gen'] = len(v[0])*[k]
                 df = pd.concat([df, df1], axis=0)
+            
+            if plotsetting.save_combined_data:
+                self.progress_line_plots_3d(df, 'gen', plotsetting)
+                exit()
+
             self.progress_line_plots_3d(df, 'gen',plotsetting)
             self.progress_line_plots_2d(df, 'gen',plotsetting)
             self.dist_plot(df,plotsetting)
@@ -423,8 +440,8 @@ class Logger:
                     ax.scatter(df[col1], df[col2], c=colors, alpha=plotsetting._alpha, s=plotsetting._s, edgecolors=plotsetting._ec)
                     plt.style.use(plotsetting._plot_style)
                     fname = f"{title_name}_{col1}_vs_{col2}"+".png"
-                    fname = os.path.join(self.IMAGE_SAVE_FOLDER, fname)
-                    plt.savefig(fname)
+                    fname = self.get_save_name(fname)
+                    plt.savefig(fname, dpi =plotsetting._dpi)
                     plt.show()
 
         # Create a 3D scatter plot
@@ -446,7 +463,7 @@ class Logger:
         plt.style.use(plotsetting._plot_style)
         fname = title_name+".png"
         fname = os.path.join(self.IMAGE_SAVE_FOLDER, fname)
-        plt.savefig(fname)
+        plt.savefig(fname, dpi =plotsetting._dpi)
         plt.show()
         pass
 
@@ -478,17 +495,17 @@ class Logger:
                 _ax.set_ylim((limits['low'][plotsetting._y_axis], limits['high'][plotsetting._y_axis]))
                 _ax.set_zlim((limits['low'][plotsetting._z_axis], limits['high'][plotsetting._z_axis]))
 
-            ax.set_title(_title_name, fontsize=plotsetting._traj_font_size)
-            ax.set_xlabel(plotsetting._x_axis, fontsize=plotsetting._traj_font_size)
-            ax.set_ylabel(plotsetting._y_axis, fontsize=plotsetting._traj_font_size)
-            ax.set_zlabel(plotsetting._z_axis, fontsize=plotsetting._traj_font_size)
+            _ax.set_title(_title_name, fontsize=plotsetting._traj_font_size)
+            _ax.set_xlabel(plotsetting._x_axis, fontsize=plotsetting._traj_font_size)
+            _ax.set_ylabel(plotsetting._y_axis, fontsize=plotsetting._traj_font_size)
+            _ax.set_zlabel(plotsetting._z_axis, fontsize=plotsetting._traj_font_size)
 
             # Customize legend
             if len(_legend_list) > 0:
                 _ax.legend(legends_list, fontsize=int(plotsetting._traj_font_size*0.5))
 
             # customize the viewing angle
-            ax.view_init(elev=plotsetting._3d_plot_elev, azim=plotsetting._3d_plot_azim)
+            _ax.view_init(elev=plotsetting._3d_plot_elev, azim=plotsetting._3d_plot_azim)
 
             # Set plot size
             if plotsetting._plot_size:
@@ -513,6 +530,11 @@ class Logger:
             mean_df/=len(df_dict)
 
             df_dict['mean'] = mean_df
+
+            if plotsetting.save_combined_data:
+                fname = f"{self.log_name} + mean_df.csv"
+                mean_df.to_csv(fname,index=False)
+                exit()
                 
             # individual plots
             for k, dfv in df_dict.items():
@@ -530,7 +552,7 @@ class Logger:
                 plt.style.use(plotsetting._plot_style)
                 plt.tight_layout()
                 fname = f"{title_name}.png"
-                fname = os.path.join(self.IMAGE_SAVE_FOLDER,fname)
+                fname = self.get_save_name(fname)
                 plt.savefig(fname, dpi=plotsetting._dpi)
                 plt.show()
 
@@ -554,14 +576,18 @@ class Logger:
 
             plt.style.use(plotsetting._plot_style)
             plt.tight_layout()
-            fname = os.path.join(self.IMAGE_SAVE_FOLDER,fname)
+            fname = self.get_save_name(fname)
             plt.savefig(fname, dpi=plotsetting._dpi)
             plt.show()
         elif grouping_type == 'gen':
             mean_df = df.groupby(grouping_type).mean()
+            if plotsetting.save_combined_data:
+                fname = f"{self.log_name} + mean_df.csv"
+                mean_df.to_csv(fname,index=False)
+                exit()
+
             fig = plt.figure(figsize=plotsetting._plot_size)
             ax = fig.add_subplot(111, projection='3d')
-
             self.plot_trajectory_3d(mean_df, ax, plotsetting)
 
             # Set plot title and labels
@@ -570,11 +596,11 @@ class Logger:
 
             plt.style.use(plotsetting._plot_style)
             plt.tight_layout()
-            fname = os.path.join(self.IMAGE_SAVE_FOLDER,fname)
+            fname = f"{title_name}.png"
+            fname = self.get_save_name(fname)
             plt.savefig(fname, dpi=plotsetting._dpi)
             plt.show()
         pass
-
 
     def plot_trajectory_2d(self, df, ax, plotsetting):
 
@@ -650,7 +676,7 @@ class Logger:
                         plt.style.use(plotsetting._plot_style)
                         plt.tight_layout()
                         fname = f"{title_name}.png"
-                        fname = os.path.join(self.IMAGE_SAVE_FOLDER,fname)
+                        fname = self.get_save_name(fname)
                         plt.savefig(fname, dpi=plotsetting._dpi)
                         plt.show()
 
@@ -674,7 +700,7 @@ class Logger:
                     plt.style.use(plotsetting._plot_style)
                     plt.tight_layout()
                     fname = f"{title_name}.png"
-                    fname = os.path.join(self.IMAGE_SAVE_FOLDER,fname)
+                    fname = self.get_save_name(fname)
                     plt.savefig(fname, dpi=plotsetting._dpi)
                     plt.show()
                 elif grouping_type == 'gen':
@@ -688,7 +714,7 @@ class Logger:
                     plt.style.use(plotsetting._plot_style)
                     plt.tight_layout()
                     fname = f"{title_name}.png"
-                    fname = os.path.join(self.IMAGE_SAVE_FOLDER,fname)
+                    fname = self.get_save_name(fname)
                     plt.savefig(fname, dpi=plotsetting._dpi)
                     plt.show()
         plotsetting._x_axis = old_x_axis
@@ -708,8 +734,8 @@ class Logger:
                 plotsetting._x_axis = clst[j]
                 plotsetting._y_axis = clst[i]
                 plotsetting._z_axis = clst[(6-i-j)%3]
-                self.point_plot_and_gif(df,plotsetting)
                 self.grad_plot_and_gif(df,plotsetting)
+                self.point_plot_and_gif(df,plotsetting)
         plotsetting._x_axis = old_x_axis
         plotsetting._y_axis = old_y_axis
         plotsetting._z_axis = old_z_axis
@@ -724,12 +750,13 @@ class Logger:
             limits = self.get_plotting_limits(df, plotsetting)
 
         def _save_plot(title):
-            fname = title + f"-{plotsetting._x_axis}-{plotsetting._y_axis}"+ ".png"
-            fname = os.path.join(self.IMAGE_SAVE_FOLDER, fname)
-            plt.savefig(fname, plotsetting._dpi)
+            fname = title + f"-{plotsetting._x_axis}-{plotsetting._y_axis}-point"+ ".png"
+            fname = self.get_save_name(fname)
+            plt.savefig(fname, dpi = plotsetting._dpi)
+            plt.show()
 
         @gif.frame
-        def plot(gen, x, y, to_save_plot = False):
+        def plot(gen, x, y,to_save_plot=False):
             fig, ax = plt.subplots()
             ax.scatter(x=x, y=y, color='red')
             if plotsetting._use_xyz_limits:
@@ -753,12 +780,12 @@ class Logger:
             frames += [plot(grp_key, _x, _y)]
             plot(grp_key,_x,_y,to_save_plot=True)
 
-        fname = f"{self.log_name}-{plotsetting._x_axis}-{plotsetting._y_axis}" + ".gif"
-        fname = os.path.join(self.IMAGE_SAVE_FOLDER, fname)
+        fname = f"{self.log_name}-{plotsetting._x_axis}-{plotsetting._y_axis}-point" + ".gif"
+        fname = self.get_save_name(fname)
         gif.save(frames, fname, duration=plotsetting._duration)
         pass
 
-    def grad_plot_and_gif(self, df, plotsetting):
+    def grad_plot_and_gif(self, df, plotsetting:PlotSettings):
 
         plt.style.use(plotsetting._plot_style)
         gif.options.matplotlib["dpi"] = plotsetting._dpi
@@ -773,17 +800,18 @@ class Logger:
         gen_max = len(df_list)
         points_count = len(df_list[0])
         color_of_point = []
-        for i in range(len(points_count)):
+        for i in range(points_count):
             # give different color for each point
-            color_of_point += ['red']
+            color_of_point += plotsetting.color_names_proper[i%len(plotsetting.color_names_proper)]
 
         def _save_plot(title):
-            fname = title + f"-{plotsetting._x_axis}-{plotsetting._y_axis}"+ ".png"
-            fname = os.path.join(self.IMAGE_SAVE_FOLDER, fname)
-            plt.savefig(fname, plotsetting._dpi)
+            fname = title + f"-{plotsetting._x_axis}-{plotsetting._y_axis}-gard"+ ".png"
+            fname = self.get_save_name(fname)
+            plt.savefig(fname, dpi = plotsetting._dpi)
+            plt.show()
 
         @gif.frame
-        def plot(gen, to_save_plot = False):
+        def plot(gen,to_save_plot=False):
             fig, ax = plt.subplots()
             list_point_xs = []
             list_point_ys = []
@@ -793,9 +821,9 @@ class Logger:
                 list_point_ys += [[df_list[gg][plotsetting._y_axis][point] for gg in range(gen-1, gen+1)]]
                 metric += [((list_point_xs[-1][1]-list_point_xs[-1][0])**2+(list_point_ys[-1][1]-list_point_ys[-1][0])**2)**0.5]
             q25q75 = pd.DataFrame(metric).quantile([0.25,0.75])
-            
-            for p in range(len(points_count)):
-                if metric[p] > 2.5*q25q75[1]-1.5*q25q75[0]:
+
+            for p in range(points_count):
+                if metric[p] > 2.5*q25q75[0][0.75]-1.5*q25q75[0][0.25]:
                     continue
                 ax.plot(list_point_xs[p], list_point_ys[p],color=color_of_point[p])
                 if plotsetting._use_xyz_limits:
@@ -817,32 +845,94 @@ class Logger:
         for gen_i in range(1, gen_max-1):
             plot(gen_i,to_save_plot=True)
 
-        fname = f"{self.log_name}-{plotsetting._x_axis}-{plotsetting._y_axis}" + ".gif"
-        fname = os.path.join(self.IMAGE_SAVE_FOLDER, fname)
+        fname = f"{self.log_name}-{plotsetting._x_axis}-{plotsetting._y_axis}-grad" + ".gif"
+        fname = self.get_save_name(fname)
         gif.save(frames, fname, duration=plotsetting._duration)
         pass
 
-    # OLD CODES
-    def plot_scatter_LR(self, x_scale="linear", y_scale="linear", save=False, file_name="fig.png"):
-        sns.set_style("darkgrid")
-        sns.set_palette("bright")
-        x_label = "Reward"
-        y_label = "Loss"
-        ax = sns.scatterplot(x=self.list_R, y=self.list_L)
-        ax.set(xscale=x_scale, yscale=y_scale, xlabel=x_label, ylabel=y_label)
-        if save:
-            plt.savefig(file_name)
+    def combined_progress_plot(self, df_dict, plotsetting:PlotSettings):
+        # all combined plot
+        fig = plt.figure(figsize=plotsetting._plot_size)
+        ax = fig.add_subplot(111, projection='3d')
+        legends_list = []
+        counter_i = 0
+        for k, dfv in df_dict.items():
+            plotsetting.store_in_buffer(plotsetting._traj_color)
+            plotsetting._traj_color = plotsetting.color_names[counter_i%len(plotsetting.color_names)]
+            self.plot_trajectory_3d(dfv, ax, plotsetting)
+            plotsetting._traj_color = plotsetting.swap_buffer
+            legends_list += [f"{k}"]
+            counter_i+=1
+
+        # Set plot title and labels
+        title_name = f"All Methods Trajectories"
+
+        ax.set_title(title_name, fontsize=plotsetting._traj_font_size)
+        ax.set_xlabel(plotsetting._x_axis, fontsize=plotsetting._traj_font_size)
+        ax.set_ylabel(plotsetting._y_axis, fontsize=plotsetting._traj_font_size)
+        ax.set_zlabel(plotsetting._z_axis, fontsize=plotsetting._traj_font_size)
+
+        # Customize legend
+        if len(legends_list) > 0:
+            ax.legend(legends_list, fontsize=int(plotsetting._traj_font_size*0.5))
+
+        # customize the viewing angle
+        ax.view_init(elev=plotsetting._3d_plot_elev, azim=plotsetting._3d_plot_azim)
+
+        # Set plot size
+        if plotsetting._plot_size:
+            fig.set_size_inches(plotsetting._plot_size[0], plotsetting._plot_size[1])
+
+        plt.style.use(plotsetting._plot_style)
+        fname = title_name+".png"
+        fname = self.get_save_name(fname)
+        plt.savefig(fname, dpi=plotsetting._dpi)
         plt.show()
 
-    def distribution_plot(self, save=False, filename='distplot.png'):
-        fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(10, 4))
-        sns.set_style('whitegrid')
-        sns.distplot(self.list_R, label='Reward', ax=ax1)
-        ax1.set(title='Distribution of Rewards')
-        sns.distplot(self.list_L, label='Loss', ax=ax2)
-        ax2.set(title='Distribution of Loss')
-        ax1.legend()
-        ax2.legend()
-        if save:
-            plt.savefig(filename)
-        plt.show()
+        clst = ['R', '-logL', '-logO']
+        old_x_axis = plotsetting._x_axis
+        old_y_axis = plotsetting._y_axis
+        old_z_axis = plotsetting._z_axis
+        for i in range(len(clst)):
+            for j in range(i):
+                plotsetting._x_axis = clst[j]
+                plotsetting._y_axis = clst[i]
+                plotsetting._z_axis = clst[(6-i-j)%3]
+
+                # all combined plot
+                fig = plt.figure(figsize=plotsetting._plot_size)
+                ax = fig.add_subplot(111)
+                legends_list = []
+                counter_i = 0
+                for k, dfv in df_dict.items():
+                    plotsetting.store_in_buffer(plotsetting._traj_color)
+                    plotsetting._traj_color = plotsetting.color_names[counter_i%len(plotsetting.color_names)]
+                    self.plot_trajectory_2d(dfv, ax, plotsetting)
+                    plotsetting._traj_color = plotsetting.swap_buffer
+                    legends_list += [f"{k}"]
+                    counter_i+=1
+
+                title_name =  f"All Methods Trajectories {plotsetting._x_axis} {plotsetting._y_axis}"
+
+
+                ax.set_title(title_name, fontsize=plotsetting._traj_font_size)
+                ax.set_xlabel(plotsetting._x_axis, fontsize=plotsetting._traj_font_size)
+                ax.set_ylabel(plotsetting._y_axis, fontsize=plotsetting._traj_font_size)
+
+                # Customize legend
+                if len(legends_list) > 0:
+                    ax.legend(legends_list, fontsize=int(plotsetting._traj_font_size*0.5))
+
+                # Set plot size
+                if plotsetting._plot_size:
+                    fig.set_size_inches(plotsetting._plot_size[0], plotsetting._plot_size[1])
+
+                plt.style.use(plotsetting._plot_style)
+                plt.tight_layout()
+                fname = f"{title_name}.png"
+                fname = self.get_save_name(fname)
+                plt.savefig(fname, dpi=plotsetting._dpi)
+                plt.show()
+        plotsetting._x_axis = old_x_axis
+        plotsetting._y_axis = old_y_axis
+        plotsetting._z_axis = old_z_axis
